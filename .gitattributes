@@ -1,0 +1,6 @@
+* text eol=lf
+scripts/lib/* binary
+stylesheets/lib/* binary
+*.jpg binary
+*.png binary
+*.ico binary

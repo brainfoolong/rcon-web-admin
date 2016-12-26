@@ -1,2 +1,5 @@
-# rcon-web-admin
-Self hosted, online RCON administration tool for your server.
+# Rust Web Admin
+Online RCON console and web interface for your Rust server.
+
+# Work in progress
+No release yet.

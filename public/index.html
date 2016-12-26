@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport"
+          content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <link rel="stylesheet" type="text/css" href="stylesheets/lib/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/lib/bootstrap-select.min.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/page.css">
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/icon">
+    <script type="text/javascript" src="scripts/lib/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="scripts/lib/sockjs.min.js"></script>
+    <script type="text/javascript" src="scripts/global.js"></script>
+    <title>Rust Web Admin by BrainFooLong</title>
+</head>
+<body>
+
+<div id="wrapper">
+    <div class="overlay"></div>
+    <button type="button" class="hamburger is-closed"
+            data-toggle="offcanvas">
+        <span class="hamb-top"></span>
+        <span class="hamb-middle"></span>
+        <span class="hamb-bottom"></span>
+    </button>
+    <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
+        <ul class="nav sidebar-nav">
+            <li class="sidebar-brand">
+                <div><img src="images/logo.png">
+                </div>
+            </li>
+            <li>
+                <a href="#index" class="page-link" data-translate="dashboard"></a>
+            </li>
+            <li>
+                <a href="#servers" class="page-link" data-translate="servers.title"></a>
+            </li>
+            <li>
+                <a href="#settings" class="page-link" data-translate="settings"></a>
+            </li>
+            <li>
+                <a href="#users" class="page-link" data-translate="users.title"></a>
+            </li>
+            <li>
+                <a href="https://github.com/brainfoolong/rustwebadmin" target="_blank">Github</a>
+            </li>
+            <li>
+                <a href="https://github.com/brainfoolong/rustwebadmin/issues" target="_blank">Issues</a>
+            </li>
+            <li>
+                <a href="#logout" class="page-link" data-translate="logout"></a>
+            </li>
+        </ul>
+    </nav>
+    <div id="page-content-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <div class="spinner-container"></div>
+                    <div class="page-content">
+                        <span class="top-logo">
+                             <a href="https://github.com/brainfoolong/rustwebadmin"
+                                target="_blank" class="github">
+                                <strong>Rust Web Admin v<span data-variable="version"></span></strong>
+                                 <small>by BrainFooLong<span></span></small>
+                            </a>
+                            <a href="https://github.com/brainfoolong/rustwebadmin/releases/latest"
+                               class="update hidden" target="_blank">
+                                <small>Update is ready</small>
+                            </a>
+                        </span>
+                    </div>
+                    <script type="text/javascript">
+                        spinner(".spinner-container");
+                        $(".page-content").addClass("hidden");
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="scripts/lib/bootstrap.min.js"></script>
+<script type="text/javascript" src="scripts/lib/bootstrap-select.min.js"></script>
+<script type="text/javascript" src="scripts/lib/bootstrap-notify.min.js"></script>
+</body>
+</html>
