@@ -1,5 +1,4 @@
-# Rust Web Admin
-Online RCON console and web interface for your Rust server.
+# RCON Web Admin
 
 # Work in progress
-No release yet.
+No release yet, no function yet.

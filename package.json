@@ -1,13 +1,13 @@
 {
-  "author": "BrainFooLong (https://github.com/brainfoolong/rust-web-admin)",
-  "name": "rust-web-admin",
-  "description": "A responsive web interface for your rust server administration.",
+  "author": "BrainFooLong (https://github.com/brainfoolong/rcon-web-admin)",
+  "name": "rcon-web-admin",
+  "description": "Self hosted, online RCON administration tool for your server.",
   "version": "0.9.0",
   "license": "MIT",
   "main": "src/server.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/brainfoolong/rust-web-admin.git"
+    "url": "git://github.com/brainfoolong/rcon-web-admin.git"
   },
   "dependencies": {
     "express": "^4.14.0",

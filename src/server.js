@@ -18,13 +18,13 @@ const dbServers = Low(__dirname + '/../db/servers.json');
 dbServers.defaults({});
 
 /**
- * A single rust server instance
+ * A single server instance
  * @param {string} id
  * @param {object} serverData
  * @constructor
  */
-function RustServer(id, serverData) {
-    /** @type {RustServer} */
+function RconServer(id, serverData) {
+    /** @type {RconServer} */
     var self = this;
     /** @type {string} */
     this.id = id;
@@ -51,7 +51,7 @@ function RustServer(id, serverData) {
             self.con.disconnect();
         }
         self.connected = false;
-        RustServer.instances[id] = self;
+        RconServer.instances[id] = self;
     };
 
     /**
@@ -113,19 +113,19 @@ function RustServer(id, serverData) {
 
 /**
  * All opened server instances
- * @type {object<string, RustServer>}
+ * @type {object<string, RconServer>}
  */
-RustServer.instances = {};
+RconServer.instances = {};
 
 /**
  * Connect to each servers in our pool
  */
-RustServer.connectAll = function () {
+RconServer.connectAll = function () {
     var servers = dbServers.get().value();
     if (servers) {
         for (var id in servers) {
             if (servers.hasOwnProperty(id)) {
-                RustServer.get(id, function () {
+                RconServer.get(id, function () {
 
                 });
             }
@@ -137,27 +137,27 @@ RustServer.connectAll = function () {
  * Get the server instance for given id
  * Connect to server if not yet connected
  * @param {string} id
- * @param {RustServerCallback} callback
+ * @param {RconServerCallback} callback
  */
-RustServer.get = function (id, callback) {
-    if (typeof RustServer.instances[id] != "undefined") {
-        callback(RustServer.instances[id]);
+RconServer.get = function (id, callback) {
+    if (typeof RconServer.instances[id] != "undefined") {
+        callback(RconServer.instances[id]);
         return;
     }
     var serverData = dbServers.get(id).value();
     if (serverData) {
-        RustServer.instances[id] = new RustServer(id, serverData);
-        callback(RustServer.instances[id]);
+        RconServer.instances[id] = new RconServer(id, serverData);
+        callback(RconServer.instances[id]);
         return;
     }
     callback(null);
 };
 
-// connect to all rust servers and create an interval
-RustServer.connectAll();
+// connect to all servers and create an interval
+RconServer.connectAll();
 // check each x seconds connect to each server in the list
 // if already connected than nothing happen
-setInterval(RustServer.connectAll, 10000);
+setInterval(RconServer.connectAll, 10000);
 
 
 /**
@@ -269,7 +269,7 @@ var WebSocketUser = function (socket) {
                         self.getServerById(messageData.id, function (server) {
                             if (server) {
                                 server.removeInstance(true);
-                                RustServer.connectAll();
+                                RconServer.connectAll();
                                 sendCallback(true);
                                 return;
                             }
@@ -337,14 +337,14 @@ var WebSocketUser = function (socket) {
      * Get a server instance by id, only if this user is in the list of assigned users
      * Admins can get all server instances
      * @param {string} id
-     * @param {RustServerCallback} callback
+     * @param {RconServerCallback} callback
      */
     this.getServerById = function (id, callback) {
         if (self.userData === null) {
             callback(null);
             return;
         }
-        RustServer.get(id, function (server) {
+        RconServer.get(id, function (server) {
             if (!server) {
                 callback(null);
                 return;
@@ -380,7 +380,7 @@ WebSocketUser.ROLE_USER = 2;
 // here we have defined all possible callbacks just for the sake of IDE auto completion
 
 /**
- * RustServer Calback
- * @callback RustServerCallback
- * @param {RustServer|null} server
+ * RconServer Calback
+ * @callback RconServerCallback
+ * @param {RconServer|null} server
  */
