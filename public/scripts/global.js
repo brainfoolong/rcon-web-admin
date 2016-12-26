@@ -1,65 +1,55 @@
 "use strict";
 
-var rwa = {};
-
-// some values that will be set in the main layout view
-rwa.translations = {};
-rwa.language = "";
-rwa.rootUrl = "";
-rwa.settings = {};
-rwa.version = "";
-rwa.userWebsocketHash = "";
-
 /**
  * Socket connection stuff
  */
-rwa.socket = {};
+var Socket = {};
 
 /** @type {WebSocket} */
-rwa.socket.con = null;
+Socket.con = null;
 
 /** @type {function[]} */
-rwa.socket.callbacks = [];
+Socket.callbacks = [];
 
 /** @type {object} */
-rwa.socket.queue = [];
+Socket.queue = [];
 
 /** @type {object[]} */
-rwa.socket.onMessageEvents = {};
+Socket.onMessageEvents = {};
 
 /**
  * Bind a callback to be triggered everytime a message is received
  * @param {string} id Just an identifier to later use offMessage to remove this callback
  * @param {nodeMessageCallback} callback
  */
-rwa.socket.onMessage = function (id, callback) {
-    rwa.socket.onMessageEvents[id] = callback;
+Socket.onMessage = function (id, callback) {
+    Socket.onMessageEvents[id] = callback;
 };
 
 /**
  * Unbind a previously added callback with given event name
  * @param {string} id The identifier used in onMessage
  */
-rwa.socket.offMessage = function (id) {
-    rwa.socket.onMessageEvents[id] = null;
+Socket.offMessage = function (id) {
+    Socket.onMessageEvents[id] = null;
 };
 
 /**
  * Connect to websocket
- * @param {function} callback If connection is established
+ * @param {function=} callback If connection is established
  */
-rwa.socket.connect = function (callback) {
+Socket.connect = function (callback) {
     var con = new WebSocket('ws://localhost:4325');
     con.onopen = function () {
-        rwa.socket.con = con;
-        rwa.socket.send("init", null, function (messageData) {
-            callback(messageData);
+        Socket.con = con;
+        Socket.send("init", null, function (messageData) {
+            if (callback) callback(messageData);
             // send all messages in the queue
-            for (var i in rwa.socket.queue) {
-                var q = rwa.socket.queue[i];
-                rwa.socket.send(q.action, q.messageData, q.callback);
+            for (var i in Socket.queue) {
+                var q = Socket.queue[i];
+                Socket.send(q.action, q.messageData, q.callback);
             }
-            rwa.socket.queue = [];
+            Socket.queue = [];
         });
     };
 
@@ -73,12 +63,12 @@ rwa.socket.connect = function (callback) {
                 var data = JSON.parse(e.data);
                 if (data.action) {
                     if (typeof data.callbackId != "undefined") {
-                        rwa.socket.callbacks[data.callbackId](data.messageData);
-                        rwa.socket.callbacks[data.callbackId] = null;
+                        Socket.callbacks[data.callbackId](data.messageData);
+                        Socket.callbacks[data.callbackId] = null;
                     }
-                    for (var i in rwa.socket.onMessageEvents) {
-                        if (rwa.socket.onMessageEvents.hasOwnProperty(i)) {
-                            var cb = rwa.socket.onMessageEvents[i];
+                    for (var i in Socket.onMessageEvents) {
+                        if (Socket.onMessageEvents.hasOwnProperty(i)) {
+                            var cb = Socket.onMessageEvents[i];
                             if (typeof cb == "function") cb(data);
                         }
                     }
@@ -90,7 +80,7 @@ rwa.socket.connect = function (callback) {
     };
 
     con.onclose = function (e) {
-        rwa.socket.con = null;
+        Socket.con = null;
     };
 };
 
@@ -100,15 +90,15 @@ rwa.socket.connect = function (callback) {
  * @param {=object} messageData
  * @param {=function} callback
  */
-rwa.socket.send = function (action, messageData, callback) {
+Socket.send = function (action, messageData, callback) {
     if (!callback) callback = function () {
     };
     if (typeof messageData == "undefined") {
         messageData = null;
     }
     // if connection not yet established add to queue
-    if (rwa.socket.con === null) {
-        rwa.socket.queue.push({
+    if (Socket.con === null) {
+        Socket.queue.push({
             "action": action,
             "messageData": messageData,
             "callback": callback
@@ -117,101 +107,55 @@ rwa.socket.send = function (action, messageData, callback) {
     }
     var data = {
         "action": action,
-        "callbackId": rwa.socket.callbacks.length,
+        "callbackId": Socket.callbacks.length,
         "messageData": messageData,
-        "userWebsocketHash": rwa.userWebsocketHash
+        "login_name": Storage.get("login_name"),
+        "loing_hash": Storage.get("login_hash")
     };
-    rwa.socket.callbacks.push(callback);
-    rwa.socket.con.send(JSON.stringify(data));
+    Socket.callbacks.push(callback);
+    Socket.con.send(JSON.stringify(data));
 };
 
-$(document).ready(function () {
-
-    $.notify({
-        // options
-        message: 'Hello World'
-    },{
-        // settings
-        type: 'danger',
-        placement: {
-            from: "top",
-            align: "center"
-        },
-    });
-
-    // do some hamburger and navigation magic
-    var trigger = $('.hamburger'),
-        overlay = $('.overlay'),
-        isClosed = false;
-
-    trigger.click(function () {
-        hamburger_cross();
-    });
-
-    function hamburger_cross() {
-
-        if (isClosed == true) {
-            overlay.hide();
-            trigger.removeClass('is-open');
-            trigger.addClass('is-closed');
-            isClosed = false;
-        } else {
-            overlay.show();
-            trigger.removeClass('is-closed');
-            trigger.addClass('is-open');
-            isClosed = true;
-        }
-    }
-
-    $('[data-toggle="offcanvas"]').click(function () {
-        $('#wrapper').toggleClass('toggled');
-    });
-
-    // init selectpicker
-    $('.selectpicker').selectpicker();
-
-    // remove the page-container spinner and show content
-    $(".spinner-container").remove();
-    $(".page-content").removeClass("hidden");
-
-    checkForUpdate(function (data) {
-        if (data && data.version != rwa.version) {
-            $(".top-logo .update").removeClass("hidden");
-        }
-    });
-
-    // connect socket if user is online
-    if (rwa.userWebsocketHash.length) {
-        rwa.socket.connect(function () {
-
-        });
-    }
-});
+/**
+ * Storage handling
+ */
+var Storage = {};
 
 /**
- * Translate
- *
+ * Get data from storage
  * @param {string} key
- * @param {=object} parameters
- * @return string
+ * @param {boolean=} session
+ * @returns {*}
  */
-function t(key, parameters) {
-    var value = key;
-    if (typeof rwa.translations[rwa.language] !== "undefined"
-        && typeof rwa.translations[rwa.language][key] !== "undefined") {
-        value = rwa.translations[rwa.language][key];
+Storage.get = function (key, session) {
+    var storage = session ? sessionStorage : localStorage;
+    var value = storage.getItem(key);
+    return value !== null ? JSON.parse(value) : null;
+};
+
+/**
+ * Set data in storage
+ * @param {string} key
+ * @param {*} value
+ * @param {boolean=} session
+ */
+Storage.set = function (key, value, session) {
+    var storage = session ? sessionStorage : localStorage;
+    if (value === null) {
+        storage.removeItem(key);
     } else {
-        if (typeof rwa.translations["en"][key] !== "undefined") {
-            value = rwa.translations["en"][key];
-        }
+        storage.setItem(key, JSON.stringify(value))
     }
-    if (parameters) {
-        for (var i in parameters) {
-            value = value.replace(new RegExp("{" + i + "}", "ig"),
-                parameters[i]);
-        }
-    }
-    return value;
+};
+
+/**
+ * Just get a translation value for given key
+ * @param {string} key
+ * @param {object=} params
+ * @return {string}
+ */
+function t(key, params) {
+    return lang.get(key, params)
 }
 
 /**
@@ -228,37 +172,94 @@ function spinner(el) {
 }
 
 /**
- * Get url query parameter
- * @param {string} name
- * @returns {string}
+ * Show a note message on top
+ * @param {string} message
+ * @param {string=} type
  */
-function getParameterByName(name) {
-    var url = window.location.href;
-    name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-    if (!results) return "";
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
+function note(message, type) {
+    $.notify({
+        "message": message
+    }, {
+        "type": typeof type == "undefined" ? "info" : type,
+        placement: {
+            from: "top",
+            align: "center"
+        },
+    });
 }
 
 /**
- * Check for version update
- * @param {=function} callback
+ * Load a view
+ * @param {string} view
+ * @param {object=} messageData
+ * @param {function=} callback
  */
-function checkForUpdate(callback) {
-    $.getJSON(rwa.rootUrl + "/index.php/settings?check-update=1", callback);
+function loadView(view, messageData, callback) {
+    spinner("#content");
+    if (!messageData) {
+        messageData = {};
+    }
+    messageData.view = view;
+    Socket.send("view", messageData, function (viewData) {
+        console.log(viewData);
+        $.get("views/" + view + ".html", function (htmlData) {
+            var c = $("#content");
+            c.html(htmlData);
+            lang.replaceInHtml();
+            $('.selectpicker').selectpicker();
+            $.getJSON("views/" + view + ".js?callback=onLoad", function (viewResponseData) {
+                if (callback) callback(viewResponseData);
+            });
+        });
+    });
 }
 
-/**
- *
- * @type {{action: string, messageData: {}, callbackId: number}}
- */
-var data = {
-    action : "",
-    messageData : {},
-    callbackId : 1
-}
+$(document).ready(function () {
+    // do some hamburger and navigation magic
+    (function () {
+        var trigger = $('.hamburger'),
+            overlay = $('.overlay'),
+            isClosed = false;
+
+        trigger.click(function () {
+            hamburger_cross();
+        });
+
+        function hamburger_cross() {
+
+            if (isClosed == true) {
+                overlay.hide();
+                trigger.removeClass('is-open');
+                trigger.addClass('is-closed');
+                isClosed = false;
+            } else {
+                overlay.show();
+                trigger.removeClass('is-closed');
+                trigger.addClass('is-open');
+                isClosed = true;
+            }
+        }
+
+        $('[data-toggle="offcanvas"]').click(function () {
+            $('#wrapper').toggleClass('toggled');
+        });
+    })();
+
+    // connect socket if user is online
+    Socket.connect();
+
+    var view = "index";
+    if (window.location.hash) {
+        view = window.location.hash.substr(1);
+    }
+    loadView(view);
+});
+
+$(document).on("click", ".page-link", function () {
+    $(".hamburger.is-open").trigger("click");
+    var view = $(this).attr("href");
+    loadView(view.substr(1));
+});
 
 // here we have defined all possible callbacks just for the sake of IDE auto completion
 

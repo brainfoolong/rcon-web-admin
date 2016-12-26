@@ -6,16 +6,9 @@
 require(__dirname + "/routes");
 
 var fs = require("fs");
-var Low = require("lowdb");
+var Db = require(__dirname + "/db");
 var WebSocketServer = require("ws").Server;
 var Rcon = require(__dirname + "/rcon");
-
-const dbSettings = Low(__dirname + '/../db/settings.json');
-dbSettings.defaults({});
-const dbUsers = Low(__dirname + '/../db/users.json');
-dbUsers.defaults({});
-const dbServers = Low(__dirname + '/../db/servers.json');
-dbServers.defaults({});
 
 /**
  * A single server instance
@@ -121,7 +114,7 @@ RconServer.instances = {};
  * Connect to each servers in our pool
  */
 RconServer.connectAll = function () {
-    var servers = dbServers.get().value();
+    var servers = Db.get("servers").value();
     if (servers) {
         for (var id in servers) {
             if (servers.hasOwnProperty(id)) {
@@ -264,6 +257,12 @@ var WebSocketUser = function (socket) {
                 case "init":
                     sendCallback(self.userData !== null);
                     break;
+                case "view":
+                    var View = require(__dirname + "/views/" + messageData.view);
+                    View(self, messageData, function (viewData) {
+                        sendCallback(viewData);
+                    });
+                    break;
                 case "server-reload":
                     if (self.userData && self.userData.isAdmin) {
                         self.getServerById(messageData.id, function (server) {
@@ -309,14 +308,14 @@ var WebSocketUser = function (socket) {
 
         // everytime a request comes in, validate the user
         // after that go ahead with message processing
-        var users = dbUsers.get().value();
+        var users = Db.get("users").get().value();
         // invalidate userdata and check against stored users
         self.userData = null;
         if (users) {
             for (var id in users) {
                 if (users.hasOwnProperty(id)) {
                     var userData = users[id];
-                    if (userData.userWebsocketHash === responseData.userWebsocketHash) {
+                    if (userData.login_hash === responseData.login_hash && userData.username === responseData.login_name) {
                         self.userData = userData;
                         self.userData.isAdmin = self.userData.role === WebSocketUser.ROLE_ADMIN;
                         // add instance of this is a complete new user

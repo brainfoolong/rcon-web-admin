@@ -12,6 +12,10 @@
     <link rel="shortcut icon" href="images/favicon.ico" type="image/icon">
     <script type="text/javascript" src="scripts/lib/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" src="scripts/lib/sockjs.min.js"></script>
+    <script type="text/javascript" src="scripts/lib/bootstrap.min.js"></script>
+    <script type="text/javascript" src="scripts/lib/bootstrap-select.min.js"></script>
+    <script type="text/javascript" src="scripts/lib/bootstrap-notify.min.js"></script>
+    <script type="text/javascript" src="scripts/lang.js"></script>
     <script type="text/javascript" src="scripts/global.js"></script>
     <title>RCON Web Admin by BrainFooLong</title>
 </head>
@@ -58,7 +62,6 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2">
-                    <div class="spinner-container"></div>
                     <div class="page-content">
                         <span class="top-logo">
                              <a href="https://github.com/brainfoolong/rcon-web-admin"
@@ -71,18 +74,12 @@
                                 <small>Update is ready</small>
                             </a>
                         </span>
+                        <div id="content"></div>
                     </div>
-                    <script type="text/javascript">
-                        spinner(".spinner-container");
-                        $(".page-content").addClass("hidden");
-                    </script>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script type="text/javascript" src="scripts/lib/bootstrap.min.js"></script>
-<script type="text/javascript" src="scripts/lib/bootstrap-select.min.js"></script>
-<script type="text/javascript" src="scripts/lib/bootstrap-notify.min.js"></script>
 </body>
 </html>
