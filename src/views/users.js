@@ -13,7 +13,7 @@ var hash = require(__dirname + "/../hash");
 function View(user, messageData, callback) {
     var users = db.get("users").cloneDeep().value();
     var deeperCallback = function (sendMessageData) {
-        sendMessageData.users = users;
+        sendMessageData.users = db.get("users").cloneDeep().value();
         if(messageData.id){
             sendMessageData.editData = db.get("users").get(messageData.id).cloneDeep().value();
         }

@@ -9,12 +9,6 @@ var hash = require(__dirname + "/hash");
 var db = {};
 
 /**
- * Instances for files
- * @type {object<string, Low>}
- */
-db.instances = {};
-
-/**
  * The db defaults
  * @type {object<string, *>}
  * @private
@@ -31,11 +25,7 @@ db._defaults = {
  * @returns {Low}
  */
 db.get = function (file) {
-    if (typeof db.instances[file] != "undefined") {
-        //return db.instances[file];
-    }
     var inst = Low(__dirname + '/../db/' + file + '.json');
-    db.instances[file] = inst;
     // if getting settings than set some defaults
     if (typeof db._defaults[file] != "undefined") {
         inst.defaults(db._defaults[file]);

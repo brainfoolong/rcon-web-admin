@@ -60,6 +60,9 @@ View.load = function (view, messageData, callback) {
             if (!hashData.view || viewData.view != hashData.view) {
                 window.location.hash = "#" + viewData.view;
             }
+            if (viewData.redirect) {
+                window.location.hash = "#" + viewData.redirect;
+            }
             $.get("views/" + viewData.view + ".html", function (htmlData) {
                 c.html(htmlData);
                 // set body classes for login and admin checks

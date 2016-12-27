@@ -1,5 +1,6 @@
 "use strict";
-View.register("index", function (backendData) {
+View.register("index", function (messageData) {
+
     return;
     console.log("load");
     Socket.send("server-messages", {"id" : "6ea5cf8aaa5b6912b9858d00f5502764"}, function (data) {

@@ -66,6 +66,10 @@ function populateForm(form, data) {
 }
 
 $(document).ready(function () {
+    if(typeof WebSocket == "undefined"){
+        note("Your browser is not supported in this application (Outdated Browser). Please upgrade to the newest version");
+        return;
+    }
     // do some hamburger and navigation magic
     (function () {
         var trigger = $('.hamburger'),

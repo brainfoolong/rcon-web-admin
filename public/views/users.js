@@ -14,7 +14,7 @@ View.register("users", function (messageData) {
         messageData.editData.admin = messageData.editData ? "yes" : "no";
         populateForm($("form").filter("[name='users']"), messageData.editData);
     }
-    // write user to table
+    // write to table
     var tbody = $("table.data-table tbody");
     for (var i in messageData.users) {
         var user = messageData.users[i];
