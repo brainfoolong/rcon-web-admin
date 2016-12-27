@@ -42,7 +42,13 @@ lang.replaceInHtml = function () {
     el.each(function () {
         $(this).html(lang.get($(this).attr("data-translate")));
     });
-    el.removeAttr("data-translate");
+    el.removeAttr("data-translate-property");
+    el = $("body").find("[data-translate-property]");
+    el.each(function () {
+        var s = $(this).attr("data-translate-property").split(",");
+        $(this).attr(s[0], lang.get(s[1]));
+    });
+    el.removeAttr("data-translate-property");
 };
 
 /**
@@ -58,11 +64,10 @@ lang.values.en = {
     "users.username.info": "Only A-Z, Numbers, - and _ allowed",
     "users.password.title": "Password",
     "users.password.info": "Repeat it, will be saved as hash",
-    "users.role.title": "Role",
-    "users.role.info": "Admin can manage everything, User is only allowed to manage own assigned servers",
+    "users.admin.title": "Administrator",
+    "users.admin.info": "Admin can manage everything, User is only allowed to manage own assigned servers",
+    "users.error.pwmatch": "Password did not match",
     "users.missing.admin": "At least one administrator must exist in user database",
-    "user.role.1": "Administrator",
-    "user.role.2": "User",
     "settings": "Settings",
     "settings.language.title": "Language",
     "settings.language.desc": "Select the language for the web interface",
@@ -82,9 +87,11 @@ lang.values.en = {
     "servers.users.title": "Assigned users",
     "servers.users.info": "Usernames separated with comma, only the given user's will see this server",
     "delete.confirm": "Are you sure? This cannot be undone!",
-    "login.failed": "Login failed",
     "login.remember": "Remember me",
     "login.title": "Welcome",
+    "login.success": "Hello",
+    "login.failed": "Login failed",
+    "logout.title": "Bye bye",
     "logout": "Logout",
     "cancel": "Cancel",
     "save": "Save",
@@ -96,5 +103,7 @@ lang.values.en = {
     "submit": "Submit",
     "submitted": "Submitted",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "access.denied": "Access denied",
+    "socket.disconnect" : "Connection to backend closed, automatically trying to reconnect in 5 seconds..."
 };

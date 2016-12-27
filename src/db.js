@@ -1,34 +1,46 @@
 "use strict";
-/**
- * LowDB management
- */
 
 var Low = require("lowdb");
-const crypto = require('crypto');
+var hash = require(__dirname + "/hash");
 
-var Db = {};
+/**
+ * LowDB helper
+ */
+var db = {};
 
 /**
  * Instances for files
  * @type {object<string, Low>}
+ */
+db.instances = {};
+
+/**
+ * The db defaults
+ * @type {object<string, *>}
  * @private
  */
-Db._instances = {};
+db._defaults = {
+    "users": {},
+    "servers": {},
+    "settings": {"salt": hash.random(64)}
+};
 
 /**
  * Get lowdb instance
  * @param {string} file
  * @returns {Low}
  */
-Db.get = function (file) {
-    if (typeof Db._instances[file] != "undefined") {
-        return Db._instances[file];
+db.get = function (file) {
+    if (typeof db.instances[file] != "undefined") {
+        //return db.instances[file];
     }
     var inst = Low(__dirname + '/../db/' + file + '.json');
-    Db._instances[file] = inst;
+    db.instances[file] = inst;
     // if getting settings than set some defaults
-    inst.defaults({"salt": crypto.randomBytes(64).toString('hex')});
-    return Db._instances[file];
+    if (typeof db._defaults[file] != "undefined") {
+        inst.defaults(db._defaults[file]);
+    }
+    return inst;
 };
 
-module.exports = Db;
+module.exports = db;

@@ -448,3 +448,11 @@ h1 {
     padding: 5px;
     background: #62c462;
 }
+
+body.is-not-logged-in [data-role='login']{
+    display: none;
+}
+
+body.is-not-admin [data-role='admin']{
+    display: none;
+}

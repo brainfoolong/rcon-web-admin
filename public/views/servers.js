@@ -1,4 +1,4 @@
 "use strict";
-onLoad(function () {
+View.register("servers", function (backendData) {
 
-});
+})();

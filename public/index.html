@@ -16,6 +16,9 @@
     <script type="text/javascript" src="scripts/lib/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="scripts/lib/bootstrap-notify.min.js"></script>
     <script type="text/javascript" src="scripts/lang.js"></script>
+    <script type="text/javascript" src="scripts/socket.js"></script>
+    <script type="text/javascript" src="scripts/storage.js"></script>
+    <script type="text/javascript" src="scripts/view.js"></script>
     <script type="text/javascript" src="scripts/global.js"></script>
     <title>RCON Web Admin by BrainFooLong</title>
 </head>
@@ -35,16 +38,16 @@
                 <div><img src="images/logo.png">
                 </div>
             </li>
-            <li>
+            <li data-role="login">
                 <a href="#index" class="page-link" data-translate="dashboard"></a>
             </li>
-            <li>
+            <li data-role="admin">
                 <a href="#servers" class="page-link" data-translate="servers.title"></a>
             </li>
-            <li>
+            <li data-role="admin">
                 <a href="#settings" class="page-link" data-translate="settings"></a>
             </li>
-            <li>
+            <li data-role="admin">
                 <a href="#users" class="page-link" data-translate="users.title"></a>
             </li>
             <li>
@@ -53,7 +56,7 @@
             <li>
                 <a href="https://github.com/brainfoolong/rcon-web-admin/issues" target="_blank">Issues</a>
             </li>
-            <li>
+            <li data-role="login">
                 <a href="#logout" class="page-link" data-translate="logout"></a>
             </li>
         </ul>

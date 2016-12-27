@@ -6,9 +6,10 @@
 require(__dirname + "/routes");
 
 var fs = require("fs");
-var Db = require(__dirname + "/db");
+var db = require(__dirname + "/db");
 var WebSocketServer = require("ws").Server;
 var Rcon = require(__dirname + "/rcon");
+var pjson = require(__dirname + "/../package.json");
 
 /**
  * A single server instance
@@ -114,7 +115,7 @@ RconServer.instances = {};
  * Connect to each servers in our pool
  */
 RconServer.connectAll = function () {
-    var servers = Db.get("servers").value();
+    var servers = db.get("servers").value();
     if (servers) {
         for (var id in servers) {
             if (servers.hasOwnProperty(id)) {
@@ -250,21 +251,44 @@ var WebSocketUser = function (socket) {
         var verificationDone = function () {
             // just send a message to the user for the callback in the frontend
             var sendCallback = function (sendMessageData) {
+                if (!sendMessageData) sendMessageData = {};
+                if (!sendMessageData.sessionUserData && self.userData !== null) {
+                    sendMessageData.sessionUserData = {
+                        "username": self.userData.username,
+                        "loginHash": self.userData.loginHash,
+                        "admin": self.userData.admin
+                    };
+                }
                 self.send(responseData.action, sendMessageData, responseData.callbackId);
             };
             var messageData = responseData.messageData;
             switch (responseData.action) {
-                case "init":
-                    sendCallback(self.userData !== null);
-                    break;
                 case "view":
+                    if (!Object.keys(db.get("users").cloneDeep().value()).length) {
+                        // if no user exist, force user admin panel
+                        messageData.view = "users";
+                    } else if (self.userData === null) {
+                        // if not logged in, force login page
+                        messageData.view = "login";
+                    }
                     var View = require(__dirname + "/views/" + messageData.view);
                     View(self, messageData, function (viewData) {
+                        if (!viewData) viewData = {};
+                        viewData.view = messageData.view;
+                        if (viewData.redirect) {
+                            viewData.view = viewData.redirect;
+                        }
+                        if (messageData.form) {
+                            viewData.form = messageData.form;
+                        }
+                        if (messageData.btn) {
+                            viewData.btn = messageData.btn;
+                        }
                         sendCallback(viewData);
                     });
                     break;
                 case "server-reload":
-                    if (self.userData && self.userData.isAdmin) {
+                    if (self.userData && self.userData.admin) {
                         self.getServerById(messageData.id, function (server) {
                             if (server) {
                                 server.removeInstance(true);
@@ -303,30 +327,31 @@ var WebSocketUser = function (socket) {
                     self.socket = null;
                     self.userData = null;
                     break;
+                default:
+                    sendCallback();
+                    break;
             }
         };
 
         // everytime a request comes in, validate the user
         // after that go ahead with message processing
-        var users = Db.get("users").get().value();
+        var users = db.get("users").get().cloneDeep().value();
         // invalidate userdata and check against stored users
         self.userData = null;
-        if (users) {
-            for (var id in users) {
-                if (users.hasOwnProperty(id)) {
-                    var userData = users[id];
-                    if (userData.login_hash === responseData.login_hash && userData.username === responseData.login_name) {
-                        self.userData = userData;
-                        self.userData.isAdmin = self.userData.role === WebSocketUser.ROLE_ADMIN;
-                        // add instance of this is a complete new user
-                        if (self.id === null) {
-                            self.id = WebSocketUser.instances.length;
-                            WebSocketUser.instances.push(self);
-                        }
-                        verificationDone();
-                        return;
-                    }
+        if (responseData.loginHash && responseData.loginName) {
+            var userData = db.get("users").find({
+                "username": responseData.loginName,
+                "loginHash": responseData.loginHash
+            }).cloneDeep().value();
+            if (userData) {
+                self.userData = userData;
+                // add instance of this is a complete new user
+                if (self.id === null) {
+                    self.id = WebSocketUser.instances.length;
+                    WebSocketUser.instances.push(self);
                 }
+                verificationDone();
+                return;
             }
         }
         verificationDone();
@@ -348,7 +373,7 @@ var WebSocketUser = function (socket) {
                 callback(null);
                 return;
             }
-            if (self.userData.isAdmin) {
+            if (self.userData && self.userData.admin) {
                 callback(server);
                 return;
             }
@@ -371,10 +396,6 @@ var WebSocketUser = function (socket) {
  * @type []
  */
 WebSocketUser.instances = [];
-
-// the user roles
-WebSocketUser.ROLE_ADMIN = 1;
-WebSocketUser.ROLE_USER = 2;
 
 // here we have defined all possible callbacks just for the sake of IDE auto completion
 

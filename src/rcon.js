@@ -1,12 +1,12 @@
 "use strict";
-/**
- * RCON socket connection
- */
 
 var net = require("net");
 var events = require("events");
 
-var Rcon = function (host, port) {
+/**
+ * RCON socket connection
+ */
+function Rcon(host, port) {
     events.EventEmitter.call(this);
 
     /**

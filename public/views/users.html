@@ -1,1 +1,48 @@
-Dashboard
+<h1 data-translate="users.title"></h1>
+<form name="users">
+    <div class="title spacer">
+        <strong data-translate="users.username.title"></strong>
+        <small data-translate="users.username.info"></small>
+    </div>
+    <div class="spacer">
+        <input type="text" pattern="[A-Za-z0-9-_]+" name="username" class="form-control" required>
+    </div>
+
+    <div class="title spacer">
+        <strong data-translate="users.password.title"></strong>
+        <small data-translate="users.password.info"></small>
+    </div>
+    <div class="spacer">
+        <input type="password" name="password1" class="form-control">
+        <input type="password" name="password2" class="form-control">
+    </div>
+
+    <div class="title spacer">
+        <strong data-translate="users.admin.title"></strong>
+        <small data-translate="users.admin.info"></small>
+    </div>
+    <div class="spacer">
+        <select name="admin" class="selectpicker">
+            <option value="no" data-translate="no"></option>
+            <option value="yes" data-translate="yes"></option>
+        </select>
+    </div>
+
+    <span data-name="save" data-translate="save" class="btn btn-default btn-info submit-form"></span>
+    <span data-name="delete" data-translate="delete" class="btn btn-danger btn-info submit-form hidden"></span>
+    <a href="#users" class="btn page-link" data-translate="cancel"></a>
+</form>
+
+<div class="spacer"></div>
+
+<table class="table table-bordered table-striped data-table">
+    <thead>
+    <tr>
+        <th data-translate="users.username.title"></th>
+        <th data-translate="users.admin.title"></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
