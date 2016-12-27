@@ -27,14 +27,14 @@ WebSocketMgr.startServer = function () {
                     try {
                         user.onMessage(JSON.parse(message));
                     } catch (e) {
-                        console.error(e);
+                        console.trace(e);
                     }
                 });
                 ws.on("close", function () {
                     try {
                         user.onMessage({"action": "closed"});
                     } catch (e) {
-                        console.error(e);
+                        console.trace(e);
                     }
                 });
             });
@@ -45,7 +45,7 @@ WebSocketMgr.startServer = function () {
             });
         }
     } catch (e) {
-        console.error(e);
+        console.trace(e);
     }
 };
 

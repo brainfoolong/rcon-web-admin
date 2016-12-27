@@ -149,6 +149,11 @@ Rcon.prototype.send = function (cmd, callback, type) {
 Rcon.prototype.disconnect = function () {
     if (!this.socket) return false;
     this.socket.removeAllListeners();
+    // blind error handler, we don't care about those error's anymore
+    // if we don't add this, it will result in uncatched error
+    this.socket.on("error", function () {
+
+    });
     this.socket.end();
     this.socket = null;
     this.emit("disconnect");

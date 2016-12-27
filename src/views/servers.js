@@ -34,8 +34,7 @@ var View = function (user, messageData, callback) {
             db.get("servers").setState(servers);
             deeperCallback({
                 "note": ["deleted", "success"],
-                "redirect": "servers",
-                "resetForm": true
+                "redirect": "servers"
             });
         });
         return;
@@ -60,11 +59,14 @@ var View = function (user, messageData, callback) {
         if (messageData.id) {
             user.getServerById(messageData.id, function (server) {
                 if (server) {
+                    server.con.on("disconnect", function () {
+                        RconServer.connectAll();
+                    });
                     server.removeInstance(true);
-                    RconServer.connectAll();
                 }
             });
         }
+        messageData.id = null;
         deeperCallback({
             "note": ["saved", "success"],
             "redirect": "servers"

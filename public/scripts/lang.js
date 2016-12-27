@@ -96,10 +96,11 @@ lang.values.en = {
     "login.failed": "Login failed",
     "logout.title": "Bye bye",
     "logout": "Logout",
-    "index.pickserver" : "Pick a server",
-    "index.pickwidget" : "Pick a widget",
+    "index.pickserver": "Pick a server",
+    "index.pickwidget": "Pick a widget",
     "cancel": "Cancel",
     "save": "Save",
+    "save.edited": "Save edited data",
     "saved": "Saved",
     "delete": "Delete",
     "deleted": "Deleted",
@@ -109,7 +110,7 @@ lang.values.en = {
     "submitted": "Submitted",
     "yes": "Yes",
     "no": "No",
-    "sure" : "Are you sure?",
+    "sure": "Are you sure?",
     "access.denied": "Access denied",
-    "socket.disconnect" : "Connection to backend closed, automatically trying to reconnect in 5 seconds..."
+    "socket.disconnect": "Connection to backend closed, automatically trying to reconnect in 5 seconds..."
 };

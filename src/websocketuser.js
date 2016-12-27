@@ -63,7 +63,7 @@ function WebSocketUser(socket) {
             var messageData = responseData.messageData;
             switch (responseData.action) {
                 case "view":
-                    if (!Object.keys(db.get("users").cloneDeep().value()).length) {
+                    if (!db.get("users").size().value()) {
                         // if no user exist, force user admin panel
                         messageData.view = "users";
                     } else if (self.userData === null) {

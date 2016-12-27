@@ -22,13 +22,15 @@ View.register = function (name, handler) {
 
 /**
  * Get view data by current hash
+ * @param {string=} hash
  * @returns {{view: string, messageData: *}}
  */
-View.getViewDataByHash = function () {
+View.getViewDataByHash = function (hash) {
     var messageData = null;
     var view = null;
-    if (window.location.hash) {
-        view = window.location.hash.substr(1);
+    hash = hash || window.location.hash;
+    if (hash) {
+        view = hash.substr(1);
         var viewSplit = view.split("-");
         view = viewSplit[0];
         if (viewSplit[1]) {
@@ -39,12 +41,32 @@ View.getViewDataByHash = function () {
 };
 
 /**
+ * Change current hash in url, using pushState to be later able to detect back button
+ * @param {string} newHash
+ */
+View.changeHash = function (newHash) {
+    if (window.location.hash != "#" + newHash) {
+        history.pushState({hash: newHash}, null, window.location.href.replace(/\#.*/ig, "") + "#" + newHash);
+    }
+};
+
+/**
+ * Get json message string for use in html links
+ * @param {object} data
+ * @returns {string}
+ */
+View.getJsonMessage = function (data) {
+    return btoa(JSON.stringify(data));
+};
+
+/**
  * Load given view
  * @param {string} view
  * @param {object=} messageData
  * @param {function=} callback
  */
 View.load = function (view, messageData, callback) {
+    var initialMessageData = messageData;
     if (!messageData) messageData = {};
     messageData.view = view;
     var c = $("#content");
@@ -55,13 +77,15 @@ View.load = function (view, messageData, callback) {
             note(viewData.note[0], viewData.note[1]);
         }
         var loadCallback = function () {
-            // change hash if view is different
-            var hashData = View.getViewDataByHash();
-            if (!hashData.view || viewData.view != hashData.view) {
-                window.location.hash = "#" + viewData.view;
-            }
+            var hash = viewData.view;
+            // only change the hash if no form data has been sent back or if redirect is given
             if (viewData.redirect) {
-                window.location.hash = "#" + viewData.redirect;
+                View.changeHash(viewData.redirect);
+            } else if (!viewData.form) {
+                if (!viewData.form && initialMessageData) {
+                    hash = hash + "-" + View.getJsonMessage(initialMessageData);
+                }
+                View.changeHash(hash);
             }
             $.get("views/" + viewData.view + ".html", function (htmlData) {
                 c.html(htmlData);

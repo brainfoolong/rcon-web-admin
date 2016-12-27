@@ -12,15 +12,17 @@ var hash = require(__dirname + "/../hash");
  */
 function View(user, messageData, callback) {
     var users = db.get("users").cloneDeep().value();
+    var usersCount = db.get("users").size().value();
     var deeperCallback = function (sendMessageData) {
         sendMessageData.users = db.get("users").cloneDeep().value();
-        if(messageData.id){
+        if (messageData.id) {
             sendMessageData.editData = db.get("users").get(messageData.id).cloneDeep().value();
+            sendMessageData.editData.admin = sendMessageData.editData.admin ? "yes" : "no";
         }
         callback(sendMessageData);
     }
     // access denied if users are in database and user is not admin
-    if (Object.keys(users).length && (!user.userData || !user.userData.admin)) {
+    if (usersCount && (!user.userData || !user.userData.admin)) {
         callback({redirect: "index", "note": ["access.denied", "danger"]});
         return;
     }
@@ -31,7 +33,7 @@ function View(user, messageData, callback) {
         var hasAdmin = formData.admin == "yes";
         if (!hasAdmin) {
             for (var userId in users) {
-                if (users.hasOwnProperty(userId)) {
+                if (userId != id && users.hasOwnProperty(userId)) {
                     if (users[userId].admin) {
                         hasAdmin = true;
                         break;
@@ -56,12 +58,13 @@ function View(user, messageData, callback) {
         userData.admin = formData.admin == "yes";
         userData.loginHash = hash.random(64);
         db.get("users").set(id, userData).value();
+        messageData.id = null;
         deeperCallback({
             "sessionUserData": {"username": userData.username, "loginHash": userData.loginHash},
             "login": !user.userData || user.userData.id == id,
-            "initial" : Object.keys(users).length == 0,
+            "initial": usersCount == 0,
             "note": ["saved", "success"],
-            "resetForm": true
+            "redirect": "users"
         });
         return;
     }

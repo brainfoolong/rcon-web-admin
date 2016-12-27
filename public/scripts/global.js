@@ -66,7 +66,7 @@ function populateForm(form, data) {
 }
 
 $(document).ready(function () {
-    if(typeof WebSocket == "undefined"){
+    if (typeof WebSocket == "undefined") {
         note("Your browser is not supported in this application (Outdated Browser). Please upgrade to the newest version");
         return;
     }
@@ -113,9 +113,9 @@ $(document).on("click", ".page-link", function (ev) {
     var hash = $(this).attr("href").substr(1);
     if ($(this).attr("data-message")) {
         messageData = JSON.parse(atob($(this).attr("data-message")));
-        window.location.hash = "#" + hash + "-" + $(this).attr("data-message");
+        View.changeHash(hash + "-" + $(this).attr("data-message"));
     } else {
-        window.location.hash = "#" + hash;
+        View.changeHash(hash);
     }
     View.load(hash, messageData);
 }).on("click", ".submit-form", function () {
@@ -144,8 +144,8 @@ $(document).on("click", ".page-link", function (ev) {
         }
         // send data to view
         View.load(view, messageData, function (viewData) {
-            // just filling data back into form if request does not do reset the form
-            if (!viewData.resetForm) {
+            // just filling data back into form if no redirect is going on
+            if (!viewData.redirect) {
                 populateForm($("#content").find("form").filter("[name='" + name + "']"), data);
             }
         });
@@ -153,6 +153,14 @@ $(document).on("click", ".page-link", function (ev) {
         // on validation error trigger a fake submit button to enable validation UI popup
         $(this).after('<input type="submit">');
         $(this).next().trigger("click").remove();
+    }
+});
+
+$(window).on("popstate", function (ev) {
+    // if the state is the page you expect, pull the name and load it.
+    if (ev.originalEvent.state && ev.originalEvent.state.hash) {
+        var hashData = View.getViewDataByHash("#" + ev.originalEvent.state.hash);
+        View.load(hashData.view, hashData.messageData);
     }
 });
 

@@ -28,7 +28,7 @@ var View = function (user, messageData, callback) {
                 return;
             }
         }
-        callback({"note": ["login.failed", "danger"], "resetForm": true});
+        callback({"note": ["login.failed", "danger"], "redirect": "login"});
         return;
     }
     callback({});

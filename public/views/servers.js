@@ -1,6 +1,8 @@
 "use strict";
 View.register("servers", function (messageData) {
     if (messageData.editData) {
+        $(".btn.save").removeClass("btn-info").addClass("btn-success").attr("data-translate", "save.edited");
+        $(".btn.cancel").removeClass("hidden");
         populateForm($("form").filter("[name='servers']"), messageData.editData);
         $(".btn.delete").removeClass("hidden").on("click", function (ev) {
             if (!confirm(t("sure"))) {
@@ -17,7 +19,7 @@ View.register("servers", function (messageData) {
             '<td>' + server.name + '</td>' +
             '<td>' + server.port + '</td>' +
             '<td>' + server.rcon_port + '</td>' +
-            '<td><a href="#servers" data-message="' + btoa(JSON.stringify({id: server.id})) + '" data-translate="edit" ' +
+            '<td><a href="#servers" data-message="' + View.getJsonMessage({id: server.id}) + '" data-translate="edit" ' +
             'class="btn btn-info btn-sm page-link"></a></td>' +
             '</tr>');
     }

@@ -21,7 +21,7 @@ function RconServer(id, serverData) {
     /** @type {boolean} */
     this.connected = false;
     /** @type {{timestamp:string, message : string}} */
-    this.messages = []
+    this.messages = [];
 
     // require this here to not get a loop because websocketuser itself require the RconServer module
     var WebSocketUser = require(__dirname + "/websocketuser");
@@ -39,6 +39,7 @@ function RconServer(id, serverData) {
         if (disconnect) {
             self.con.disconnect();
         }else{
+            self.con = null;
             self.connected = false;
             delete RconServer.instances[self.id];
         }
@@ -53,7 +54,7 @@ function RconServer(id, serverData) {
         if (this.connected) {
             this.con.send(cmd, function (err, result) {
                 if (err) {
-                    console.error(err);
+                    console.trace(err);
                     callback(false);
                     return;
                 }
@@ -66,18 +67,24 @@ function RconServer(id, serverData) {
 
     this.con.connect(function (err) {
         if (err) {
-            console.error(err);
+            console.trace(err);
             return;
         }
+        // authenticate
         self.con.send(self.serverData.rcon_password, function (err) {
-
             if (err) {
-                console.error(err);
+                console.trace(err);
                 return;
             }
             self.connected = true;
         }, Rcon.SERVERDATA_AUTH);
 
+        // catch errors
+        self.con.on("error", function (err) {
+            console.trace(err);
+        });
+
+        // on receive message
         self.con.on("message", function (data) {
             var str = data.body.toString();
             if (str && str.length) {
@@ -89,7 +96,7 @@ function RconServer(id, serverData) {
                 self.messages = self.messages.slice(-200);
                 // push this message to all connected clients that have access to this server
                 for (var i in WebSocketUser.instances) {
-                    const user = WebSocketUser.instances[i];
+                    var user = WebSocketUser.instances[i];
                     user.getServerById(self.id, function (server) {
                         if (server) {
                             user.send("server-message", msg);
