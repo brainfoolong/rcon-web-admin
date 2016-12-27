@@ -43,9 +43,9 @@ function WebSocketUser(socket) {
 
     /**
      * On receive message from socket
-     * @param {object} responseData
+     * @param {object} frontendData
      */
-    this.onMessage = function (responseData) {
+    this.onMessage = function (frontendData) {
         // this will be called when message verification is done
         var verificationDone = function () {
             // just send a message to the user for the callback in the frontend
@@ -58,10 +58,11 @@ function WebSocketUser(socket) {
                         "admin": self.userData.admin
                     };
                 }
-                self.send(responseData.action, sendMessageData, responseData.callbackId);
+                self.send(frontendData.action, sendMessageData, frontendData.callbackId);
             };
-            var messageData = responseData.messageData;
-            switch (responseData.action) {
+            var messageData = frontendData.messageData;
+            var server = frontendData.server ? self.getServerById(frontendData.server) : null;
+            switch (frontendData.action) {
                 case "view":
                     if (!db.get("users").size().value()) {
                         // if no user exist, force user admin panel
@@ -86,40 +87,21 @@ function WebSocketUser(socket) {
                         sendCallback(viewData);
                     });
                     break;
-                case "server-reload":
-                    if (self.userData && self.userData.admin) {
-                        self.getServerById(messageData.id, function (server) {
-                            if (server) {
-                                server.removeInstance(true);
-                                RconServer.connectAll();
-                                sendCallback(true);
-                                return;
-                            }
-                            sendCallback(false);
-                        });
+                case "server-messages":
+                    if (server) {
+                        sendCallback(server.messages);
                         return;
                     }
                     sendCallback(false);
                     break;
-                case "server-messages":
-                    self.getServerById(messageData.id, function (server) {
-                        if (server) {
-                            sendCallback(server.messages);
-                            return;
-                        }
-                        sendCallback(false);
-                    });
-                    break;
                 case "cmd":
-                    self.getServerById(messageData.id, function (server) {
-                        if (server) {
-                            server.send(messageData.cmd, function (serverMessage) {
-                                sendCallback(serverMessage);
-                            });
-                            return;
-                        }
-                        sendCallback(false);
-                    });
+                    if (server) {
+                        server.send(messageData.cmd, function (serverMessage) {
+                            sendCallback(serverMessage);
+                        });
+                        return;
+                    }
+                    sendCallback(false);
                     break;
                 case "closed":
                     delete WebSocketUser.instances[self.id];
@@ -137,10 +119,10 @@ function WebSocketUser(socket) {
         var users = db.get("users").get().cloneDeep().value();
         // invalidate userdata and check against stored users
         self.userData = null;
-        if (responseData.loginHash && responseData.loginName) {
+        if (frontendData.loginHash && frontendData.loginName) {
             var userData = db.get("users").find({
-                "username": responseData.loginName,
-                "loginHash": responseData.loginHash
+                "username": frontendData.loginName,
+                "loginHash": frontendData.loginHash
             }).cloneDeep().value();
             if (userData) {
                 self.userData = userData;
@@ -160,33 +142,31 @@ function WebSocketUser(socket) {
      * Get a server instance by id, only if this user is in the list of assigned users
      * Admins can get all server instances
      * @param {string} id
-     * @param {RconServerCallback} callback
+     * @return {RconServer|null}
      */
-    this.getServerById = function (id, callback) {
-        if (self.userData === null) {
-            callback(null);
-            return;
+    this.getServerById = function (id) {
+        if (!id) {
+            return null;
         }
-        RconServer.get(id, function (server) {
-            if (!server) {
-                callback(null);
-                return;
-            }
-            if (self.userData && self.userData.admin) {
-                callback(server);
-                return;
-            }
-            var users = server.serverData.users.split(",");
-            if (users) {
-                for (var id in users) {
-                    if (users[id] == self.userData.username) {
-                        callback(server);
-                        return;
-                    }
+        if (self.userData === null) {
+            return null;
+        }
+        var server = RconServer.get(id);
+        if (!server) {
+            return null;
+        }
+        if (self.userData && self.userData.admin) {
+            return server;
+        }
+        var users = server.serverData.users.split(",");
+        if (users) {
+            for (var id in users) {
+                if (users[id] == self.userData.username) {
+                    return server;
                 }
             }
-            callback(null);
-        });
+        }
+        return null;
     };
 }
 

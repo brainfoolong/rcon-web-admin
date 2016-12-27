@@ -29,7 +29,7 @@ function Rcon(host, port) {
 
     /**
      * Callback store.
-     * @type {Object.<number, function>}
+     * @type {Object.<number, object>}
      */
     this.callbacks = {};
 
@@ -110,8 +110,8 @@ Rcon.prototype.connect = function (callback) {
 /**
  * Send a commant to the server
  * @param {string|Buffer} cmd Command to execute
+ * @param {function} callback Callback
  * @param {number=} type Message type
- * @param {function=} callback Callback
  */
 Rcon.prototype.send = function (cmd, callback, type) {
     if (typeof type !== 'number') {
@@ -129,7 +129,10 @@ Rcon.prototype.send = function (cmd, callback, type) {
         cmd = new Buffer(cmd, "ascii");
     }
     if (callback) {
-        this.callbacks[this.packetId] = callback;
+        this.callbacks[this.packetId] = {
+            "callback" : callback,
+            "type" : type
+        };
     }
     // write request
     this.socket.write(this._pack(this.packetId, type, cmd));
@@ -178,14 +181,15 @@ Rcon.prototype._data = function () {
         // handle multiple packets and callbacks
         if (this.callbacks.hasOwnProperty(id)) {
             var cb = this.callbacks[id];
-            delete this.callbacks[id];
-            if (type == Rcon.SERVERDATA_AUTH_RESPONSE) {
+            if (type == Rcon.SERVERDATA_AUTH_RESPONSE && cb.type == Rcon.SERVERDATA_AUTH) {
+                delete this.callbacks[id];
                 // if we get an auth response just callback
                 if (cb.callback) cb.callback(null);
-            } else if (type == Rcon.SERVERDATA_RESPONSE_VALUE) {
+            } else if (type == Rcon.SERVERDATA_RESPONSE_VALUE && cb.type == Rcon.SERVERDATA_EXECCOMMAND) {
                 // if we receive an empty body with this type of request than all messages have been collected and
                 // can be sent to callback
                 if (body.equals(this.emptyBuffer)) {
+                    delete this.callbacks[id];
                     if (cb.callback) cb.callback(this.bodyBuffer);
                     this.bodyBuffer = new Buffer(0);
                 } else {

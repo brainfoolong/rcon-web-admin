@@ -14,24 +14,15 @@ Socket.callbacks = [];
 /** @type {object} */
 Socket.queue = [];
 
-/** @type {object[]} */
-Socket.onMessageEvents = {};
+/** @type {[]} */
+Socket.onMessageEvents = [];
 
 /**
  * Bind a callback to be triggered everytime a message is received
- * @param {string} id Just an identifier to later use offMessage to remove this callback
  * @param {nodeMessageCallback} callback
  */
-Socket.onMessage = function (id, callback) {
-    Socket.onMessageEvents[id] = callback;
-};
-
-/**
- * Unbind a previously added callback with given event name
- * @param {string} id The identifier used in onMessage
- */
-Socket.offMessage = function (id) {
-    Socket.onMessageEvents[id] = null;
+Socket.onMessage = function (callback) {
+    Socket.onMessageEvents.push(callback);
 };
 
 /**

@@ -97,11 +97,10 @@ function RconServer(id, serverData) {
                 // push this message to all connected clients that have access to this server
                 for (var i in WebSocketUser.instances) {
                     var user = WebSocketUser.instances[i];
-                    user.getServerById(self.id, function (server) {
-                        if (server) {
-                            user.send("server-message", msg);
-                        }
-                    });
+                    var server = user.getServerById(self.id);
+                    if(server){
+                        user.send("server-message", msg);
+                    }
                 }
             }
         });
@@ -121,9 +120,7 @@ RconServer.connectAll = function () {
     var servers = db.get("servers").value();
     if (servers) {
         for (var i in servers) {
-            RconServer.get(servers[i].id, function () {
-
-            });
+            RconServer.get(servers[i].id);
         }
     }
 };
@@ -132,20 +129,18 @@ RconServer.connectAll = function () {
  * Get the server instance for given id
  * Connect to server if not yet connected
  * @param {string} id
- * @param {RconServerCallback} callback
+ * @return {RconServer|null}
  */
-RconServer.get = function (id, callback) {
+RconServer.get = function (id) {
     if (RconServer.instances[id]) {
-        callback(RconServer.instances[id]);
-        return;
+        return RconServer.instances[id];
     }
     var serverData = db.get("servers").get(id).cloneDeep().value();
     if (serverData) {
         RconServer.instances[id] = new RconServer(id, serverData);
-        callback(RconServer.instances[id]);
-        return;
+        return RconServer.instances[id];
     }
-    callback(null);
+    return null;
 };
 
 // connect to all servers and create an interval
@@ -153,12 +148,5 @@ RconServer.connectAll();
 // check each x seconds connect to each server in the list
 // if already connected than nothing happen
 setInterval(RconServer.connectAll, 10000);
-
-// here we have defined all possible callbacks just for the sake of IDE auto completion
-/**
- * RconServer Calback
- * @callback RconServerCallback
- * @param {RconServer|null} server
- */
 
 module.exports = RconServer;

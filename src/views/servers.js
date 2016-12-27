@@ -25,9 +25,11 @@ var View = function (user, messageData, callback) {
         callback(sendMessageData);
     }
     var servers = null;
+    var server = null;
     // on delete
     if (messageData.form == "servers" && messageData.btn == "delete") {
-        RconServer.get(messageData.id, function (server) {
+        server = RconServer.get(messageData.id);
+        if (server) {
             server.removeInstance(true);
             servers = db.get("servers").getState();
             delete servers[messageData.id];
@@ -36,7 +38,7 @@ var View = function (user, messageData, callback) {
                 "note": ["deleted", "success"],
                 "redirect": "servers"
             });
-        });
+        }
         return;
     }
     // on save
@@ -57,14 +59,13 @@ var View = function (user, messageData, callback) {
 
         // reload server if edited
         if (messageData.id) {
-            user.getServerById(messageData.id, function (server) {
-                if (server) {
-                    server.con.on("disconnect", function () {
-                        RconServer.connectAll();
-                    });
-                    server.removeInstance(true);
-                }
-            });
+            server = user.getServerById(messageData.id);
+            if (server) {
+                server.con.on("disconnect", function () {
+                    RconServer.connectAll();
+                });
+                server.removeInstance(true);
+            }
         }
         messageData.id = null;
         deeperCallback({
