@@ -65,6 +65,30 @@ function populateForm(form, data) {
     });
 }
 
+/**
+ * Escape html characters for secure dom injection
+ * @param {string} string
+ * @return {string}
+ */
+function escapeHtml(string) {
+    return String(string).replace(/[&<>"'\/]/g, function (s) {
+        return escapeHtml.map[s];
+    });
+}
+
+/**
+ * The escape html mapping
+ * @type {{}}
+ */
+escapeHtml.map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': '&quot;',
+    "'": '&#39;',
+    "/": '&#x2F;'
+};
+
 $(document).ready(function () {
     if (typeof WebSocket == "undefined") {
         note("Your browser is not supported in this application (Outdated Browser). Please upgrade to the newest version");
@@ -103,59 +127,6 @@ $(document).ready(function () {
     Socket.connectAndLoadView();
 });
 
-// delegate events
-$(document).on("click", ".page-link", function (ev) {
-    // onclick pagelink
-    ev.stopPropagation();
-    ev.preventDefault();
-    $(".hamburger.is-open").trigger("click");
-    var messageData = null;
-    var hash = $(this).attr("href").substr(1);
-    if ($(this).attr("data-message")) {
-        messageData = JSON.parse(atob($(this).attr("data-message")));
-        View.changeHash(hash + "-" + $(this).attr("data-message"));
-    } else {
-        View.changeHash(hash);
-    }
-    View.load(hash, messageData);
-}).on("click", ".submit-form", function () {
-    // onclick form submit btn
-    var f = $(this).closest("form");
-    var name = f.attr("name");
-    if (f[0].checkValidity()) {
-        var data = {};
-        var formData = f.serializeArray();
-        for (var i in formData) {
-            data[formData[i].name] = formData[i].value;
-        }
-        var view = f.attr("data-view");
-        var messageData = {
-            "form": name,
-            "btn": $(this).attr("data-name"),
-            "formData": data
-        };
-        // if view not given, just use the current view
-        if (!view) {
-            var hashData = View.getViewDataByHash();
-            view = hashData.view;
-            if (hashData.messageData) {
-                $.extend(messageData, hashData.messageData);
-            }
-        }
-        // send data to view
-        View.load(view, messageData, function (viewData) {
-            // just filling data back into form if no redirect is going on
-            if (!viewData.redirect) {
-                populateForm($("#content").find("form").filter("[name='" + name + "']"), data);
-            }
-        });
-    } else {
-        // on validation error trigger a fake submit button to enable validation UI popup
-        $(this).after('<input type="submit">');
-        $(this).next().trigger("click").remove();
-    }
-});
-
 $(window).on("popstate", function (ev) {
     // if the state is the page you expect, pull the name and load it.
     if (ev.originalEvent.state && ev.originalEvent.state.hash) {
@@ -168,6 +139,6 @@ $(window).on("popstate", function (ev) {
 
 /**
  * Node Message Callback
- * @callback nodeMessageCallback
+ * @callback NodeMessageCallback
  * @param {{action: string, messageData: *, callbackId: =int}} responseData
  */

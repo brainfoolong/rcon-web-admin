@@ -1,6 +1,7 @@
 "use strict";
 
 var db = require(__dirname + "/db");
+var hash = require(__dirname + "/hash");
 
 /**
  * A single websocket user
@@ -61,7 +62,7 @@ function WebSocketUser(socket) {
                 self.send(frontendData.action, sendMessageData, frontendData.callbackId);
             };
             var messageData = frontendData.messageData;
-            var server = frontendData.server ? self.getServerById(frontendData.server) : null;
+            var server = messageData && messageData.server ? self.getServerById(messageData.server) : null;
             switch (frontendData.action) {
                 case "view":
                     if (!db.get("users").size().value()) {
@@ -87,17 +88,25 @@ function WebSocketUser(socket) {
                         sendCallback(viewData);
                     });
                     break;
-                case "server-messages":
+                case "server-log":
                     if (server) {
-                        sendCallback(server.messages);
+                        server.logRoll();
+                        var logData = server.getLogData().toString();
+                        if (messageData.limit) {
+                            logData = logData.split("\n");
+                            logData = logData.slice(-messageData.limit);
+                            logData = logData.join("\n");
+                        }
+                        sendCallback({"log": logData});
                         return;
                     }
                     sendCallback(false);
                     break;
                 case "cmd":
                     if (server) {
-                        server.send(messageData.cmd, function (serverMessage) {
-                            sendCallback(serverMessage);
+                        server.send(messageData.cmd, self.userData.username, function (serverMessage) {
+                            server.logMessage("> " + messageData.cmd, self.userData.username);
+                            sendCallback({"message": serverMessage});
                         });
                         return;
                     }

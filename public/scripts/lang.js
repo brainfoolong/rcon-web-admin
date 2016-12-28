@@ -97,7 +97,8 @@ lang.values.en = {
     "logout.title": "Bye bye",
     "logout": "Logout",
     "index.pickserver": "Pick a server",
-    "index.pickwidget": "Pick a widget",
+    "index.addwidget": "Add a widget",
+    "widget.delete": "Delete this widget",
     "cancel": "Cancel",
     "save": "Save",
     "save.edited": "Save edited data",
@@ -110,6 +111,8 @@ lang.values.en = {
     "submitted": "Submitted",
     "yes": "Yes",
     "no": "No",
+    "on": "On",
+    "off": "Off",
     "sure": "Are you sure?",
     "access.denied": "Access denied",
     "socket.disconnect": "Connection to backend closed, automatically trying to reconnect in 5 seconds..."

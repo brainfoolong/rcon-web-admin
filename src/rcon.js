@@ -28,10 +28,16 @@ function Rcon(host, port) {
     this.packetId = 1;
 
     /**
-     * Callback store.
-     * @type {Object.<number, object>}
+     * The auth callback
+     * @type {function|null}
      */
-    this.callbacks = {};
+    this.authCallback = null;
+
+    /**
+     * Callback store.
+     * @type object[]
+     */
+    this.callbacks = [];
 
     /**
      * RCON connection.
@@ -49,7 +55,7 @@ function Rcon(host, port) {
      * The received body buffer
      * @type string
      */
-    this.bodyBuffer = "";
+    this.bodyBuffer = new Buffer(0);
 
     /**
      * Just an empty buffer to compare
@@ -60,11 +66,11 @@ function Rcon(host, port) {
 
 Rcon.prototype = Object.create(events.EventEmitter.prototype);
 
-Rcon.SERVERDATA_RUSTLOG = 4;
-Rcon.SERVERDATA_AUTH = 3;
+Rcon.SERVERDATA_RESPONSE_VALUE = 0;
 Rcon.SERVERDATA_AUTH_RESPONSE = 2;
 Rcon.SERVERDATA_EXECCOMMAND = 2;
-Rcon.SERVERDATA_RESPONSE_VALUE = 0;
+Rcon.SERVERDATA_AUTH = 3;
+Rcon.SERVERDATA_LOG = 4;
 
 /**
  * Get next packetid
@@ -110,10 +116,12 @@ Rcon.prototype.connect = function (callback) {
 /**
  * Send a commant to the server
  * @param {string|Buffer} cmd Command to execute
+ * @param {string} server
+ * @param {string|null} username
  * @param {function} callback Callback
  * @param {number=} type Message type
  */
-Rcon.prototype.send = function (cmd, callback, type) {
+Rcon.prototype.send = function (cmd, server, username, callback, type) {
     if (typeof type !== 'number') {
         type = Rcon.SERVERDATA_EXECCOMMAND;
     }
@@ -128,21 +136,29 @@ Rcon.prototype.send = function (cmd, callback, type) {
     if (!Buffer.isBuffer(cmd)) {
         cmd = new Buffer(cmd, "ascii");
     }
-    if (callback) {
-        this.callbacks[this.packetId] = {
-            "callback" : callback,
-            "type" : type
-        };
+    // for auth request we handle a special callback
+    if (type == Rcon.SERVERDATA_AUTH) {
+        this.authCallback = callback;
+    } else {
+        if (callback) {
+            this.callbacks.push({
+                "id": this.packetId,
+                "server": server,
+                "callback": callback,
+                "username": username
+            });
+        }
     }
     // write request
     this.socket.write(this._pack(this.packetId, type, cmd));
     this.packetId = this.nextPacketId();
 
-    // send an empty request to detect message boundings
-    if (type !== Rcon.SERVERDATA_AUTH) {
+    // write extra empty request to be able to find multipart message boundings
+    if (type != Rcon.SERVERDATA_AUTH) {
         this.socket.write(this._pack(this.packetId, Rcon.SERVERDATA_RESPONSE_VALUE, new Buffer(0)));
         this.packetId = this.nextPacketId();
     }
+
 };
 
 /**
@@ -178,33 +194,29 @@ Rcon.prototype._data = function () {
         var type = this.dataBuffer.readInt32LE(8);
         var body = this.dataBuffer.slice(12, 4 + size - 2);
 
-        // handle multiple packets and callbacks
-        if (this.callbacks.hasOwnProperty(id)) {
-            var cb = this.callbacks[id];
-            if (type == Rcon.SERVERDATA_AUTH_RESPONSE && cb.type == Rcon.SERVERDATA_AUTH) {
-                delete this.callbacks[id];
-                // if we get an auth response just callback
-                if (cb.callback) cb.callback(null);
-            } else if (type == Rcon.SERVERDATA_RESPONSE_VALUE && cb.type == Rcon.SERVERDATA_EXECCOMMAND) {
-                // if we receive an empty body with this type of request than all messages have been collected and
-                // can be sent to callback
-                if (body.equals(this.emptyBuffer)) {
-                    delete this.callbacks[id];
-                    if (cb.callback) cb.callback(this.bodyBuffer);
-                    this.bodyBuffer = new Buffer(0);
-                } else {
-                    // just collect messages for the body buffer
-                    this.bodyBuffer = Buffer.concat([this.bodyBuffer, body]);
-                }
+        this.bodyBuffer = Buffer.concat([this.bodyBuffer, body]);
+        if (type == Rcon.SERVERDATA_AUTH_RESPONSE) {
+            if (this.authCallback) this.authCallback(id !== -1);
+        } else if (type == Rcon.SERVERDATA_RESPONSE_VALUE && body.length === 0) {
+            if (this.callbacks.length) {
+                var cb = this.callbacks.shift();
+                cb.callback(this.bodyBuffer);
+                //var RconServer = require(__dirname + "/rconserver");
+                //var server = RconServer.get(cb.server);
+                // if (this.bodyBuffer.length) server.logMessage(this.bodyBuffer.toString(), cb.username);
+                this.bodyBuffer = new Buffer(0);
+                //this.dataBuffer = this.dataBuffer.slice(4 + size, this.dataBuffer.length);
+                //continue;
             }
         }
-        // just pipe each raw body to the event listener
+        // just pipe each not catched raw body to the event listener
         this.emit("message", {
             size: size,
             id: id,
             type: type,
             body: body
         });
+
         // reduce buffer and go ahead in while
         this.dataBuffer = this.dataBuffer.slice(4 + size, this.dataBuffer.length);
     }

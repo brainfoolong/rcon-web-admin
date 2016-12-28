@@ -1,0 +1,26 @@
+.widget-console .console {
+    max-height: 300px;
+    font-size: 90%;
+    white-space: pre-wrap;
+    overflow: auto;
+    margin-bottom: 10px;
+}
+.widget-console .console .message{
+    padding:5px;
+}
+
+.widget-console .console .message .timestamp{
+    color:#999;
+    font-size: 90%;
+}
+
+.widget-console .console .message:nth-child(2n) {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius:3px;
+}
+
+.widget-console .message .match{
+    background: white;
+    color:#2ac7d2;
+    border-radius:3px;
+}

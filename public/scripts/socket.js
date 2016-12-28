@@ -19,10 +19,20 @@ Socket.onMessageEvents = [];
 
 /**
  * Bind a callback to be triggered everytime a message is received
- * @param {nodeMessageCallback} callback
+ * @param {NodeMessageCallback} callback
  */
 Socket.onMessage = function (callback) {
     Socket.onMessageEvents.push(callback);
+};
+/**
+ * Unbind a callback
+ * @param {NodeMessageCallback} callback
+ */
+Socket.offMessage = function (callback) {
+    var index = Socket.onMessageEvents.indexOf(callback);
+    if(index > -1){
+        Socket.onMessageEvents.slice(index, 1);
+    }
 };
 
 /**
@@ -118,8 +128,8 @@ Socket.connectAndLoadView = function () {
 /**
  * Send a command to the backend
  * @param {string} action
- * @param {=object} messageData
- * @param {=function} callback
+ * @param {object=} messageData
+ * @param {function=} callback
  */
 Socket.send = function (action, messageData, callback) {
     if (!callback) callback = function () {

@@ -3,18 +3,233 @@
 /**
  * Widget Management
  */
-var Widget = {};
+function Widget(name) {
+    /** @type {Widget} */
+    var self = this;
+    /** @type {string} */
+    this.server = "";
+    /** @type {string} */
+    this.name = name;
+    /** @type {string} */
+    this.name = name;
+    /** @type {string} */
+    this.id = "";
+    /** @type {NodeMessageCallback[]} */
+    this.socketMessageHandlers = [];
+    /** @type {jQuery} */
+    this.container = null;
+    /** @type {jQuery} */
+    this.content = null;
+    /** @type {object} */
+    this.data = null;
+
+    /**
+     * On widget init
+     */
+    this.onInit = function () {
+        console.error("Please override 'onInit' function of widget " + this.name);
+    };
+
+    /**
+     * On widget update
+     */
+    this.onUpdate = function () {
+        console.error("Please override 'onUpdate' function of widget " + this.name);
+    };
+
+    /**
+     * On widget option update
+     * @param {string} key
+     * @param {*} value
+     */
+    this.onOptionUpdate = function (key, value) {
+        console.error("Please override 'onOptionUpdate' function of widget " + this.name);
+    };
+
+    /**
+     * Bind a callback when the server send a message
+     * @param {WidgetOnMessageCallback} callback
+     */
+    this.onMessage = function (callback) {
+        var socketCallback = function (data) {
+            if (data.action == "server-message" && self.server == data.messageData.server) {
+                callback(data.messageData.message, new Date(data.messageData.timestamp));
+            }
+        };
+        Socket.onMessage(socketCallback);
+        this.socketMessageHandlers.push(socketCallback);
+    };
+
+    /**
+     * Send a raw command to the server
+     * @param {string} action
+     * @param {object=} messageData
+     * @param {function=} callback
+     */
+    this.send = function (action, messageData, callback) {
+        if (!messageData) messageData = {};
+        messageData.server = self.server;
+        Socket.send(action, messageData, function (data) {
+            if (callback) callback(data);
+        });
+    };
+
+    /**
+     * Send a rcon command to the server
+     * @param {string} cmd
+     * @param {function=} callback
+     */
+    this.cmd = function (cmd, callback) {
+        this.send("cmd", {"cmd": cmd}, function (data) {
+            if (callback) callback(data.message);
+        });
+    };
+
+    /**
+     * Get a locale translation value from widgets manifest
+     * @param {string} key
+     * @param {object=} params
+     * @return {string}
+     */
+    this.t = function (key, params) {
+        var v = key;
+        var locale = self.data.manifest.locale;
+        if (!locale) {
+            return key;
+        }
+        if (typeof locale[lang.language] != "undefined" && typeof locale[lang.language][key] != "undefined") {
+            v = locale[lang.language][key];
+        } else if (typeof locale["en"] != "undefined" && typeof locale["en"][key] != "undefined") {
+            v = locale["en"][key];
+        }
+        if (typeof params != "undefined") {
+            for (var i in params) {
+                if (params.hasOwnProperty(i)) {
+                    v = v.replace(new RegExp("{" + i + "}", "ig"), params[i]);
+                }
+            }
+        }
+        return v;
+    };
+
+    /**
+     * Set an option value
+     * @param {string} key
+     * @param {*} value
+     * @param {function=} callback
+     */
+    this.setOptionValue = function (key, value, callback) {
+        var option = this.data.manifest.options[key];
+        if (option) {
+            if (option.type == "switch") value = value === "1" || value === true;
+            if (option.type == "number") value = parseFloat(value);
+            this.send("view", {
+                "view": "index",
+                "action": "widget",
+                "widget": this.id,
+                "type": "option",
+                "option": key,
+                "value": value
+            }, function () {
+                if(callback) callback();
+                self.data.options[key] = value;
+                self.onOptionUpdate(key, value);
+            });
+        }
+    };
+
+    /**
+     * Get value of a defined manifest option
+     * @param {string} key
+     * @returns {*|null} Null if not found
+     */
+    this.getOptionValue = function (key) {
+        if (self.data.options && typeof self.data.options[key] != "undefined") {
+            return self.data.options[key];
+        }
+        if (self.data.manifest.options && typeof self.data.manifest.options[key] != "undefined") {
+            return self.data.manifest.options[key].default;
+        }
+        return null;
+    };
+
+    /**
+     * Delete the widget and drop all data and handlers
+     */
+    this.remove = function () {
+        for (var i in this.socketMessageHandlers) {
+            Socket.offMessage(this.socketMessageHandlers[i]);
+        }
+        delete Widget.widgets[this.id];
+        this.container.remove();
+    };
+}
 
 /**
- * All registeres widgets
- * @type {[]}
+ * The register callback
+ * @type {WidgetRegisterCallback|null}
  */
-Widget.widgets = [];
+Widget.registerCallback = null;
 
 /**
- * Register a widget handler
- * @param {function} handler
+ * All widgets
+ * @type {{string: Widget}}
  */
-Widget.register = function (handler) {
-    Widget.widgets.push(handler);
+Widget.widgets = {};
+
+/**
+ * Get widget by given html element
+ * @param {string|jQuery} el
+ * @return {Widget|null}
+ */
+Widget.getByElement = function (el) {
+    var w = $(el).closest(".widget");
+    if (w.length) {
+        if (typeof Widget.widgets[w.attr("id")] != "undefined") {
+            return Widget.widgets[w.attr("id")];
+        }
+    }
+    return null;
 };
+
+/**
+ * Register a callback
+ * @param {WidgetRegisterCallback} callback
+ */
+Widget.register = function (callback) {
+    Widget.registerCallback = callback;
+};
+
+/**
+ * The timeout for a option change
+ * @type {number}
+ */
+Widget._optionChangeTimeout = null;
+
+// delegate events
+$(document).on("click", ".widget .widget-options-icon", function () {
+    var w = $(this).closest(".widget");
+    w.find(".widget-options").toggleClass("hidden");
+    w.find(".widget-content").toggleClass("hidden");
+}).on("input change", ".widget-options .option :input", function () {
+    var e = $(this);
+    clearTimeout(Widget._optionChangeTimeout);
+    Widget._optionChangeTimeout = setTimeout(function () {
+        var widget = Widget.getByElement(e);
+        var id = e.closest(".option").attr("data-id");
+        widget.setOptionValue(id, e.val());
+    }, 300);
+});
+
+/**
+ * Widget Register Callback
+ * @callback WidgetRegisterCallback
+ * @param {Widget} widget
+ */
+
+/**
+ * Widget OnMessage Callback
+ * @callback WidgetOnMessageCallback
+ * @param {string} message
+ * @param {Date} timestamp
+ */

@@ -14,9 +14,10 @@ var db = {};
  * @private
  */
 db._defaults = {
-    "users": {},
     "servers": {},
-    "settings": {"salt": hash.random(64)}
+    "settings": {},
+    "users": {},
+    "widgets": {"array" : []}
 };
 
 /**
@@ -28,7 +29,10 @@ db.get = function (file) {
     var inst = Low(__dirname + '/../db/' + file + '.json');
     // if getting settings than set some defaults
     if (typeof db._defaults[file] != "undefined") {
-        inst.defaults(db._defaults[file]);
+        if(file == "settings"){
+            db._defaults[file].salt = hash.random(64);
+        }
+        inst.defaults(db._defaults[file]).value();
     }
     return inst;
 };

@@ -6,6 +6,12 @@
 var View = {};
 
 /**
+ * The most recent loaded view
+ * @type {string}
+ */
+View.current = "";
+
+/**
  * All registeres views
  * @type {object}
  */
@@ -76,7 +82,7 @@ View.load = function (view, messageData, callback) {
         if (viewData.note) {
             note(viewData.note[0], viewData.note[1]);
         }
-        var loadCallback = function () {
+        var loadCallback = function (firstLoad) {
             var hash = viewData.view;
             // only change the hash if no form data has been sent back or if redirect is given
             if (viewData.redirect) {
@@ -88,6 +94,7 @@ View.load = function (view, messageData, callback) {
                 View.changeHash(hash);
             }
             $.get("views/" + viewData.view + ".html", function (htmlData) {
+                View.current = viewData.view;
                 c.html(htmlData);
                 // set body classes for login and admin checks
                 var b = $("body");
@@ -103,7 +110,7 @@ View.load = function (view, messageData, callback) {
                     b.addClass("is-not-logged-in is-not-admin");
                 }
                 // load view
-                View.views[viewData.view](viewData);
+                View.views[viewData.view](viewData, firstLoad);
                 if (callback) callback(viewData);
                 // replace language keys
                 lang.replaceInHtml();
@@ -112,9 +119,64 @@ View.load = function (view, messageData, callback) {
             });
         };
         if (typeof View.views[viewData.view] == "undefined") {
-            $.getScript("views/" + viewData.view + ".js", loadCallback);
+            $.getScript("views/" + viewData.view + ".js", function () {
+                loadCallback(true);
+            });
         } else {
-            loadCallback();
+            loadCallback(false);
         }
     });
 };
+
+// delegate events
+$(document).on("click", ".page-link", function (ev) {
+    // onclick pagelink
+    ev.stopPropagation();
+    ev.preventDefault();
+    $(".hamburger.is-open").trigger("click");
+    var messageData = null;
+    var hash = $(this).attr("href").substr(1);
+    if ($(this).attr("data-message")) {
+        messageData = JSON.parse(atob($(this).attr("data-message")));
+        View.changeHash(hash + "-" + $(this).attr("data-message"));
+    } else {
+        View.changeHash(hash);
+    }
+    View.load(hash, messageData);
+}).on("click", ".submit-form", function () {
+    // onclick form submit btn
+    var f = $(this).closest("form");
+    var name = f.attr("name");
+    if (f[0].checkValidity()) {
+        var data = {};
+        var formData = f.serializeArray();
+        for (var i in formData) {
+            data[formData[i].name] = formData[i].value;
+        }
+        var view = f.attr("data-view");
+        var messageData = {
+            "form": name,
+            "btn": $(this).attr("data-name"),
+            "formData": data
+        };
+        // if view not given, just use the current view
+        if (!view) {
+            var hashData = View.getViewDataByHash();
+            view = hashData.view;
+            if (hashData.messageData) {
+                $.extend(messageData, hashData.messageData);
+            }
+        }
+        // send data to view
+        View.load(view, messageData, function (viewData) {
+            // just filling data back into form if no redirect is going on
+            if (!viewData.redirect) {
+                populateForm($("#content").find("form").filter("[name='" + name + "']"), data);
+            }
+        });
+    } else {
+        // on validation error trigger a fake submit button to enable validation UI popup
+        $(this).after('<input type="submit">');
+        $(this).next().trigger("click").remove();
+    }
+});

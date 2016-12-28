@@ -1,3 +1,29 @@
 {
-  "version": "0.9.0"
+  "name": "console",
+  "version": "0.9.0",
+  "compatibleGames": "all",
+  "options": {
+    "limit": {
+      "type": "switch",
+      "default": false
+    },
+    "limitNr": {
+      "type": "number",
+      "default": 200,
+      "min": 0,
+      "max": 99999,
+      "step": 1
+    }
+  },
+  "locale": {
+    "en": {
+      "title": "Console",
+      "option.limit.title": "Limit messages",
+      "option.limit.info": "Just display the last x messages (defined with next option), if disabled than the full log will be loaded (max. 1 MegaByte)",
+      "option.limitNr.title": "Number of messages",
+      "option.limitNr.info": "Any number you like",
+      "input.search" : "Search in the rcon console log",
+      "input.cmd" : "Execute a rcon command, press enter"
+    }
+  }
 }
