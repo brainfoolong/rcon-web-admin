@@ -27,11 +27,6 @@ function RconServer(id, serverData) {
     // require this here to not get a loop because websocketuser itself require the RconServer module
     var WebSocketUser = require(__dirname + "/websocketuser");
 
-    // on disconnect remove server from instances
-    this.con.on("disconnect", function () {
-        self.removeInstance();
-    });
-
     /**
      * Temove this instance from server list
      * @param {boolean=} disconnect If true also do call disconnect
@@ -54,7 +49,7 @@ function RconServer(id, serverData) {
      */
     this.send = function (cmd, username, callback) {
         if (this.connected) {
-            this.con.send(cmd, self.id, username, function (result) {
+            this.con.send(cmd, username, function (result) {
                 callback(result.toString());
             });
             return;
@@ -98,27 +93,28 @@ function RconServer(id, serverData) {
 
     /**
      * Log message to disk and notify each connected user
-     * @param {string} message
-     * @param {string=} username
+     * @param {object} data
      */
-    this.logMessage = function (message, username) {
-        var msg = {
-            "server": self.id,
-            "timestamp": new Date().toString(),
-            "message": message,
-            "username": username
-        };
+    this.logMessage = function (data) {
+        if (typeof data.body != "string") data.body = data.body.toString();
+        data.timestamp = new Date().toString();
+        data.server = self.id;
         // push this message to all connected clients that have access to this server
         for (var i in WebSocketUser.instances) {
             var user = WebSocketUser.instances[i];
             var server = user.getServerById(self.id);
             if (server) {
-                user.send("server-message", msg);
+                user.send("server-message", data);
             }
         }
         // log to disk
-        fs.appendFileSync(this.serverLogFile, JSON.stringify(msg) + "\n", "utf8");
+        fs.appendFileSync(this.serverLogFile, JSON.stringify(data) + "\n", "utf8");
     };
+
+    // on disconnect remove server from instances
+    this.con.on("disconnect", function () {
+        self.removeInstance();
+    });
 
     // connect to server
     this.con.connect(function (err) {
@@ -127,7 +123,9 @@ function RconServer(id, serverData) {
             return;
         }
         // authenticate
-        self.con.send(self.serverData.rcon_password, self.id, null, function (success) {
+        self.logMessage({"body": "Rcon authentication by rcon web admin..."});
+        self.con.send(self.serverData.rcon_password, null, function (success) {
+            self.logMessage({"body": "Rcon authentication " + (success ? "successfull" : "invalid")});
             if (!success) {
                 console.error("Invalid rcon password for server " + self.serverData.name + ":" + self.serverData.rcon_port);
                 return;
@@ -142,9 +140,8 @@ function RconServer(id, serverData) {
 
         // on receive message
         self.con.on("message", function (data) {
-            var str = data.body.toString();
-            if (str && str.length) {
-                self.logMessage(str);
+            if (data.body.length) {
+                self.logMessage(data);
             }
         });
     });

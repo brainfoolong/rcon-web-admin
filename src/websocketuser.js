@@ -104,8 +104,11 @@ function WebSocketUser(socket) {
                     break;
                 case "cmd":
                     if (server) {
+                        server.logMessage({
+                            "body": "> " + messageData.cmd,
+                            "username": self.userData.username
+                        });
                         server.send(messageData.cmd, self.userData.username, function (serverMessage) {
-                            server.logMessage("> " + messageData.cmd, self.userData.username);
                             sendCallback({"message": serverMessage});
                         });
                         return;

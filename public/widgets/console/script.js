@@ -16,21 +16,21 @@ Widget.register(function (widget) {
 
     /**
      * Add a message to console
-     * @param {string} message
-     * @param {Date} timestamp
-     * @param {string=} username
+     * @param {object} log
      */
-    var addMessage = function (message, timestamp, username) {
+    var addMessage = function (log) {
+        if (widget.getOptionValue("hideUserCommands") && (log.username)) return;
+        if (widget.getOptionValue("hideServerLogs") && (log.type === 4)) return;
         var e = $('<div class="message">' +
             '<div class="timestamp"></div>' +
             '<div class="text"></div>' +
             '</div>'
         );
-        var tsText = timestamp.toLocaleString();
-        if (username) tsText += " | " + username;
-        e.find(".text").html(escapeHtml(message));
+        var tsText = new Date(log.timestamp).toLocaleString();
+        if (log.username) tsText += '<span class="username"><span class="glyphicon glyphicon-user"></span> ' + log.username + '</span>';
+        e.find(".text").html(escapeHtml(log.body));
         e.find(".timestamp").html(tsText);
-        e.data("text", message).data("timestamp", tsText);
+        e.data("text", log.body).data("timestamp", tsText);
         consoleEl.append(e);
         setTimeout(function () {
             var elem = consoleEl[0];
@@ -51,8 +51,7 @@ Widget.register(function (widget) {
             var logData = messageData.log.split("\n");
             for (var i in logData) {
                 try {
-                    var m = JSON.parse(logData[i]);
-                    addMessage(m.message, new Date(m.timestamp), m.username);
+                    addMessage(JSON.parse(logData[i]));
                 } catch (e) {
 
                 }
@@ -65,10 +64,6 @@ Widget.register(function (widget) {
      */
     widget.onInit = function () {
         // get all available command and list in the cmd select
-        widget.cmd("status", function (message) {
-            // console.log(message);
-        });
-
         widget.content.on("keydown", ".cmd input", function (ev) {
             if (ev.keyCode == 9) {
                 ev.preventDefault();
@@ -78,9 +73,9 @@ Widget.register(function (widget) {
             if (ev.keyCode == 27) {
                 this.value = "";
             }
-            console.log(ev.keyCode);
             if (ev.keyCode == 13) {
-
+                widget.cmd(this.value);
+                this.value = "";
             }
         });
         widget.content.on("input", ".search input", function () {
@@ -154,7 +149,7 @@ Widget.register(function (widget) {
      * @param {*} value
      */
     widget.onOptionUpdate = function (key, value) {
-        if (key == "limit" || key == "limitNr") {
+        if (key == "limit" || key == "limitNr" || key == "hideUserCommands") {
             reloadServerLog();
         }
     };

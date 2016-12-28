@@ -481,8 +481,7 @@ body.is-not-admin [data-role='admin'] {
     top: 10px;
     width: 24px;
     height: 24px;
-    background: url(../images/icons/ic_settings_white_24px.svg);
-    background-size: contain;
+    font-size: 24px;
     opacity: 0.5;
     cursor: pointer;
     transition: 0.4s;
@@ -490,4 +489,5 @@ body.is-not-admin [data-role='admin'] {
 
 .widget .widget-options-icon:hover {
     opacity: 1;
+    transform:rotate(90deg);
 }

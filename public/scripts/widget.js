@@ -48,12 +48,12 @@ function Widget(name) {
 
     /**
      * Bind a callback when the server send a message
-     * @param {WidgetOnMessageCallback} callback
+     * @param {function} callback
      */
     this.onMessage = function (callback) {
         var socketCallback = function (data) {
             if (data.action == "server-message" && self.server == data.messageData.server) {
-                callback(data.messageData.message, new Date(data.messageData.timestamp));
+                callback(data.messageData);
             }
         };
         Socket.onMessage(socketCallback);
@@ -225,11 +225,4 @@ $(document).on("click", ".widget .widget-options-icon", function () {
  * Widget Register Callback
  * @callback WidgetRegisterCallback
  * @param {Widget} widget
- */
-
-/**
- * Widget OnMessage Callback
- * @callback WidgetOnMessageCallback
- * @param {string} message
- * @param {Date} timestamp
  */

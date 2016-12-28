@@ -51,9 +51,9 @@ View.register("index", function (messageData, firstLoad) {
                                 var optionsEl = widget.container.find(".widget-options .options");
                                 for (var i in widget.data.manifest.options) {
                                     var option = widget.data.manifest.options[i];
-                                    var optionEl = $("#content").find(".templates .option." + option.type);
-                                    optionEl.attr("data-id", i);
+                                    var optionEl = $("#content").find(".templates .option." + option.type).clone();
                                     if (optionEl.length) {
+                                        optionEl.attr("data-id", i);
                                         optionEl.find("strong").html(widget.t("option." + i + ".title"));
                                         optionEl.find("small").html(widget.t("option." + i + ".info"));
                                         optionsEl.append(optionEl);
@@ -77,7 +77,7 @@ View.register("index", function (messageData, firstLoad) {
                                         }
                                         if (option.type == "switch") {
                                             input = optionEl.find("select");
-                                            input.val(widget.getOptionValue(i) ? "1" : "0").selectpicker("refresh");
+                                            input.val(widget.getOptionValue(i) ? "1" : "0").selectpicker();
                                         }
                                     }
                                 }
