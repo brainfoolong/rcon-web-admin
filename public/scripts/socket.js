@@ -30,7 +30,7 @@ Socket.onMessage = function (callback) {
  */
 Socket.offMessage = function (callback) {
     var index = Socket.onMessageEvents.indexOf(callback);
-    if(index > -1){
+    if (index > -1) {
         Socket.onMessageEvents.slice(index, 1);
     }
 };
@@ -40,7 +40,7 @@ Socket.offMessage = function (callback) {
  * @param {function=} callback If connection is established
  */
 Socket.connect = function (callback) {
-    var con = new WebSocket('ws://localhost:4325');
+    var con = new WebSocket('ws://' + window.location.hostname + ':4325');
     /**
      * On open connection
      */

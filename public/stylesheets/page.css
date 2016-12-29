@@ -489,33 +489,40 @@ body.is-not-admin [data-role='admin'] {
 
 .widget .widget-options-icon:hover {
     opacity: 1;
-    transform:rotate(90deg);
+    transform: rotate(90deg);
 }
-.gridrows .row .grid-column{
+
+.grid-row .row .grid-column {
     background: rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     display: none;
+    transition: 0.3s;
 }
 
-.gridrows .row .new-widget{
-    padding:40px;
+.grid-row .row .new-widget {
+    padding: 40px;
     text-align: center;
     display: none;
 }
 
-.gridrows-container.toggled .grid-column:not(.has-widget) .new-widget{
+.grid-row-container.toggled .grid-column:not(.has-widget) .new-widget {
     display: block;
 }
 
-.gridrows-container.toggled .grid-column,
-.gridrows .row .grid-column.has-widget{
+.grid-row-container.toggled .grid-column,
+.grid-row .row .grid-column.has-widget {
     display: block;
 }
 
-.gridrows .row .grid-column.has-widget .new-widget{
+.grid-row .row .grid-column.has-widget .new-widget {
     display: none;
 }
 
-.gridrows .row .new-widget .bootstrap-select{
+.grid-row .row .new-widget .bootstrap-select {
     display: block;
+}
+
+.grid-row .row .ui-droppable-hover {
+    background: rgba(255, 255, 255, 0.1);
+
 }

@@ -11,7 +11,7 @@ View.register("index", function (messageData, firstLoad) {
     var addWidget = c.find(".add-widget");
 
     var updateDragAndDrop = function () {
-        var container = c.find(".gridrows-container");
+        var container = c.find(".grid-row-container");
         container.find(".widget.ui-draggable").draggable("destroy");
         container.find(".grid-column.ui-droppable").droppable("destroy");
         if (container.hasClass("toggled")) {
@@ -27,14 +27,14 @@ View.register("index", function (messageData, firstLoad) {
                 "activate": function (ev, ui) {
                     ui.draggable.data("pos", {
                         "columnId": ui.draggable.closest(".grid-column").attr("data-id"),
-                        "rowId": ui.draggable.closest(".gridrows").attr("data-id"),
+                        "rowId": ui.draggable.closest(".grid-row").attr("data-id"),
                     });
                 },
                 "drop": function (ev, ui) {
                     var oldPos = ui.draggable.data("pos");
                     var newPos = {
                         "columnId": $(this).attr("data-id"),
-                        "rowId": $(this).closest(".gridrows").attr("data-id"),
+                        "rowId": $(this).closest(".grid-row").attr("data-id"),
                     };
                     Socket.send("view", {
                         "view": "index",
@@ -51,7 +51,8 @@ View.register("index", function (messageData, firstLoad) {
                         Widget.getByElement(widgetA).remove();
                     }
                     if(widgetB.length){
-                        Widget.getByElement(widgetB).remove();
+                        var w = Widget.getByElement(widgetB);
+                        if(w) w.remove();
                     }
                 }
             });
@@ -86,7 +87,7 @@ View.register("index", function (messageData, firstLoad) {
                 (function () {
                     // correctly positioning the widgets, maybe the position have changed since an update
                     var snapWidget = function (widget) {
-                        c.find(".gridrows-container").children()
+                        c.find(".grid-row-container").children()
                             .filter("[data-id='" + widget.data.rowId + "']")
                             .find(".grid-column").filter("[data-id='" + widget.data.columnId + "']")
                             .append(widget.container).addClass("has-widget");
@@ -190,7 +191,7 @@ View.register("index", function (messageData, firstLoad) {
                 "server": self.server,
                 "name": $(this).val(),
                 "columnId": $(this).closest(".grid-column").attr("data-id"),
-                "rowId": $(this).closest(".gridrows").attr("data-id")
+                "rowId": $(this).closest(".grid-row").attr("data-id")
             }, function () {
                 loadAllWidgets();
             });
@@ -211,21 +212,21 @@ View.register("index", function (messageData, firstLoad) {
                 });
             }
         }
-    }).on("click.index", ".gridrows .new-widget", function () {
+    }).on("click.index", ".grid-row .new-widget", function () {
         $(this).append(addWidget.closest(".bootstrap-select"));
     }).on("click.index", ".grid-toggle", function () {
-        var container = c.find(".gridrows-container");
+        var container = c.find(".grid-row-container");
         container.toggleClass("toggled");
         updateDragAndDrop();
     });
 
     (function () {
         // copy gridrow multiple times
-        var gridrows = c.find(".templates .gridrows");
-        gridrows.find(".grid-column").append('<div class="new-widget">' +
+        var gridrow = c.find(".templates .grid-row");
+        gridrow.find(".grid-column").append('<div class="new-widget">' +
             '<div><div class="glyphicon glyphicon-plus"></div></div></div>');
         for (var i = 0; i < 10; i++) {
-            c.find(".gridrows-container").append(gridrows.clone().attr("data-id", i));
+            c.find(".grid-row-container").append(gridrow.clone().attr("data-id", i));
         }
     })();
 
@@ -254,13 +255,8 @@ View.register("index", function (messageData, firstLoad) {
     if (self.server) {
         loadAllWidgets();
     } else {
-        c.find(".gridrows-container").html(t(!hashData.messageData ? "index.noserver" : "index.serveroffline"));
+        c.find(".grid-row-container").html(t(!hashData.messageData ? "index.noserver" : "index.serveroffline"));
     }
-
-    if (!messageData.gridrows) {
-
-    }
-
 
     // add widgets to the selectbox
     if (messageData.widgets && self.server) {
