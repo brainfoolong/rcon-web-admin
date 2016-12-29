@@ -21,18 +21,25 @@ Widget.register(function (widget) {
      * @param {object} log
      */
     var addMessage = function (log) {
-        if (widget.getOptionValue("hideUserCommands") && (log.username)) return;
-        if (widget.getOptionValue("hideServerLogs") && (log.type === 4)) return;
-        var e = $('<div class="message">' +
-            '<div class="timestamp"></div>' +
+        var cl = "";
+        if (widget.getOptionValue("hideUserCommands") && (log.username)) {
+            cl = "collapsed";
+        }
+        if (widget.getOptionValue("hideServerLogs") && (log.type === 4)) {
+            cl = "collapsed";
+        }
+        var e = $('<div class="message ' + cl + '">' +
+            '<div class="header"><span class="glyphicon glyphicon-chevron-down"></span>' +
+            '<span class="glyphicon glyphicon-chevron-right"></span></div>' +
             '<div class="text"></div>' +
             '</div>'
         );
-        var tsText = new Date(log.timestamp).toLocaleString();
-        if (log.username) tsText += '<span class="username"><span class="glyphicon glyphicon-user"></span> ' + log.username + '</span>';
+        e.find(".header").append($('<span class="timestamp"></span>').html(new Date(log.timestamp).toLocaleString()));
+        if (log.username) {
+            e.find(".header").append('<span class="glyphicon glyphicon-user"></span>' +
+                '<span class="username">' + log.username + '</span>');
+        }
         e.find(".text").html(escapeHtml(log.body));
-        e.find(".timestamp").html(tsText);
-        e.data("text", log.body).data("timestamp", tsText);
         consoleEl.append(e);
         setTimeout(function () {
             var elem = consoleEl[0];
@@ -49,7 +56,7 @@ Widget.register(function (widget) {
         if (widget.getOptionValue("limit")) {
             data.limit = widget.getOptionValue("limitNr");
         }
-        widget.send("server-log", data, function (messageData) {
+        widget.backend("server-log", data, function (messageData) {
             var logData = messageData.log.split("\n");
             for (var i in logData) {
                 try {
@@ -101,6 +108,9 @@ Widget.register(function (widget) {
                 this.value = "";
             }
         });
+        widget.content.on("click", ".timestamp", function (ev) {
+            $(this).closest(".message").toggleClass("collapsed");
+        });
         widget.content.on("change", ".cmd-select select", function (ev) {
             var v = $(this).val();
             if (v.length) {
@@ -116,12 +126,12 @@ Widget.register(function (widget) {
         });
         widget.content.on("input", ".search input", function () {
             var messages = widget.content.find(".console .message");
-            if (this.value.length <= 1) {
-                messages.removeClass("hidden").each(function () {
-                    $(this).find(".text").html($(this).data("text"));
-                    $(this).find(".timestamp").html($(this).data("timestamp"));
-                });
-            } else {
+            if (this.value.length <= 1 && $(this).data("searched")) {
+                $(this).data("searched", 0);
+                reloadServerLog();
+            }
+            if (this.value.length > 1) {
+                $(this).data("searched", 1);
                 var s = this.value.trim().split(" ");
                 var sRegex = s;
                 for (var i in sRegex) {
@@ -133,10 +143,14 @@ Widget.register(function (widget) {
                 messages.addClass("hidden").each(function () {
                     var f = $(this);
                     var value = f.find("*").text();
-                    var elements = [
-                        {"el": f.find(".timestamp"), "value": f.data("timestamp")},
-                        {"el": f.find(".text"), "value": f.data("text")}
-                    ];
+                    if (!f.data("searchelements")) {
+                        f.data("searchelements", [
+                            {"el": f.find(".header .username"), "value": f.find(".header .username").text()},
+                            {"el": f.find(".header .timestamp"), "value": f.find(".header .timestamp").text()},
+                            {"el": f.find(".text"), "value": f.find(".text").text()}
+                        ]);
+                    }
+                    var elements = f.data("searchelements");
                     for (var i in elements) {
                         var data = elements[i];
                         var html = data.value;
@@ -152,9 +166,9 @@ Widget.register(function (widget) {
                                 html = html.replace(val.regex, "_" + (matches.length - 1) + "_");
                             }
                         });
-                        if (!fail) f.removeClass("hidden");
+                        if (!fail) f.removeClass("hidden collapsed");
                         for (var m in matches) {
-                            html = html.replace(new RegExp("_" + i + "_", "ig"), '<span class="match">' + matches[m] + '</span>');
+                            html = html.replace(new RegExp("_" + m + "_", "ig"), '<span class="match">' + matches[m] + '</span>');
                         }
                         data.el.html(html);
                     }
@@ -173,10 +187,10 @@ Widget.register(function (widget) {
     };
 
     /**
-     * On update
+     * On backend update
      */
     widget.onBackendUpdate = function () {
-        console.log("on backend update");
+
     };
 
     /**

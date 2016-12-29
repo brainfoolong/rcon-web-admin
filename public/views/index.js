@@ -1,5 +1,6 @@
 "use strict";
 View.register("index", function (messageData, firstLoad) {
+
     var self = this;
 
     /** @type {string} */
@@ -9,7 +10,55 @@ View.register("index", function (messageData, firstLoad) {
     var pickServer = c.find(".pick-server");
     var addWidget = c.find(".add-widget");
 
-    // load/reload all widgets
+    var updateDragAndDrop = function () {
+        var container = c.find(".gridrows-container");
+        container.find(".widget.ui-draggable").draggable("destroy");
+        container.find(".grid-column.ui-droppable").droppable("destroy");
+        if (container.hasClass("toggled")) {
+            container.find(".widget").draggable({
+                "handle": ".widget-title",
+                "revert": "invalid",
+                "scroll" : false
+            });
+            container.find(".grid-column").droppable({
+                "accept": ".widget",
+                "revert": "invalid",
+                "tolerance" : "pointer",
+                "activate": function (ev, ui) {
+                    ui.draggable.data("pos", {
+                        "columnId": ui.draggable.closest(".grid-column").attr("data-id"),
+                        "rowId": ui.draggable.closest(".gridrows").attr("data-id"),
+                    });
+                },
+                "drop": function (ev, ui) {
+                    var oldPos = ui.draggable.data("pos");
+                    var newPos = {
+                        "columnId": $(this).attr("data-id"),
+                        "rowId": $(this).closest(".gridrows").attr("data-id"),
+                    };
+                    Socket.send("view", {
+                        "view": "index",
+                        "action": "widget",
+                        "type": "position",
+                        "oldPos": oldPos,
+                        "newPos": newPos,
+                        "server": self.server,
+                        "widget": widget.id
+                    }, loadAllWidgets);
+                    var widgetA = ui.draggable;
+                    var widgetB = $(this).find(".widget");
+                    if(widgetA.length){
+                        Widget.getByElement(widgetA).remove();
+                    }
+                    if(widgetB.length){
+                        Widget.getByElement(widgetB).remove();
+                    }
+                }
+            });
+        }
+    };
+
+    // load all new widgets and remove deprecated ones
     var loadAllWidgets = function () {
         if (!self.server) {
             return;
@@ -20,16 +69,35 @@ View.register("index", function (messageData, firstLoad) {
             "type": "list",
             "server": self.server
         }, function (data) {
-            var allWidgets = $("#content").find(".widget");
+            // if server is down for some reason, reload view
+            if (!data.server) {
+                Storage.set("server", null);
+                View.changeHash("index");
+                View.load("index");
+                note("index.serveroffline", "danger", -1);
+                return;
+            }
+            var allWidgets = c.find(".widget");
             if (!data.myWidgets) {
                 return;
             }
+            c.find(".grid-column").removeClass("has-widget");
             for (var i in data.myWidgets) {
                 (function () {
+                    // correctly positioning the widgets, maybe the position have changed since an update
+                    var snapWidget = function (widget) {
+                        c.find(".gridrows-container").children()
+                            .filter("[data-id='" + widget.data.rowId + "']")
+                            .find(".grid-column").filter("[data-id='" + widget.data.columnId + "']")
+                            .append(widget.container).addClass("has-widget");
+                        updateDragAndDrop();
+                    };
                     var widgetData = data.myWidgets[i];
                     allWidgets = allWidgets.not("#" + widgetData.id);
                     if (typeof Widget.widgets[widgetData.id] != "undefined") {
-                        Widget.widgets[widgetData.id].data = widgetData;
+                        var widget = Widget.widgets[widgetData.id];
+                        widget.data = widgetData;
+                        snapWidget(widget);
                     } else {
                         $.getScript("widgets/" + widgetData.name + "/frontend.js", function () {
                             var widget = new Widget(widgetData.name);
@@ -38,7 +106,7 @@ View.register("index", function (messageData, firstLoad) {
                             widget.server = self.server;
                             widget.data = widgetData;
                             // some html stuff
-                            widget.container = $("#content").find(".templates .widget").clone().attr("id", widget.id);
+                            widget.container = c.find(".templates .widget").clone().attr("id", widget.id);
                             widget.container.addClass("widget-" + widget.name);
                             widget.container.find(".widget-title").text(widget.t("title"));
                             widget.content = widget.container.find(".widget-content");
@@ -47,7 +115,7 @@ View.register("index", function (messageData, firstLoad) {
                                 var optionsEl = widget.container.find(".widget-options .options");
                                 for (var i in widget.data.manifest.options) {
                                     var option = widget.data.manifest.options[i];
-                                    var optionEl = $("#content").find(".templates .option." + option.type).clone();
+                                    var optionEl = c.find(".templates .option." + option.type).clone();
                                     if (optionEl.length) {
                                         optionEl.attr("data-id", i);
                                         optionEl.find("strong").html(widget.t("option." + i + ".title"));
@@ -56,13 +124,13 @@ View.register("index", function (messageData, firstLoad) {
                                         var input = optionEl.find("input");
                                         if (option.type == "number") {
                                             if (typeof option.min == "number") {
-                                                input.attr("min", optionEl.min);
+                                                input.attr("min", option.min);
                                             }
                                             if (typeof option.max == "number") {
-                                                input.attr("max", optionEl.max);
+                                                input.attr("max", option.max);
                                             }
                                             if (typeof option.step == "number") {
-                                                input.attr("step", optionEl.step);
+                                                input.attr("step", option.step);
                                             }
                                         }
                                         if (option.type == "text" || option.type == "number") {
@@ -78,7 +146,7 @@ View.register("index", function (messageData, firstLoad) {
                                     }
                                 }
                             }
-                            $("#content").find(".widgets").append(widget.container);
+                            snapWidget(widget);
                             $("head").append('<link type="text/css" href="widgets/' + widgetData.name + '/style.css" ' +
                                 'rel="stylesheet" media="all" id="css-' + widgetData.id + '">');
                             Widget.registerCallback(widget);
@@ -120,7 +188,9 @@ View.register("index", function (messageData, firstLoad) {
                 "action": "widget",
                 "type": "add",
                 "server": self.server,
-                "name": $(this).val()
+                "name": $(this).val(),
+                "columnId": $(this).closest(".grid-column").attr("data-id"),
+                "rowId": $(this).closest(".gridrows").attr("data-id")
             }, function () {
                 loadAllWidgets();
             });
@@ -139,16 +209,26 @@ View.register("index", function (messageData, firstLoad) {
                 }, function () {
                     widget.remove();
                 });
-
             }
         }
+    }).on("click.index", ".gridrows .new-widget", function () {
+        $(this).append(addWidget.closest(".bootstrap-select"));
+    }).on("click.index", ".grid-toggle", function () {
+        var container = c.find(".gridrows-container");
+        container.toggleClass("toggled");
+        updateDragAndDrop();
     });
 
-    // if no server is selected, select the last selected
-    var savedServer = Storage.get("server");
-    if (savedServer && !messageData.server && typeof messageData.myServers[savedServer] !== "undefined") {
-        View.load("index", {"server": savedServer});
-    }
+    (function () {
+        // copy gridrow multiple times
+        var gridrows = c.find(".templates .gridrows");
+        gridrows.find(".grid-column").append('<div class="new-widget">' +
+            '<div><div class="glyphicon glyphicon-plus"></div></div></div>');
+        for (var i = 0; i < 10; i++) {
+            c.find(".gridrows-container").append(gridrows.clone().attr("data-id", i));
+        }
+    })();
+
     // list all my servers
     if (messageData.myServers) {
         for (var i in messageData.myServers) {
@@ -156,11 +236,32 @@ View.register("index", function (messageData, firstLoad) {
             pickServer.append($('<option></option>').attr("value", server.id).text(server.name));
         }
     }
+
+    // check if server is selected via hash
+    var hashData = View.getViewDataByHash();
+    if (!hashData.messageData || !hashData.messageData.server) {
+        var savedServer = Storage.get("server");
+        if (savedServer) {
+            View.changeHash("index-" + View.getAttributeMessage({server: savedServer}));
+            View.load("index", {"server": savedServer});
+            return;
+        }
+    } else {
+        pickServer.val(hashData.messageData.server);
+    }
+
     // if server is selected
     if (self.server) {
-        pickServer.val(self.server);
         loadAllWidgets();
+    } else {
+        c.find(".gridrows-container").html(t(!hashData.messageData ? "index.noserver" : "index.serveroffline"));
     }
+
+    if (!messageData.gridrows) {
+
+    }
+
+
     // add widgets to the selectbox
     if (messageData.widgets && self.server) {
         for (var i in messageData.widgets) {

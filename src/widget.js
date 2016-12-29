@@ -91,14 +91,14 @@ Widget.getAllWidgets = function () {
 Widget.callMethodForAllWidgetsIfActive = function (method, server) {
     try {
         var widgets = Widget.getAllWidgets();
-        var wdb = db.get("widgets", "server_" + server.id).get("array");
+        var wdb = db.get("widgets", "server_" + server.id).get("list");
         for (var widgetsIndex in widgets) {
             if (widgets.hasOwnProperty(widgetsIndex)) {
                 var widgetsRow = widgets[widgetsIndex];
                 var found = wdb.find({
                     "name": widgetsRow.name
                 });
-                if (found) {
+                if (found.value()) {
                     widgetsRow[method].apply(widgetsRow, Array.prototype.slice.call(arguments, 1));
                 }
             }
@@ -164,7 +164,7 @@ Widget.updateAllActive = function () {
         if (users.hasOwnProperty(usersIndex)) {
             var usersRow = users[usersIndex];
             if (usersRow.server) {
-                usersRow.send("widget-update-done", {"server" : usersRow.server.id});
+                usersRow.send("widget-update-done", {"server": usersRow.server.id});
             }
         }
     }

@@ -15,6 +15,7 @@ var Widget = require(__dirname + "/../widget");
 var View = function (user, messageData, callback) {
     var myServers = {};
     var currentServer = user.getServerById(messageData.server);
+    if (currentServer && !currentServer.connected) currentServer = null;
     var widgets = {};
     var servers = db.get("servers").cloneDeep().value();
     var wdb = null;
@@ -23,9 +24,10 @@ var View = function (user, messageData, callback) {
         sendMessageData.widgets = widgets;
         sendMessageData.myServers = myServers;
         if (currentServer) {
-            sendMessageData.myWidgets = wdb.get("array").filter({
+            sendMessageData.myWidgets = wdb.get("list").filter({
                 "user": user.userData.id
             }).cloneDeep().value();
+            sendMessageData.gridrows = wdb.get("gridrows").value();
             if (sendMessageData.myWidgets) {
                 for (var i in sendMessageData.myWidgets) {
                     sendMessageData.myWidgets[i].manifest = sendMessageData.widgets[sendMessageData.myWidgets[i].name];
@@ -70,27 +72,48 @@ var View = function (user, messageData, callback) {
     if (messageData.action == "widget") {
         if (user.userData !== null && currentServer) {
             switch (messageData.type) {
+                case "position":
+                    var widgetA = wdb.get("list").find({
+                        "user": user.userData.id,
+                        "columnId": messageData.oldPos.columnId,
+                        "rowId": messageData.oldPos.rowId
+                    }).value();
+                    var widgetB = wdb.get("list").find({
+                        "user": user.userData.id,
+                        "columnId": messageData.newPos.columnId,
+                        "rowId": messageData.newPos.rowId
+                    }).value();
+                    if (widgetA) {
+                        widgetA.columnId = messageData.newPos.columnId;
+                        widgetA.rowId = messageData.newPos.rowId;
+                    }
+                    if (widgetB) {
+                        widgetB.columnId = messageData.oldPos.columnId;
+                        widgetB.rowId = messageData.oldPos.rowId;
+                    }
+                    deeperCallback({});
+                    break;
                 case "add":
                     var widgetId = "w" + hash.random(64);
-                    wdb.get("array").push({
+                    wdb.get("list").push({
                         "id": widgetId,
                         "name": messageData.name,
                         "user": user.userData.id,
-                        "position": 0,
-                        "data": {},
+                        "columnId": messageData.columnId,
+                        "rowId": messageData.rowId,
                         "options": {}
                     }).value();
                     deeperCallback({"widget": widgetId});
                     break;
                 case "remove":
-                    wdb.get("array").remove({
+                    wdb.get("list").remove({
                         "id": messageData.widget,
                         "user": user.userData.id
                     }).value();
                     deeperCallback({});
                     break;
                 case "option":
-                    var widgetEntry = wdb.get("array").find({
+                    var widgetEntry = wdb.get("list").find({
                         "id": messageData.widget,
                         "user": user.userData.id
                     });

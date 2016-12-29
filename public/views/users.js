@@ -21,7 +21,7 @@ View.register("users", function (messageData) {
         var user = messageData.users[i];
         tbody.append('<tr><td>' + user.username + '</td>' +
             '<td>' + t(user.admin ? "yes" : "no") + '</td>' +
-            '<td><a href="#users" data-message="' + View.getJsonMessage({id: user.id}) + '" data-translate="edit" ' +
+            '<td><a href="#users" data-message="' + View.getAttributeMessage({id: user.id}) + '" data-translate="edit" ' +
             'class="btn btn-info btn-sm page-link"></a></td>' +
             '</tr>');
     }

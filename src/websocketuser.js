@@ -115,20 +115,6 @@ function WebSocketUser(socket) {
                             sendCallback(viewData);
                         });
                         break;
-                    case "server-log":
-                        if (self.server && self.server.connected) {
-                            self.server.logRoll();
-                            var logData = self.server.getLogData().toString();
-                            if (messageData.limit) {
-                                logData = logData.split("\n");
-                                logData = logData.slice(-messageData.limit);
-                                logData = logData.join("\n");
-                            }
-                            sendCallback({"log": logData});
-                            return;
-                        }
-                        sendCallback({"error": {"message": "Not connected to RCON server"}});
-                        break;
                     case "cmd":
                         if (self.server && self.server.connected) {
                             self.server.logMessage({

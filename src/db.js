@@ -17,7 +17,7 @@ db._defaults = {
     "servers": {},
     "settings": {},
     "users": {},
-    "widgets": {"array": []}
+    "widgets": {"list": []}
 };
 
 /**

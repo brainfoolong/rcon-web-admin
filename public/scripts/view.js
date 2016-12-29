@@ -40,7 +40,7 @@ View.getViewDataByHash = function (hash) {
         var viewSplit = view.split("-");
         view = viewSplit[0];
         if (viewSplit[1]) {
-            messageData = JSON.parse(atob(viewSplit[1]));
+            messageData = View.parseAttributeMessage(viewSplit[1]);
         }
     }
     return {"view": view, "messageData": messageData};
@@ -61,8 +61,31 @@ View.changeHash = function (newHash) {
  * @param {object} data
  * @returns {string}
  */
-View.getJsonMessage = function (data) {
-    return btoa(JSON.stringify(data));
+View.getAttributeMessage = function (data) {
+    var msg = [];
+    for (var dataIndex in data) {
+        if (data.hasOwnProperty(dataIndex)) {
+            var dataRow = data[dataIndex];
+            msg.push(dataIndex + ":" + dataRow);
+        }
+    }
+    return msg.join(",");
+};
+
+/**
+ * Parse a attribute message to object
+ * @param {string} str
+ * @returns {{}}
+ */
+View.parseAttributeMessage = function (str) {
+    var strSpl = str.split(",");
+    var o = {};
+    for (var i = 0; i < strSpl.length; i++) {
+        var param = strSpl[i];
+        var m = param.split(":", 2);
+        o[m[0]] = m[1];
+    }
+    return o;
 };
 
 /**
@@ -72,7 +95,14 @@ View.getJsonMessage = function (data) {
  * @param {function=} callback
  */
 View.load = function (view, messageData, callback) {
-    var initialMessageData = messageData;
+    // remove all widgets on loading a view
+    for (var widgetIndex in Widget.widgets) {
+        if (Widget.widgets.hasOwnProperty(widgetIndex)) {
+            var widgetRow = Widget.widgets[widgetIndex];
+            widgetRow.remove();
+        }
+    }
+
     if (!messageData) messageData = {};
     messageData.view = view;
     var c = $("#content");
@@ -96,11 +126,6 @@ View.load = function (view, messageData, callback) {
             // only change the hash if no form data has been sent back or if redirect is given
             if (viewData.redirect) {
                 View.changeHash(viewData.redirect);
-            } else if (!viewData.form) {
-                if (!viewData.form && initialMessageData) {
-                    hash = hash + "-" + View.getJsonMessage(initialMessageData);
-                }
-                View.changeHash(hash);
             }
             $.get("views/" + viewData.view + ".html", function (htmlData) {
                 View.current = viewData.view;
@@ -145,9 +170,10 @@ $(document).on("click", ".page-link", function (ev) {
     $(".hamburger.is-open").trigger("click");
     var messageData = null;
     var hash = $(this).attr("href").substr(1);
-    if ($(this).attr("data-message")) {
-        messageData = JSON.parse(atob($(this).attr("data-message")));
-        View.changeHash(hash + "-" + $(this).attr("data-message"));
+    var msg = $(this).attr("data-message");
+    if (msg) {
+        messageData = View.parseAttributeMessage(msg);
+        View.changeHash(hash + "-" + msg);
     } else {
         View.changeHash(hash);
     }

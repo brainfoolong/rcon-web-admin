@@ -43,6 +43,16 @@ widget.onFrontendMessage = function (server, user, action, messageData, callback
         case "commands":
             callback(widget.availableCommands);
             break;
+        case "server-log":
+            server.logRoll();
+            var logData = server.getLogData().toString();
+            if (messageData.limit) {
+                logData = logData.split("\n");
+                logData = logData.slice(-messageData.limit - 1);
+                logData = logData.join("\n");
+            }
+            callback({"log": logData});
+            break;
     }
 };
 
