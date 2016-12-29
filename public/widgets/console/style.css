@@ -10,23 +10,27 @@
     padding: 5px;
 }
 
+.widget-console .console .message .text {
+    margin-top: 5px;
+}
+
 .widget-console .console .message .timestamp {
     color: #999;
     font-size: 90%;
+    display: inline-block;
+    padding: 3px 10px 3px 10px;
+    border-radius: 3px;
+    line-height: 1.3;
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .widget-console .console .message .timestamp .username {
-    color: white;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-    line-height: 1.3;
+    color: #00daff;
     margin-left: 10px;
     display: inline-block;
-    padding-left: 5px;
-    padding-right: 5px;
 }
 
-.widget-console .console .message .timestamp .username .glyphicon{
+.widget-console .console .message .timestamp .username .glyphicon {
     font-size: 90%;
 }
 
@@ -39,4 +43,9 @@
     background: white;
     color: #2ac7d2;
     border-radius: 3px;
+}
+
+.widget-console .cmd-select .bootstrap-select .option .glyphicon{
+    font-size: 80%;
+    padding-right: 10px;
 }

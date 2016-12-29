@@ -1,6 +1,7 @@
 "use strict";
 
 var Rcon = require(__dirname + "/rcon");
+var Widget = require(__dirname + "/widget");
 var db = require(__dirname + "/db");
 var fs = require("fs");
 
@@ -22,7 +23,11 @@ function RconServer(id, serverData) {
     /** @type {boolean} */
     this.connected = false;
     /** @type {string} */
-    this.serverLogFile = __dirname + "/../db/serverlog_" + self.id + ".log";
+    this.serverDbFolder = __dirname + "/../db/server_" + self.id;
+    /** @type {string} */
+    this.serverLogFile = this.serverDbFolder + "/messages.log";
+    /** @type {number|null} */
+    this.widgetIv = null;
 
     // require this here to not get a loop because websocketuser itself require the RconServer module
     var WebSocketUser = require(__dirname + "/websocketuser");
@@ -35,6 +40,7 @@ function RconServer(id, serverData) {
         if (disconnect) {
             self.con.disconnect();
         } else {
+            clearInterval(self.widgetIv);
             self.con = null;
             self.connected = false;
             delete RconServer.instances[self.id];
@@ -63,9 +69,9 @@ function RconServer(id, serverData) {
     this.logRoll = function () {
         try {
             var fileData = this.getLogData();
-            // keep 1mb of logs
+            // keep 1mb of logs and start progress if over 1.3mb
             var max = 1024 * 1024;
-            if (fileData.length > max) {
+            if (fileData.length > max * 1.3) {
                 fileData = fileData.toString().substr(-max);
                 // find last first line end
                 var i = fileData.indexOf("\n");
@@ -108,7 +114,11 @@ function RconServer(id, serverData) {
             }
         }
         // log to disk
-        fs.appendFileSync(this.serverLogFile, JSON.stringify(data) + "\n", "utf8");
+        try {
+            fs.appendFileSync(this.serverLogFile, JSON.stringify(data) + "\n", "utf8");
+        } catch (e) {
+
+        }
     };
 
     // on disconnect remove server from instances
@@ -131,6 +141,7 @@ function RconServer(id, serverData) {
                 return;
             }
             self.connected = true;
+            Widget.callMethodForAllWidgetsIfActive("onServerConnected", self);
         }, Rcon.SERVERDATA_AUTH);
 
         // catch errors

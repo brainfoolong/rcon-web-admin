@@ -35,7 +35,8 @@
       "option.hideServerLogs.title": "Hide server log messages",
       "option.hideServerLogs.info": "If enabled than all logs, that are flagged as 'log' (Rust use this alot), will be hidden",
       "input.search" : "Search in the rcon console log",
-      "input.cmd" : "Execute a rcon command, press enter"
+      "input.cmd" : "Execute a rcon command, press enter",
+      "list.commands" : "List of all commands and variables"
     }
   }
 }

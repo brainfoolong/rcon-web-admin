@@ -27,8 +27,10 @@ function spinner(el) {
  * Show a note message on top
  * @param {string} message
  * @param {string=} type
+ * @param {number=} delay
  */
-function note(message, type) {
+function note(message, type, delay) {
+    if(delay === -1) delay = 99999999;
     $.notify({
         "message": t(message)
     }, {
@@ -37,6 +39,7 @@ function note(message, type) {
             from: "top",
             align: "center"
         },
+        "delay" : delay || 5000,
     });
 }
 

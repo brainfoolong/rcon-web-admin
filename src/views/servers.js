@@ -1,6 +1,7 @@
 "use strict";
 
 var db = require(__dirname + "/../db");
+var fs = require("fs");
 var hash = require(__dirname + "/../hash");
 var RconServer = require(__dirname + "/../rconserver");
 
@@ -23,7 +24,7 @@ var View = function (user, messageData, callback) {
             sendMessageData.editData = sendMessageData.servers[messageData.id];
         }
         callback(sendMessageData);
-    }
+    };
     var servers = null;
     var server = null;
     // on delete
@@ -34,6 +35,16 @@ var View = function (user, messageData, callback) {
             servers = db.get("servers").getState();
             delete servers[messageData.id];
             db.get("servers").setState(servers);
+            // delete server folder
+            var dir = __dirname + "/../../db/server_" + messageData.id;
+            if (fs.existsSync(dir)) {
+                var files = fs.readdirSync(dir);
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    fs.unlinkSync(dir + "/" + file);
+                }
+                fs.unlinkSync(dir);
+            }
             deeperCallback({
                 "note": ["deleted", "success"],
                 "redirect": "servers"
@@ -57,8 +68,8 @@ var View = function (user, messageData, callback) {
         serverData.rcon_password = formData.rcon_password;
         db.get("servers").set(id, serverData).value();
 
-        // reload server if edited
         if (messageData.id) {
+            // reload server if edited
             server = user.getServerById(messageData.id);
             if (server) {
                 server.con.on("disconnect", function () {
@@ -66,6 +77,9 @@ var View = function (user, messageData, callback) {
                 });
                 server.removeInstance(true);
             }
+        } else {
+            // create server folder
+            fs.mkdirSync(__dirname + "/../../db/server_" + id);
         }
         messageData.id = null;
         deeperCallback({

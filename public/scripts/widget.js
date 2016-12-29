@@ -11,8 +11,6 @@ function Widget(name) {
     /** @type {string} */
     this.name = name;
     /** @type {string} */
-    this.name = name;
-    /** @type {string} */
     this.id = "";
     /** @type {NodeMessageCallback[]} */
     this.socketMessageHandlers = [];
@@ -31,10 +29,10 @@ function Widget(name) {
     };
 
     /**
-     * On widget update
+     * Fired after the backend widget have done it's onUpdate cycle
      */
-    this.onUpdate = function () {
-        console.error("Please override 'onUpdate' function of widget " + this.name);
+    this.onBackendUpdate = function () {
+        console.error("Please override 'onBackendUpdate' function of widget " + this.name);
     };
 
     /**
@@ -47,10 +45,10 @@ function Widget(name) {
     };
 
     /**
-     * Bind a callback when the server send a message
+     * Bind a callback when the rcon server send a message
      * @param {function} callback
      */
-    this.onMessage = function (callback) {
+    this.onRconMessage = function (callback) {
         var socketCallback = function (data) {
             if (data.action == "server-message" && self.server == data.messageData.server) {
                 callback(data.messageData);
@@ -75,13 +73,25 @@ function Widget(name) {
     };
 
     /**
-     * Send a rcon command to the server
+     * Send a rcon command directly to the server
      * @param {string} cmd
      * @param {function=} callback
      */
     this.cmd = function (cmd, callback) {
         this.send("cmd", {"cmd": cmd}, function (data) {
             if (callback) callback(data.message);
+        });
+    };
+
+    /**
+     * Send a message to the backend script
+     * @param {string} action
+     * @param {*} messageData
+     * @param {function=} callback
+     */
+    this.backend = function (action, messageData, callback) {
+        this.send("widget", {"widgetAction": action, "widgetMessageData": messageData}, function (responseData) {
+            if (callback) callback(responseData.widgetMessageData);
         });
     };
 
@@ -131,7 +141,7 @@ function Widget(name) {
                 "option": key,
                 "value": value
             }, function () {
-                if(callback) callback();
+                if (callback) callback();
                 self.data.options[key] = value;
                 self.onOptionUpdate(key, value);
             });
@@ -163,6 +173,17 @@ function Widget(name) {
         delete Widget.widgets[this.id];
         this.container.remove();
     };
+
+    // bind a message handler to call the update method when the backend send that request
+    (function () {
+        var socketCallback = function (data) {
+            if (data.action == "widget-update-done" && self.server == data.messageData.server) {
+                self.onBackendUpdate();
+            }
+        };
+        Socket.onMessage(socketCallback);
+        self.socketMessageHandlers.push(socketCallback);
+    })();
 }
 
 /**

@@ -11,7 +11,9 @@ Widget.register(function (widget) {
         '<input type="search" class="form-control" placeholder="' + widget.t("input.search") + '">' +
         '</div>');
     var cmdSelect = $('<div class="cmd-select">' +
-        '<select class="selectpicker"></select>' +
+        '<select class="selectpicker" data-live-search="true">' +
+        '<option value="">' + widget.t("list.commands") + '</option>' +
+        '</select>' +
         '</div>');
 
     /**
@@ -64,6 +66,27 @@ Widget.register(function (widget) {
      */
     widget.onInit = function () {
         // get all available command and list in the cmd select
+        widget.backend("commands", null, function (data) {
+            var select = cmdSelect.find("select");
+            var addOptions = function (type, entries) {
+                var icon = type == "cmd" ? "chevron-right" : "usd";
+                for (var i = 0; i < entries.length; i++) {
+                    var entry = entries[i];
+                    select.append(
+                        $('<option>')
+                            .attr("value", type + ":" + entry)
+                            .html('<div class="option">' +
+                                '<span class="glyphicon glyphicon-' + icon + '"></span>' +
+                                '<span class="text">' + entry + '</span>' +
+                                '</div>')
+                    );
+                }
+            };
+            addOptions("cmd", data.commands);
+            addOptions("variable", data.variables);
+            select.selectpicker("refresh");
+        });
+
         widget.content.on("keydown", ".cmd input", function (ev) {
             if (ev.keyCode == 9) {
                 ev.preventDefault();
@@ -76,6 +99,19 @@ Widget.register(function (widget) {
             if (ev.keyCode == 13) {
                 widget.cmd(this.value);
                 this.value = "";
+            }
+        });
+        widget.content.on("change", ".cmd-select select", function (ev) {
+            var v = $(this).val();
+            if (v.length) {
+                var inp = cmdEl.find("input");
+                inp.blur();
+                $(this).selectpicker("val", "");
+                setTimeout(function () {
+                    var cmd = v.match(/^([a-z]+)\:([a-z\.]+)/i);
+                    var iv = cmd[2].replace(/^global\./, "") + " ";
+                    inp.val(iv).focus();
+                }, 100);
             }
         });
         widget.content.on("input", ".search input", function () {
@@ -117,8 +153,8 @@ Widget.register(function (widget) {
                             }
                         });
                         if (!fail) f.removeClass("hidden");
-                        for (var i in matches) {
-                            html = html.replace(new RegExp("_" + i + "_", "ig"), '<span class="match">' + matches[i] + '</span>');
+                        for (var m in matches) {
+                            html = html.replace(new RegExp("_" + i + "_", "ig"), '<span class="match">' + matches[m] + '</span>');
                         }
                         data.el.html(html);
                     }
@@ -128,19 +164,19 @@ Widget.register(function (widget) {
             elem.scrollTop = elem.scrollHeight;
         });
         widget.content.append(consoleEl);
-        widget.content.append(searchEl)
+        widget.content.append(searchEl);
         widget.content.append(cmdEl);
         widget.content.append(cmdSelect);
-        cmdSelect.children().selectpicker();
-        widget.onMessage(addMessage);
+        widget.content.find(".selectpicker").selectpicker();
+        widget.onRconMessage(addMessage);
         reloadServerLog();
     };
 
     /**
      * On update
      */
-    widget.onUpdate = function () {
-
+    widget.onBackendUpdate = function () {
+        console.log("on backend update");
     };
 
     /**
@@ -149,8 +185,6 @@ Widget.register(function (widget) {
      * @param {*} value
      */
     widget.onOptionUpdate = function (key, value) {
-        if (key == "limit" || key == "limitNr" || key == "hideUserCommands") {
-            reloadServerLog();
-        }
+        reloadServerLog();
     };
 });

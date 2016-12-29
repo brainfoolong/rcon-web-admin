@@ -26,16 +26,12 @@ View.register("index", function (messageData, firstLoad) {
             }
             for (var i in data.myWidgets) {
                 (function () {
-                    var widgetCallback = function (widget) {
-                        widget.onUpdate();
-                    };
                     var widgetData = data.myWidgets[i];
                     allWidgets = allWidgets.not("#" + widgetData.id);
                     if (typeof Widget.widgets[widgetData.id] != "undefined") {
                         Widget.widgets[widgetData.id].data = widgetData;
-                        widgetCallback(Widget.widgets[widgetData.id]);
                     } else {
-                        $.getScript("widgets/" + widgetData.name + "/script.js", function () {
+                        $.getScript("widgets/" + widgetData.name + "/frontend.js", function () {
                             var widget = new Widget(widgetData.name);
                             Widget.widgets[widgetData.id] = widget;
                             widget.id = widgetData.id;
@@ -88,7 +84,6 @@ View.register("index", function (messageData, firstLoad) {
                             Widget.registerCallback(widget);
                             Widget.registerCallback = null;
                             widget.onInit();
-                            widgetCallback(widget);
                         });
                     }
                 })();
@@ -150,8 +145,9 @@ View.register("index", function (messageData, firstLoad) {
     });
 
     // if no server is selected, select the last selected
-    if (!messageData.server && Storage.get("server")) {
-        View.load("index", {"server": Storage.get("server")});
+    var savedServer = Storage.get("server");
+    if (savedServer && !messageData.server && typeof messageData.myServers[savedServer] !== "undefined") {
+        View.load("index", {"server": savedServer});
     }
     // list all my servers
     if (messageData.myServers) {

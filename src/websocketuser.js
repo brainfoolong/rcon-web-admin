@@ -2,6 +2,7 @@
 
 var db = require(__dirname + "/db");
 var hash = require(__dirname + "/hash");
+var Widget = require(__dirname + "/widget");
 
 /**
  * A single websocket user
@@ -14,8 +15,19 @@ function WebSocketUser(socket) {
     this.id = null;
     /** @type {WebSocket} */
     this.socket = socket;
-    /** @type {object} */
+    /**
+     * The current stored userdata
+     * Updated with each websocket incoming message
+     * @type {null}
+     */
     this.userData = null;
+    /**
+     * The current active server
+     * Updated with each incoming websocket request
+     * This means this is only possibly set if user is viewing the dashboard
+     * @type {null}
+     */
+    this.server = null;
 
     // require this here to not get a loop because rconserver itself require the websocketuser module
     var RconServer = require(__dirname + "/rconserver");
@@ -61,68 +73,91 @@ function WebSocketUser(socket) {
                 }
                 self.send(frontendData.action, sendMessageData, frontendData.callbackId);
             };
-            var messageData = frontendData.messageData;
-            var server = messageData && messageData.server ? self.getServerById(messageData.server) : null;
-            switch (frontendData.action) {
-                case "view":
-                    if (!db.get("users").size().value()) {
-                        // if no user exist, force user admin panel
-                        messageData.view = "users";
-                    } else if (self.userData === null) {
-                        // if not logged in, force login page
-                        messageData.view = "login";
-                    }
-                    var View = require(__dirname + "/views/" + messageData.view);
-                    View(self, messageData, function (viewData) {
-                        if (!viewData) viewData = {};
-                        viewData.view = messageData.view;
-                        if (viewData.redirect) {
-                            viewData.view = viewData.redirect;
+            try {
+                var messageData = frontendData.messageData;
+                self.server = messageData && messageData.server ? self.getServerById(messageData.server) : null;
+                switch (frontendData.action) {
+                    case "widget":
+                        if (self.server && self.server.connected) {
+                            Widget.callMethodForAllWidgetsIfActive(
+                                "onFrontendMessage",
+                                self.server,
+                                self,
+                                messageData.widgetAction,
+                                messageData.widgetMessageData,
+                                function (widgetMessageData) {
+                                    sendCallback({"widgetMessageData": widgetMessageData});
+                                }
+                            );
                         }
-                        if (messageData.form) {
-                            viewData.form = messageData.form;
+                        break;
+                    case "view":
+                        if (!db.get("users").size().value()) {
+                            // if no user exist, force user admin panel
+                            messageData.view = "users";
+                        } else if (self.userData === null) {
+                            // if not logged in, force login page
+                            messageData.view = "login";
                         }
-                        if (messageData.btn) {
-                            viewData.btn = messageData.btn;
-                        }
-                        sendCallback(viewData);
-                    });
-                    break;
-                case "server-log":
-                    if (server) {
-                        server.logRoll();
-                        var logData = server.getLogData().toString();
-                        if (messageData.limit) {
-                            logData = logData.split("\n");
-                            logData = logData.slice(-messageData.limit);
-                            logData = logData.join("\n");
-                        }
-                        sendCallback({"log": logData});
-                        return;
-                    }
-                    sendCallback(false);
-                    break;
-                case "cmd":
-                    if (server) {
-                        server.logMessage({
-                            "body": "> " + messageData.cmd,
-                            "username": self.userData.username
+                        var View = require(__dirname + "/views/" + messageData.view);
+                        View(self, messageData, function (viewData) {
+                            if (!viewData) viewData = {};
+                            viewData.view = messageData.view;
+                            if (viewData.redirect) {
+                                viewData.view = viewData.redirect;
+                            }
+                            if (messageData.form) {
+                                viewData.form = messageData.form;
+                            }
+                            if (messageData.btn) {
+                                viewData.btn = messageData.btn;
+                            }
+                            sendCallback(viewData);
                         });
-                        server.send(messageData.cmd, self.userData.username, function (serverMessage) {
-                            sendCallback({"message": serverMessage});
-                        });
-                        return;
+                        break;
+                    case "server-log":
+                        if (self.server && self.server.connected) {
+                            self.server.logRoll();
+                            var logData = self.server.getLogData().toString();
+                            if (messageData.limit) {
+                                logData = logData.split("\n");
+                                logData = logData.slice(-messageData.limit);
+                                logData = logData.join("\n");
+                            }
+                            sendCallback({"log": logData});
+                            return;
+                        }
+                        sendCallback({"error": {"message": "Not connected to RCON server"}});
+                        break;
+                    case "cmd":
+                        if (self.server && self.server.connected) {
+                            self.server.logMessage({
+                                "body": "> " + messageData.cmd,
+                                "username": self.userData.username
+                            });
+                            self.server.send(messageData.cmd, self.userData.username, function (serverMessage) {
+                                sendCallback({"message": serverMessage});
+                            });
+                            return;
+                        }
+                        sendCallback({"error": {"message": "Not connected to RCON server"}});
+                        break;
+                    case "closed":
+                        delete WebSocketUser.instances[self.id];
+                        self.socket = null;
+                        self.userData = null;
+                        break;
+                    default:
+                        sendCallback();
+                        break;
+                }
+            } catch (e) {
+                sendCallback({
+                    "error": {
+                        "message": e.message,
+                        "stack": self.userData && self.userData.admin ? e.stack : null
                     }
-                    sendCallback(false);
-                    break;
-                case "closed":
-                    delete WebSocketUser.instances[self.id];
-                    self.socket = null;
-                    self.userData = null;
-                    break;
-                default:
-                    sendCallback();
-                    break;
+                });
             }
         };
 

@@ -71,26 +71,25 @@ Socket.connect = function (callback) {
      */
     con.onmessage = function (e) {
         if (e.data) {
-            try {
-                var data = JSON.parse(e.data);
-                if (data.action) {
-                    if (typeof data.callbackId != "undefined") {
-                        if (Socket.callbacks[data.callbackId] === null) {
-                            console.error("No socket callback for id " + data.callbackId + ", maybe dupe callback in backend?");
-                        } else {
-                            Socket.callbacks[data.callbackId](data.messageData);
-                            Socket.callbacks[data.callbackId] = null;
-                        }
-                    }
-                    for (var i in Socket.onMessageEvents) {
-                        if (Socket.onMessageEvents.hasOwnProperty(i)) {
-                            var cb = Socket.onMessageEvents[i];
-                            if (typeof cb == "function") cb(data);
-                        }
+            var data = JSON.parse(e.data);
+            if (data.action) {
+                if (typeof data.callbackId != "undefined") {
+                    var callbackId = data.callbackId;
+                    if (Socket.callbacks[callbackId] === null) {
+                        console.error("No socket callback for id " + callbackId + ", maybe dupe callback in backend?");
+                    } else {
+                        Socket.callbacks[callbackId](data.messageData);
+                        Socket.callbacks[callbackId] = null;
                     }
                 }
-            } catch (e) {
-                console.error(e);
+                for (var i in Socket.onMessageEvents) {
+                    if (Socket.onMessageEvents.hasOwnProperty(i)) {
+                        var cb = Socket.onMessageEvents[i];
+                        // json.parse everytime again because maybe the callbacks modify the data
+                        // it's all passed by reference
+                        if (typeof cb == "function") cb(JSON.parse(e.data));
+                    }
+                }
             }
         }
     };
