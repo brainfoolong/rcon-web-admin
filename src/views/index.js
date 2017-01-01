@@ -70,39 +70,23 @@ var View = function (user, messageData, callback) {
 
     // widget actions
     if (messageData.action == "widget") {
+        var widgetEntry = null;
         if (user.userData !== null && currentServer) {
             switch (messageData.type) {
-                case "position":
-                    var widgetA = wdb.get("list").find({
-                        "user": user.userData.id,
-                        "columnId": messageData.oldPos.columnId,
-                        "rowId": messageData.oldPos.rowId
-                    }).value();
-                    var widgetB = wdb.get("list").find({
-                        "user": user.userData.id,
-                        "columnId": messageData.newPos.columnId,
-                        "rowId": messageData.newPos.rowId
-                    }).value();
-                    if (widgetA) {
-                        widgetA.columnId = messageData.newPos.columnId;
-                        widgetA.rowId = messageData.newPos.rowId;
-                    }
-                    if (widgetB) {
-                        widgetB.columnId = messageData.oldPos.columnId;
-                        widgetB.rowId = messageData.oldPos.rowId;
-                    }
-                    deeperCallback({});
-                    break;
                 case "add":
                     var widgetId = "w" + hash.random(64);
-                    wdb.get("list").push({
-                        "id": widgetId,
-                        "name": messageData.name,
-                        "user": user.userData.id,
-                        "columnId": messageData.columnId,
-                        "rowId": messageData.rowId,
-                        "options": {}
-                    }).value();
+                    var list = wdb.get("list");
+                    var widget = Widget.get(messageData.name);
+                    if (widget) {
+                        list.push({
+                            "id": widgetId,
+                            "name": messageData.name,
+                            "user": user.userData.id,
+                            "position": list.size().value(),
+                            "size": widget.manifest.compatibleSizes[0],
+                            "options" : {}
+                        }).value();
+                    }
                     deeperCallback({"widget": widgetId});
                     break;
                 case "remove":
@@ -112,14 +96,30 @@ var View = function (user, messageData, callback) {
                     }).value();
                     deeperCallback({});
                     break;
-                case "option":
-                    var widgetEntry = wdb.get("list").find({
+                case "layout":
+                    widgetEntry = wdb.get("list").find({
                         "id": messageData.widget,
                         "user": user.userData.id
                     });
-                    var options = widgetEntry.get("options").value();
-                    options[messageData.option] = messageData.value;
-                    widgetEntry.set("options", options).value();
+                    if (widgetEntry.size()) {
+                        for (var messageDataIndex in messageData.values) {
+                            if (messageData.values.hasOwnProperty(messageDataIndex)) {
+                                widgetEntry.set(messageDataIndex, messageData.values[messageDataIndex]).value();
+                            }
+                        }
+                    }
+                    deeperCallback({});
+                    break;
+                case "option":
+                    widgetEntry = wdb.get("list").find({
+                        "id": messageData.widget,
+                        "user": user.userData.id
+                    });
+                    if (widgetEntry.size()) {
+                        var options = widgetEntry.get("options").value();
+                        options[messageData.option] = messageData.value;
+                        widgetEntry.set("options", options).value();
+                    }
                     deeperCallback({});
                     break;
                 default:

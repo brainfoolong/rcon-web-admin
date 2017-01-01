@@ -1,26 +1,41 @@
 <select class="selectpicker pick-server">
     <option value="" data-translate="index.pickserver"></option>
 </select>
+<select class="selectpicker add-widget">
+    <option value="" data-translate="index.addwidget"></option>
+</select>
 <hr>
 <div class="grid-row-container"></div>
-<hr>
-<span class="btn btn-info grid-toggle" data-translate="index.gridtoggle"></span>
+<div class="widgets-unsorted hidden"></div>
 <div class="templates hidden">
-    <select class="selectpicker add-widget">
-        <option value="" data-translate="index.addwidget"></option>
-    </select>
-    <div class="grid-row">
+    <div class="grid-row large">
         <div class="row">
-            <div class="col-sm-12"><div data-id="6" class="grid-column"></div></div>
+            <div class="col-sm-12">
+                <div class="grid-column"></div>
+            </div>
         </div>
+    </div>
+    <div class="grid-row medium">
         <div class="row">
-            <div class="col-sm-4"><div data-id="1" class="grid-column"></div></div>
-            <div class="col-sm-4"><div data-id="2" class="grid-column"></div></div>
-            <div class="col-sm-4"><div data-id="3" class="grid-column"></div></div>
+            <div class="col-sm-6">
+                <div class="grid-column"></div>
+            </div>
+            <div class="col-sm-6">
+                <div class="grid-column"></div>
+            </div>
         </div>
+    </div>
+    <div class="grid-row small">
         <div class="row">
-            <div class="col-sm-6"><div data-id="4" class="grid-column"></div></div>
-            <div class="col-sm-6"><div data-id="5" class="grid-column"></div></div>
+            <div class="col-sm-4">
+                <div class="grid-column"></div>
+            </div>
+            <div class="col-sm-4">
+                <div class="grid-column"></div>
+            </div>
+            <div class="col-sm-4">
+                <div class="grid-column"></div>
+            </div>
         </div>
     </div>
     <div class="option switch">
@@ -33,6 +48,15 @@
                 <option value="1" data-translate="on"></option>
                 <option value="0" data-translate="off"></option>
             </select>
+        </div>
+    </div>
+    <div class="option select">
+        <div class="title spacer">
+            <strong></strong>
+            <small></small>
+        </div>
+        <div class="spacer">
+            <select></select>
         </div>
     </div>
     <div class="option number">
@@ -55,13 +79,40 @@
     </div>
     <div class="widget">
         <div class="widget-padding">
-            <div class="widget-options-icon"><span class="glyphicon glyphicon-cog"></span></div>
+            <div class="widget-options-icon widget-show-area" data-id="options"><span
+                    class="glyphicon glyphicon-cog"></span></div>
+            <div class="widget-layout-icon widget-show-area" data-id="layout"><span
+                    class="glyphicon glyphicon-modal-window"></span></div>
             <h4 class="widget-title"></h4>
             <div class="widget-options hidden">
                 <div class="options"></div>
                 <div class="spacer"></div>
                 <div style="text-align: right">
-                    <span class="widget-delete btn btn-danger" data-translate="widget.delete"></span>
+                    <span class="widget-delete btn btn-danger" data-translate="index.widget.delete"></span>
+                </div>
+            </div>
+            <div class="widget-layout hidden">
+                <div class="options">
+                    <div class="option select" data-id="size">
+                        <div class="title spacer">
+                            <strong data-translate="index.widget.size.title"></strong>
+                            <small data-translate="index.widget.size.info"></small>
+                        </div>
+                        <div class="spacer">
+                            <select></select>
+                        </div>
+                    </div>
+                    <div class="option number" data-id="position">
+                        <div class="title spacer">
+                            <strong data-translate="index.widget.position.title"></strong>
+                            <small data-translate="index.widget.position.info"></small>
+                        </div>
+                        <div class="spacer">
+                            <input type="number" step="1" min="0" class="form-control">
+                        </div>
+                    </div>
+                    <div class="spacer"></div>
+                    <span class="save-layout btn btn-info" data-translate="save"></span>
                 </div>
             </div>
             <div class="widget-content"></div>

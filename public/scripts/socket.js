@@ -115,10 +115,11 @@ Socket.connectAndLoadView = function () {
     Socket.connect(function () {
         var view = "index";
         var messageData = null;
-        if (window.location.hash) {
-            var hashData = View.getViewDataByHash();
+        var hashData = View.getViewDataByHash();
+        if (hashData.view) {
             view = hashData.view;
-            if (hashData.messageData) messageData = hashData.messageData;
+        }if (hashData.messageData) {
+            messageData = hashData.messageData;
         }
         View.load(view, messageData);
     });

@@ -6,15 +6,20 @@ Widget.register(function (widget) {
         '<span class="input-group-addon"><i class="glyphicon glyphicon-chevron-right"></i></span>' +
         '<input type="search" class="form-control" placeholder="' + widget.t("input.cmd") + '">' +
         '</div>');
-    var searchEl = $('<div class="search form-group has-feedback input-group">' +
+    var searchEl = $('<div class="search form-group has-feedback input-group form-inline">' +
         '<span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>' +
         '<input type="search" class="form-control" placeholder="' + widget.t("input.search") + '">' +
+        '<select class="selectpicker">' +
+        '<option value="yes">' + widget.t("autoscroll.enabled") + '</option>' +
+        '<option value="no">' + widget.t("autoscroll.disabled") + '</option>' +
+        '</select>'+
         '</div>');
     var cmdSelect = $('<div class="cmd-select">' +
         '<select class="selectpicker" data-live-search="true">' +
         '<option value="">' + widget.t("list.commands") + '</option>' +
         '</select>' +
         '</div>');
+    var autoscrollInp = searchEl.find("select");
 
     /**
      * Add a message to console
@@ -41,10 +46,6 @@ Widget.register(function (widget) {
         }
         e.find(".text").html(escapeHtml(log.body));
         consoleEl.append(e);
-        setTimeout(function () {
-            var elem = consoleEl[0];
-            elem.scrollTop = elem.scrollHeight;
-        }, 50);
     };
 
     /**
@@ -66,6 +67,12 @@ Widget.register(function (widget) {
                 }
             }
         });
+        widget.createInterval("scroll", function () {
+            if (consoleEl.length && autoscrollInp.length && autoscrollInp[0].value == "yes") {
+                var elem = consoleEl[0];
+                elem.scrollTop = 99999999999;
+            }
+        }, 50);
     };
 
     /**

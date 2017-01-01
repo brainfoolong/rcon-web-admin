@@ -2,6 +2,8 @@
   "name": "console",
   "version": "0.9.0",
   "compatibleGames": "all",
+  "compatibleSizes": ["large", "medium"],
+  "defaultSize" : "large",
   "options": {
     "limit": {
       "type": "switch",
@@ -26,6 +28,8 @@
   "locale": {
     "en": {
       "title": "Console",
+      "autoscroll.enabled": "Automatic scroll",
+      "autoscroll.disabled": "Manual scroll",
       "option.limit.title": "Limit messages",
       "option.limit.info": "Just display the last x messages (defined with next option), if disabled than the full log will be loaded (max. 1 MegaByte)",
       "option.limitNr.title": "Number of messages",

@@ -164,6 +164,24 @@ function Widget(name) {
     };
 
     /**
+     * Create an interval, automatically destroy previous interval if exist
+     * @param {string} id
+     * @param {function} func
+     * @param {number} step
+     */
+    this.createInterval = function (id, func, step) {
+        Interval.create("widget." + self.name + "." + id, func, step);
+    };
+
+    /**
+     * Destroy an interval
+     * @param {string} id
+     */
+    this.destroyInterval = function (id) {
+        Interval.destroy("widget." + self.name + "." + id);
+    };
+
+    /**
      * Delete the widget and drop all data and handlers
      */
     this.remove = function () {
@@ -226,21 +244,6 @@ Widget.register = function (callback) {
  * @type {number}
  */
 Widget._optionChangeTimeout = null;
-
-// delegate events
-$(document).on("click", ".widget .widget-options-icon", function () {
-    var w = $(this).closest(".widget");
-    w.find(".widget-options").toggleClass("hidden");
-    w.find(".widget-content").toggleClass("hidden");
-}).on("input change", ".widget-options .option :input", function () {
-    var e = $(this);
-    clearTimeout(Widget._optionChangeTimeout);
-    Widget._optionChangeTimeout = setTimeout(function () {
-        var widget = Widget.getByElement(e);
-        var id = e.closest(".option").attr("data-id");
-        widget.setOptionValue(id, e.val());
-    }, 300);
-});
 
 /**
  * Widget Register Callback
