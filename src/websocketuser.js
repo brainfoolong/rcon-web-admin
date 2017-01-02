@@ -35,8 +35,8 @@ function WebSocketUser(socket) {
     /**
      * Send message to client
      * @param {string} action
-     * @param {=object} messageData
-     * @param {=int} callbackId
+     * @param {object=} messageData
+     * @param {number=} callbackId
      */
     this.send = function (action, messageData, callbackId) {
         if (self.socket) {
@@ -62,7 +62,7 @@ function WebSocketUser(socket) {
         // this will be called when message verification is done
         var verificationDone = function () {
             // just send a message to the user for the callback in the frontend
-            var sendCallback = function (sendMessageData, overrideCallbackId) {
+            var sendCallback = function (sendMessageData) {
                 if (!sendMessageData) sendMessageData = {};
                 if (!sendMessageData.sessionUserData && self.userData !== null) {
                     sendMessageData.sessionUserData = {

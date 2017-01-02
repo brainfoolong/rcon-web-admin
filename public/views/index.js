@@ -131,11 +131,11 @@ View.register("index", function (messageData) {
                                         if (typeof option.default != "undefined") {
                                             input.attr("placeholder", option.default);
                                         }
-                                        input.val(widget.getOptionValue(i));
+                                        input.val(widget.options.get(i));
                                     }
                                     if (option.type == "switch") {
                                         input = optionEl.find("select");
-                                        input.val(widget.getOptionValue(i) ? "1" : "0").selectpicker();
+                                        input.val(widget.options.get(i) ? "1" : "0").selectpicker();
                                     }
                                     if (option.type == "select") {
                                         input = optionEl.find("select");
@@ -145,7 +145,7 @@ View.register("index", function (messageData) {
                                                 .html(widget.t("option." + i + ".value." + option.values[j]))
                                             );
                                         }
-                                        input.val(widget.getOptionValue(i)).selectpicker();
+                                        input.val(widget.options.get(i)).selectpicker();
                                     }
                                 }
                             }
@@ -262,7 +262,7 @@ View.register("index", function (messageData) {
         e.data("optionTimeout", setTimeout(function () {
             var widget = Widget.getByElement(e);
             var id = e.closest(".option").attr("data-id");
-            widget.setOptionValue(id, e.val());
+            widget.options.set(id, e.val());
             note("saved", "success");
         }, 600));
     }).on("click.index", ".widget-layout .save-layout", function () {

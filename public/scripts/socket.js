@@ -24,6 +24,7 @@ Socket.onMessageEvents = [];
 Socket.onMessage = function (callback) {
     Socket.onMessageEvents.push(callback);
 };
+
 /**
  * Unbind a callback
  * @param {NodeMessageCallback} callback
@@ -85,9 +86,7 @@ Socket.connect = function (callback) {
                 for (var i in Socket.onMessageEvents) {
                     if (Socket.onMessageEvents.hasOwnProperty(i)) {
                         var cb = Socket.onMessageEvents[i];
-                        // json.parse everytime again because maybe the callbacks modify the data
-                        // it's all passed by reference
-                        if (typeof cb == "function") cb(JSON.parse(e.data));
+                        if (cb) cb(data);
                     }
                 }
             }
@@ -118,7 +117,8 @@ Socket.connectAndLoadView = function () {
         var hashData = View.getViewDataByHash();
         if (hashData.view) {
             view = hashData.view;
-        }if (hashData.messageData) {
+        }
+        if (hashData.messageData) {
             messageData = hashData.messageData;
         }
         View.load(view, messageData);

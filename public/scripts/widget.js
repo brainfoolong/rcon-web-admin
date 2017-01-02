@@ -25,14 +25,14 @@ function Widget(name) {
      * On widget init
      */
     this.onInit = function () {
-        console.error("Please override 'onInit' function of widget " + this.name);
+        // override this function in the child widget
     };
 
     /**
      * Fired after the backend widget have done it's onUpdate cycle
      */
     this.onBackendUpdate = function () {
-        console.error("Please override 'onBackendUpdate' function of widget " + this.name);
+        // override this function in the child widget
     };
 
     /**
@@ -41,7 +41,7 @@ function Widget(name) {
      * @param {*} value
      */
     this.onOptionUpdate = function (key, value) {
-        console.error("Please override 'onOptionUpdate' function of widget " + this.name);
+        // override this function in the child widget
     };
 
     /**
@@ -127,20 +127,60 @@ function Widget(name) {
     };
 
     /**
+     * The widget storage
+     * @type {{}}
+     */
+    this.storage = {};
+
+    /**
+     * Set a value in the widget storage
+     * @param {string} key
+     * @param {*} value
+     */
+    this.storage.set = function (key, value) {
+        self.send("view", {
+            "view": "index",
+            "action": "widget",
+            "widget": self.id,
+            "type": "storage",
+            "key": key,
+            "value": value
+        }, function () {
+            if (callback) callback();
+            self.data.storage[key] = value;
+        });
+    };
+
+    /**
+     * Get a value from the widget storage
+     * @param {string} key
+     * @returns {*|null} Null if not found
+     */
+    this.storage.get = function (key) {
+        return self.data.storage[key] || null;
+    };
+
+    /**
+     * The widget options
+     * @type {{}}
+     */
+    this.options = {};
+
+    /**
      * Set an option value
      * @param {string} key
      * @param {*} value
      * @param {function=} callback
      */
-    this.setOptionValue = function (key, value, callback) {
-        var option = this.data.manifest.options[key];
+    this.options.set = function (key, value, callback) {
+        var option = self.data.manifest.options[key];
         if (option) {
             if (option.type == "switch") value = value === "1" || value === true;
             if (option.type == "number") value = parseFloat(value);
-            this.send("view", {
+            self.send("view", {
                 "view": "index",
                 "action": "widget",
-                "widget": this.id,
+                "widget": self.id,
                 "type": "option",
                 "option": key,
                 "value": value
@@ -157,7 +197,7 @@ function Widget(name) {
      * @param {string} key
      * @returns {*|null} Null if not found
      */
-    this.getOptionValue = function (key) {
+    this.options.get = function (key) {
         if (self.data.options && typeof self.data.options[key] != "undefined") {
             return self.data.options[key];
         }

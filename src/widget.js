@@ -10,7 +10,7 @@ var db = require(__dirname + "/db");
  */
 function Widget(name) {
     /** @type {Widget} */
-
+    var self = this;
     /**
      * The widget internal name
      * @type {string}
@@ -21,13 +21,139 @@ function Widget(name) {
      * @type {{}}
      */
     this.manifest = {};
+    /**
+     * The widgets options cached
+     * @type {{}}
+     */
+    this.optionsCache = {};
+    /**
+     * The widgets storage cached
+     * @type {{}}
+     */
+    this.storageCache = {};
+
+    /**
+     * On lowdb instance for this widget for a given server
+     * @param {RconServer} server
+     * @returns {LoDashWrapper}
+     */
+    this.getDbEntry = function (server) {
+        var wdb = db.get("widgets", "server_" + server.id).get("list");
+        var found = wdb.find({
+            "name": this.name
+        });
+        if (found.size()) {
+            return found;
+        }
+        return null;
+    };
+
+    /**
+     * The widget storage
+     * @type {{}}
+     */
+    this.storage = {};
+
+    /**
+     * Get the storage object for given server
+     * @param {RconServer} server
+     * @return {{}}
+     */
+    this.storage.getObject = function (server) {
+        if (typeof self.storageCache[server.id] == "undefined") {
+            self.storageCache[server.id] = {};
+            var entry = self.getDbEntry(server);
+            if (entry) {
+                self.storageCache[server.id] = entry.get("storage").cloneDeep().value();
+            }
+        }
+        return self.storageCache[server.id];
+    };
+
+    /**
+     * Set a value in the widget storage
+     * @param {RconServer} server
+     * @param {string} key
+     * @param {*} value
+     */
+    this.storage.set = function (server, key, value) {
+        var data = this.getObject(server);
+        data[key] = value;
+        var entry = self.getDbEntry(server);
+        if (entry) {
+            entry.set("storage", data).value();
+        }
+    };
+
+    /**
+     * Get a value from the widget storage
+     * @param {RconServer} server
+     * @param {string} key
+     * @returns {*|null} Null if not found
+     */
+    this.storage.get = function (server, key) {
+        return this.getObject(server)[key] || null;
+    };
+
+    /**
+     * The widget options
+     * @type {{}}
+     */
+    this.options = {};
+
+    /**
+     * Get the options object for given server
+     * @param {RconServer} server
+     * @return {{}}
+     */
+    this.options.getObject = function (server) {
+        if (typeof self.optionsCache[server.id] == "undefined") {
+            self.optionsCache[server.id] = null;
+            var entry = self.getDbEntry(server);
+            if (entry) {
+                self.optionsCache[server.id] = entry.get("options").cloneDeep().value();
+            }
+        }
+        return self.optionsCache[server.id];
+    };
+
+    /**
+     * Set an option value
+     * @param {RconServer} server
+     * @param {string} key
+     * @param {*} value
+     */
+    this.options.set = function (server, key, value) {
+        var option = self.manifest.options[key];
+        console.log(self.manifest, option, key);
+        if (option) {
+            if (option.type == "switch") value = value === "1" || value === true;
+            if (option.type == "number") value = parseFloat(value);
+            var data = this.getObject(server);
+            data[key] = value;
+            var entry = self.getDbEntry(server);
+            if (entry) {
+                entry.set("options", data).value();
+            }
+        }
+    };
+
+    /**
+     * Get value of an option
+     * @param {RconServer} server
+     * @param {string} key
+     * @returns {*|null} Null if not found
+     */
+    this.options.get = function (server, key) {
+        return this.getObject(server)[key] || null;
+    };
 
     /**
      * On rcon server has successfully connected and authenticated
      * @param {RconServer} server
      */
     this.onServerConnected = function (server) {
-        console.error("Please override 'onServerConnected' function of widget " + this.name);
+        // override this function in the child widget
     };
 
     /**
@@ -35,7 +161,7 @@ function Widget(name) {
      * @param {RconServer} server
      */
     this.onUpdate = function (server) {
-        console.error("Please override 'onUpdate' function of widget " + this.name);
+        // override this function in the child widget
     };
 
     /**
@@ -46,7 +172,16 @@ function Widget(name) {
      * @param {function} callback Pass an object as message data response for the frontend
      */
     this.onFrontendMessage = function (server, user, messageData, callback) {
-        console.error("Please override 'onFrontendMessage' function of widget " + this.name);
+        // override this function in the child widget
+    };
+
+    /**
+     * On receive a server message
+     * @param {RconServer} server
+     * @param {RconMessage} message
+     */
+    this.onServerMessage = function (server, message) {
+        // override this function in the child widget
     };
 }
 
@@ -91,35 +226,13 @@ Widget.getAllWidgets = function () {
 Widget.callMethodForAllWidgetsIfActive = function (method, server) {
     try {
         var widgets = Widget.getAllWidgets();
-        var wdb = db.get("widgets", "server_" + server.id).get("list");
         for (var widgetsIndex in widgets) {
             if (widgets.hasOwnProperty(widgetsIndex)) {
                 var widgetsRow = widgets[widgetsIndex];
-                var found = wdb.find({
-                    "name": widgetsRow.name
-                });
-                if (found.value()) {
+                var entry = widgetsRow.getDbEntry(server);
+                if (entry) {
                     widgetsRow[method].apply(widgetsRow, Array.prototype.slice.call(arguments, 1));
                 }
-            }
-        }
-    } catch (e) {
-        console.error(e.stack);
-    }
-};
-
-/**
- * Call a specific method for all widgets
- * Pass all remaining arguments directly to the call
- * @param {string} method
- */
-Widget.callMethodForAllWidgets = function (method) {
-    try {
-        var widgets = Widget.getAllWidgets();
-        for (var widgetsIndex in widgets) {
-            if (widgets.hasOwnProperty(widgetsIndex)) {
-                var widgetsRow = widgets[widgetsIndex];
-                widgetsRow[method].apply(widgetsRow, Array.prototype.slice.call(arguments, 1));
             }
         }
     } catch (e) {
@@ -151,6 +264,7 @@ Widget.get = function (name) {
  */
 Widget.updateAllActive = function () {
     var RconServer = require(__dirname + "/rconserver");
+    var WebSocketUser = require(__dirname + "/websocketuser");
     for (var serverIndex in RconServer.instances) {
         if (RconServer.instances.hasOwnProperty(serverIndex)) {
             var server = RconServer.instances[serverIndex];
@@ -158,7 +272,6 @@ Widget.updateAllActive = function () {
         }
     }
     // send a ping to the frontend for all user's that have a server currently opened on the dashboard
-    var WebSocketUser = require(__dirname + "/websocketuser");
     var users = WebSocketUser.instances;
     for (var usersIndex in users) {
         if (users.hasOwnProperty(usersIndex)) {

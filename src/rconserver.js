@@ -99,29 +99,54 @@ function RconServer(id, serverData) {
     };
 
     /**
-     * Log message to disk and notify each connected user
-     * @param {object} data
+     * On receive a rcon socket message
+     * @param {RconMessage} rconMessage
      */
-    this.logMessage = function (data) {
-        // if log is disabled than stop here
-        if (data.log === false) return;
-        if (typeof data.body != "string") data.body = data.body.toString();
-        data.timestamp = new Date().toString();
-        data.server = self.id;
+    this.onServerMessage = function (rconMessage) {
+        // if log is disabled or body is null than stop here
+        if (rconMessage.log !== true || rconMessage.body.length == 0) return;
+        var rconMessageJson = {
+            "type": rconMessage.type,
+            "body": rconMessage.body,
+            "user": rconMessage.user ? rconMessage.user.id : null,
+            "server": rconMessage.server.id,
+            "timestamp": rconMessage.timestamp.toString()
+        };
         // push this message to all connected clients that have access to this server
         for (var i in WebSocketUser.instances) {
             var user = WebSocketUser.instances[i];
             var server = user.getServerById(self.id);
             if (server) {
-                user.send("server-message", data);
+                user.send("server-message", rconMessageJson);
             }
         }
+        // also send to all active widgets
+        Widget.callMethodForAllWidgetsIfActive("onServerMessage", this, rconMessage);
         // log to disk
         try {
-            fs.appendFileSync(this.serverLogFile, JSON.stringify(data) + "\n", "utf8");
+            if (rconMessage.log === true) {
+                fs.appendFileSync(this.serverLogFile, JSON.stringify(rconMessageJson) + "\n", "utf8");
+            }
         } catch (e) {
 
         }
+    };
+
+    /**
+     * Simulate the onServerMessage event by passing a simple string message
+     * @param {string} message
+     */
+    this.injectServerMessage = function (message) {
+        this.onServerMessage({
+            "id": -1,
+            "type": Rcon.SERVERDATA_RESPONSE_VALUE,
+            "size": message.length,
+            "log": true,
+            "timestamp": new Date(),
+            "user": null,
+            "server": this,
+            "body": message
+        });
     };
 
     // on disconnect remove server from instances
@@ -136,9 +161,9 @@ function RconServer(id, serverData) {
             return;
         }
         // authenticate
-        self.logMessage({"body": "Rcon authentication by rcon web admin..."});
+        self.injectServerMessage("Rcon authentication by rcon web admin...");
         self.con.send(self.serverData.rcon_password, null, true, function (success) {
-            self.logMessage({"body": "Rcon authentication " + (success ? "successfull" : "invalid")});
+            self.injectServerMessage("Rcon authentication " + (success ? "successfull" : "invalid"));
             if (!success) {
                 console.error("Invalid rcon password for server " + self.serverData.name + ":" + self.serverData.rcon_port);
                 return;
@@ -153,10 +178,9 @@ function RconServer(id, serverData) {
         });
 
         // on receive message
-        self.con.on("message", function (data) {
-            if (data.body.length) {
-                self.logMessage(data);
-            }
+        self.con.on("message", function (rconMessage) {
+            rconMessage.server = self;
+            self.onServerMessage(rconMessage);
         });
     });
 }

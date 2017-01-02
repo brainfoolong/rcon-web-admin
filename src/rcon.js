@@ -189,7 +189,10 @@ Rcon.prototype._data = function () {
             "size": size,
             "id": this.dataBuffer.readInt32LE(4),
             "type": this.dataBuffer.readInt32LE(8),
-            "body": this.dataBuffer.slice(12, 4 + size - 2)
+            "body": this.dataBuffer.slice(12, 4 + size - 2),
+            "user" : null,
+            "timestamp" : new Date(),
+            "log" : true
         };
 
         // SERVERDATA_RESPONSE_VALUE is the response to SERVERDATA_EXECCOMMAND
@@ -201,8 +204,8 @@ Rcon.prototype._data = function () {
 
         // get user to the response if possible
         if (response.id > 0 && typeof this.callbacks[response.id] != "undefined") {
-            response.user = this.callbacks[response.id].user;
-            response.log = this.callbacks[response.id].log;
+            response.user = this.callbacks[response.id].user || null;
+            response.log = this.callbacks[response.id].log === true;
         }
 
         // auth response is special handled, just callback if success auth or not
@@ -219,6 +222,7 @@ Rcon.prototype._data = function () {
                 this.lastResponseId = 0;
             }
         }
+        response.body = response.body.toString();
         // just pipe each raw response to the event listener
         this.emit("message", response);
 
@@ -244,6 +248,19 @@ Rcon.prototype._pack = function (id, type, body) {
     buf[buf.length - 2] = 0;
     buf[buf.length - 1] = 0;
     return buf;
-}
+};
+
+/**
+ * The rcon message response data
+ * @typedef {object} RconMessage
+ * @property {number} id Response id
+ * @property {number} size Response size
+ * @property {number} type Response type
+ * @property {string} body Response body
+ * @property {boolean} log Indicates if this should be logged to disk
+ * @property {Date} timestamp The timestamp
+ * @property {WebSocketUser|null} user The user that have made the request for this response
+ * @property {RconServer} server The server for this message
+ */
 
 module.exports = Rcon;

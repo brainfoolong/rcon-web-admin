@@ -84,7 +84,8 @@ var View = function (user, messageData, callback) {
                             "user": user.userData.id,
                             "position": list.size().value(),
                             "size": widget.manifest.compatibleSizes[0],
-                            "options": {}
+                            "options": {},
+                            "storage" : {}
                         }).value();
                     }
                     deeperCallback({"widget": widgetId});
@@ -107,6 +108,18 @@ var View = function (user, messageData, callback) {
                                 widgetEntry.set(messageDataIndex, messageData.values[messageDataIndex]).value();
                             }
                         }
+                    }
+                    deeperCallback({});
+                    break;
+                case "storage":
+                    widgetEntry = wdb.get("list").find({
+                        "id": messageData.widget,
+                        "user": user.userData.id
+                    });
+                    if (widgetEntry.size()) {
+                        var storage = widgetEntry.get("storage").value();
+                        storage[messageData.option] = messageData.value;
+                        widgetEntry.set("storage", storage).value();
                     }
                     deeperCallback({});
                     break;

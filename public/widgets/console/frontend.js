@@ -23,17 +23,17 @@ Widget.register(function (widget) {
 
     /**
      * Add a message to console
-     * @param {object} log
+     * @param {object} messageData
      */
-    var addMessage = function (log) {
+    var addMessage = function (messageData) {
         var cl = "";
-        if (widget.getOptionValue("hideUserCommands") && (log.user)) {
+        if (widget.options.get("hideUserCommands") && (messageData.user)) {
             cl = "collapsed";
         }
-        if (widget.getOptionValue("hideServerLogs") && (log.type === 4)) {
+        if (widget.options.get("hideServerLogs") && (messageData.type === 4)) {
             cl = "collapsed";
         }
-        cl += " logtype-" + log.type;
+        cl += " logtype-" + messageData.type;
         var e = $('<div class="message ' + cl + '">' +
             '<div class="header"><span class="glyphicon glyphicon-chevron-down"></span>' +
             '<span class="glyphicon glyphicon-chevron-right"></span>' +
@@ -41,12 +41,12 @@ Widget.register(function (widget) {
             '<div class="text"></div>' +
             '</div>'
         );
-        e.find(".header").append($('<span class="timestamp"></span>').html(new Date(log.timestamp).toLocaleString()));
-        if (log.user) {
+        e.find(".header").append($('<span class="timestamp"></span>').html(new Date(messageData.timestamp).toLocaleString()));
+        if (messageData.user) {
             e.find(".header").append('<span class="glyphicon glyphicon-user"></span>' +
-                '<span class="username">' + log.user.username + '</span>');
+                '<span class="username">' + messageData.user.username + '</span>');
         }
-        e.find(".text").html(escapeHtml(log.body));
+        e.find(".text").html(escapeHtml(messageData.body));
         consoleEl.append(e);
     };
 
@@ -56,8 +56,8 @@ Widget.register(function (widget) {
     var reloadServerLog = function () {
         consoleEl.html('');
         var data = {};
-        if (widget.getOptionValue("limit")) {
-            data.limit = widget.getOptionValue("limitNr");
+        if (widget.options.get("limit")) {
+            data.limit = widget.options.get("limitNr");
         }
         widget.backend("server-log", data, function (messageData) {
             var logData = messageData.log.split("\n");
@@ -194,13 +194,6 @@ Widget.register(function (widget) {
         widget.content.find(".selectpicker").selectpicker();
         widget.onRconMessage(addMessage);
         reloadServerLog();
-    };
-
-    /**
-     * On backend update
-     */
-    widget.onBackendUpdate = function () {
-
     };
 
     /**

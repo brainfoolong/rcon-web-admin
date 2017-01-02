@@ -56,12 +56,4 @@ widget.onFrontendMessage = function (server, user, action, messageData, callback
     }
 };
 
-/**
- * On widget update cycle - Fired every 10 seconds for each server
- * @param {RconServer} server
- */
-widget.onUpdate = function (server) {
-
-};
-
 module.exports = widget;
