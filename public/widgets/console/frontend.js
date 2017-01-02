@@ -85,6 +85,7 @@ Widget.register(function (widget) {
         widget.backend("commands", null, function (data) {
             var select = cmdSelect.find("select");
             var addOptions = function (type, entries) {
+                entries.sort();
                 var icon = type == "cmd" ? "chevron-right" : "usd";
                 for (var i = 0; i < entries.length; i++) {
                     var entry = entries[i];

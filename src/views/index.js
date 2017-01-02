@@ -84,7 +84,7 @@ var View = function (user, messageData, callback) {
                             "user": user.userData.id,
                             "position": list.size().value(),
                             "size": widget.manifest.compatibleSizes[0],
-                            "options" : {}
+                            "options": {}
                         }).value();
                     }
                     deeperCallback({"widget": widgetId});

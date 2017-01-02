@@ -1,0 +1,16 @@
+{
+  "name": "restart",
+  "version": "0.9.0",
+  "compatibleGames": "all",
+  "compatibleSizes": [
+    "small"
+  ],
+  "options": {},
+  "locale": {
+    "en": {
+      "title": "Restart",
+      "sure": "Are you sure? This cannot be canceled!",
+      "restart.scheduled": "Server will restart in {seconds} seconds"
+    }
+  }
+}

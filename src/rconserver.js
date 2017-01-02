@@ -104,7 +104,7 @@ function RconServer(id, serverData) {
      */
     this.logMessage = function (data) {
         // if log is disabled than stop here
-        if(data.log === false) return;
+        if (data.log === false) return;
         if (typeof data.body != "string") data.body = data.body.toString();
         data.timestamp = new Date().toString();
         data.server = self.id;

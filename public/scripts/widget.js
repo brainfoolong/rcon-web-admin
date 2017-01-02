@@ -90,7 +90,11 @@ function Widget(name) {
      * @param {function=} callback
      */
     this.backend = function (action, messageData, callback) {
-        this.send("widget", {"widgetAction": action, "widgetMessageData": messageData}, function (responseData) {
+        this.send("widget", {
+            "widgetAction": action,
+            "widgetMessageData": messageData,
+            "widget": self.id
+        }, function (responseData) {
             if (callback) callback(responseData.widgetMessageData);
         });
     };

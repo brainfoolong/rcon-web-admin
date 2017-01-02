@@ -62,7 +62,7 @@ function WebSocketUser(socket) {
         // this will be called when message verification is done
         var verificationDone = function () {
             // just send a message to the user for the callback in the frontend
-            var sendCallback = function (sendMessageData) {
+            var sendCallback = function (sendMessageData, overrideCallbackId) {
                 if (!sendMessageData) sendMessageData = {};
                 if (!sendMessageData.sessionUserData && self.userData !== null) {
                     sendMessageData.sessionUserData = {
@@ -85,8 +85,14 @@ function WebSocketUser(socket) {
                                 self,
                                 messageData.widgetAction,
                                 messageData.widgetMessageData,
-                                function (widgetMessageData) {
-                                    sendCallback({"widgetMessageData": widgetMessageData});
+                                function (widget, widgetMessageData) {
+                                    if (widget instanceof Widget !== true) {
+                                        console.trace("Widget.onFrontendMessage callback need a widget instance as first parameter");
+                                        return;
+                                    }
+                                    if (widget.id === frontendData.widget) {
+                                        sendCallback({"widgetMessageData": widgetMessageData});
+                                    }
                                 }
                             );
                         }

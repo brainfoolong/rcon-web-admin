@@ -41,7 +41,7 @@ widget.onServerConnected = function (server) {
 widget.onFrontendMessage = function (server, user, action, messageData, callback) {
     switch (action) {
         case "commands":
-            callback(widget.availableCommands);
+            callback(this, widget.availableCommands);
             break;
         case "server-log":
             server.logRoll();
@@ -51,7 +51,7 @@ widget.onFrontendMessage = function (server, user, action, messageData, callback
                 logData = logData.slice(-messageData.limit - 1);
                 logData = logData.join("\n");
             }
-            callback({"log": logData});
+            callback(this, {"log": logData});
             break;
     }
 };

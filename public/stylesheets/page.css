@@ -418,7 +418,7 @@ h1 {
 }
 
 .page-content {
-    padding-top: 70px;
+    padding-top: 90px;
     padding-bottom: 50px;
 }
 
@@ -464,6 +464,11 @@ body.is-not-admin [data-role='admin'] {
     border: 1px solid rgba(0, 0, 0, 0.6);
 }
 
+.widget[data-area='options'],
+.widget[data-area='layout'] {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
 .widget .widget-padding {
     padding: 10px;
 }
@@ -490,12 +495,12 @@ body.is-not-admin [data-role='admin'] {
     line-height: 1;
 }
 
-.widget .widget-layout-icon{
-    right:45px;
+.widget .widget-layout-icon {
+    right: 45px;
 }
 
 .widget .widget-options-icon:hover,
-.widget .widget-layout-icon:hover  {
+.widget .widget-layout-icon:hover {
     opacity: 1;
     transform: rotate(10deg);
 }

@@ -1,0 +1,16 @@
+{
+  "name": "shutdown",
+  "version": "0.9.0",
+  "compatibleGames": "all",
+  "compatibleSizes": [
+    "small"
+  ],
+  "options": {},
+  "locale": {
+    "en": {
+      "title": "Shutdown",
+      "sure": "Are you sure? Server will shut down right now!",
+      "shutdown.now": "Server will shutdown down right now"
+    }
+  }
+}

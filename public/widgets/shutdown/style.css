@@ -1,0 +1,19 @@
+.widget-shutdown {
+    background: #ff0505;
+    background: radial-gradient(ellipse at center, #ff0505 0%, #6d0019 100%);
+    transition: 0.4s;
+
+}
+
+.widget-shutdown .widget-content {
+    text-align: center;
+    font-size: 70px;
+    color: white;
+    height: 90px;
+    transition: 0.4s;
+    cursor: pointer;
+}
+
+.widget-shutdown .widget-content:hover {
+    font-size: 80px;
+}

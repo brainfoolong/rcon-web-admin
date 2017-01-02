@@ -4,7 +4,7 @@ View.register("users", function (messageData) {
         if (messageData.sessionUserData && messageData.login) {
             Storage.set("loginName", messageData.sessionUserData.username);
             Storage.set("loginHash", messageData.sessionUserData.loginHash);
-            if(messageData.initial){
+            if (messageData.initial) {
                 View.load("index");
                 return;
             }

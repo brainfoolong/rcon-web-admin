@@ -19,18 +19,7 @@ View.register("index", function (messageData) {
             "type": "list",
             "server": messageData.server
         }, function (data) {
-            // if server is down for some reason, reload view
-            if (!data.server) {
-                Storage.set("server", null);
-                View.changeHash("index");
-                View.load("index");
-                note("index.serveroffline", "danger", -1);
-                return;
-            }
-            if (!data.myWidgets) {
-                rowContainer.html(t("index.nowidgets"));
-                return;
-            }
+            if (!pingDataCheck(data)) return;
             // set max attribute for layout position
             $(".widget-layout .option").filter("[data-id='position']").find("input").attr("max", data.myWidgets.length - 1);
             var allWidgets = c.find(".widget");
@@ -69,6 +58,7 @@ View.register("index", function (messageData) {
                         // append the widget to the grid
                         container.find(".grid-column").eq(count - 1).append($("#" + widget.id));
                         lastSize = widget.size;
+                        count++;
                     }
                 }
             };
@@ -160,6 +150,7 @@ View.register("index", function (messageData) {
                                 }
                             }
 
+
                             widgetLoadedCallback();
                             $("head").append('<link type="text/css" href="widgets/' + widgetData.name + '/style.css" ' +
                                 'rel="stylesheet" media="all" id="css-' + widgetData.id + '">');
@@ -193,7 +184,39 @@ View.register("index", function (messageData) {
         widget.container.find(".widget-content, .widget-options, .widget-layout").addClass("hidden");
         widget.container.find(".widget-" + area).removeClass("hidden");
         widget.container.data("area", area);
+        widget.container.attr("data-area", area);
     };
+
+    /**
+     * Check the data we've got from ping
+     * @param {object} data
+     */
+    var pingDataCheck = function (data) {
+        // if server is down for some reason, reload view
+        if (!data.server) {
+            Storage.set("server", null);
+            View.changeHash("index");
+            View.load("index");
+            note("index.serveroffline", "danger", -1);
+            Interval.destroy("index.server.ping");
+            return false;
+        }
+        if (!data.myWidgets) {
+            rowContainer.html(t("index.nowidgets"));
+            return false;
+        }
+        return true;
+    };
+
+    // ping the server each 10 seconds for some checks
+    Interval.create("index.server.ping", function () {
+        Socket.send("view", {
+            "view": "index",
+            "action": "widget",
+            "type": "ping",
+            "server": messageData.server
+        }, pingDataCheck);
+    }, 10000);
 
     // bind some events
     c.off(".index").on("change.index", ".pick-server", function () {
