@@ -15,8 +15,8 @@ widget.availableCommands = {"variables": [], "commands": []};
  * @param {RconServer} server
  */
 widget.onServerConnected = function (server) {
-    // get available commands on server connect
-    server.send("find .", null, function (data) {
+    // get available commands on server connect, ignore the log
+    server.cmd("find .", null, false, function (data) {
         var key = "variables";
         var lines = data.split("\n");
         for (var i = 0; i < lines.length; i++) {

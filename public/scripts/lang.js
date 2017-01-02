@@ -110,6 +110,8 @@ lang.values.en = {
     "index.widget.position.title": "Widget position",
     "index.widget.position.info": "The layout position for this widget in ascending order.",
     "index.widget.layout.save": "You need to reload the page to see the changes",
+    "index.tooltip.options": "Options",
+    "index.tooltip.layout": "Layout",
     "cancel": "Cancel",
     "save": "Save",
     "save.edited": "Save edited data",

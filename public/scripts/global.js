@@ -30,7 +30,7 @@ function spinner(el) {
  * @param {number=} delay
  */
 function note(message, type, delay) {
-    if(delay === -1) delay = 99999999;
+    if (delay === -1) delay = 99999999;
     $.notify({
         "message": t(message)
     }, {
@@ -39,7 +39,7 @@ function note(message, type, delay) {
             from: "top",
             align: "center"
         },
-        "delay" : delay || 5000,
+        "delay": delay || 5000,
     });
 }
 
@@ -92,7 +92,7 @@ escapeHtml.map = {
     "/": '&#x2F;'
 };
 
-$(document).ready(function () {
+$(function () {
     if (typeof WebSocket == "undefined") {
         note("Your browser is not supported in this application (Outdated Browser). Please upgrade to the newest version");
         return;
@@ -126,7 +126,25 @@ $(document).ready(function () {
             $('#wrapper').toggleClass('toggled');
         });
     })();
-
+    var body = $("body");
+    var hasTouch = true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
+    body.addClass(hasTouch ? "no-touch" : "touch");
+    // bind tooltips
+    $(document).tooltip({
+        "selector": '.tooltipme',
+        "container": "body"
+    }).on("inserted.bs.tooltip", function (ev) {
+        var tt = $("#" + $(ev.target).attr("aria-describedby"));
+        var i = tt.find(".tooltip-inner");
+        i.html(t(i.html()));
+        // hide if we are on mobile touch device
+        if(hasTouch){
+            setTimeout(function () {
+                $(ev.target).trigger("mouseout");
+            }, 1000);
+        }
+    });
+    // socket stuff
     Socket.connectAndLoadView();
 });
 

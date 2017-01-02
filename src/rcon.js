@@ -116,11 +116,12 @@ Rcon.prototype.connect = function (callback) {
 /**
  * Send a commant to the server
  * @param {string|Buffer} cmd Command to execute
- * @param {string|null} username
+ * @param {WebSocketUser|null} user
+ * @param {boolean} log If true than log this message to the server log file
  * @param {function} callback Callback
  * @param {number=} type Message type
  */
-Rcon.prototype.send = function (cmd, username, callback, type) {
+Rcon.prototype.send = function (cmd, user, log, callback, type) {
     if (typeof type !== 'number') {
         type = Rcon.SERVERDATA_EXECCOMMAND;
     }
@@ -141,7 +142,8 @@ Rcon.prototype.send = function (cmd, username, callback, type) {
     } else {
         this.callbacks[this.packetId] = {
             "callback": callback,
-            "username": username
+            "user": user,
+            "log": log
         };
     }
     // write request
@@ -184,22 +186,23 @@ Rcon.prototype._data = function () {
         var size = this.dataBuffer.readInt32LE(0);
         if (this.dataBuffer.length < 4 + size) break;
         var response = {
-            "size" : size,
-            "id" : this.dataBuffer.readInt32LE(4),
-            "type" : this.dataBuffer.readInt32LE(8),
-            "body" : this.dataBuffer.slice(12, 4 + size - 2)
+            "size": size,
+            "id": this.dataBuffer.readInt32LE(4),
+            "type": this.dataBuffer.readInt32LE(8),
+            "body": this.dataBuffer.slice(12, 4 + size - 2)
         };
 
         // SERVERDATA_RESPONSE_VALUE is the response to SERVERDATA_EXECCOMMAND
         // so we collect buffer information everytime we have such a request
-        if(response.id > 0 && response.type == Rcon.SERVERDATA_RESPONSE_VALUE){
+        if (response.id > 0 && response.type == Rcon.SERVERDATA_RESPONSE_VALUE) {
             this.lastResponseId = response.id;
             this.bodyBuffer = Buffer.concat([this.bodyBuffer, response.body]);
         }
 
-        // get username to the response if possible
-        if(response.id > 0 && typeof this.callbacks[response.id] != "undefined"){
-            response.username = this.callbacks[response.id].username;
+        // get user to the response if possible
+        if (response.id > 0 && typeof this.callbacks[response.id] != "undefined") {
+            response.user = this.callbacks[response.id].user;
+            response.log = this.callbacks[response.id].log;
         }
 
         // auth response is special handled, just callback if success auth or not
@@ -208,10 +211,10 @@ Rcon.prototype._data = function () {
         }
         // if we receive an empty package than the SERVERDATA_EXECCOMMAND is finally done
         if (response.type == Rcon.SERVERDATA_RESPONSE_VALUE && response.body.length === 0 && this.lastResponseId > 0) {
-            if(typeof this.callbacks[this.lastResponseId] != "undefined"){
+            if (typeof this.callbacks[this.lastResponseId] != "undefined") {
                 var cb = this.callbacks[this.lastResponseId];
                 delete this.callbacks[this.lastResponseId];
-                if(cb.callback) cb.callback(this.bodyBuffer);
+                if (cb.callback) cb.callback(this.bodyBuffer);
                 this.bodyBuffer = new Buffer(0);
                 this.lastResponseId = 0;
             }

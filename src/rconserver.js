@@ -50,12 +50,13 @@ function RconServer(id, serverData) {
     /**
      * Send a command
      * @param {string} cmd
-     * @param {string|null} username
+     * @param {WebSocketUser|null} user
+     * @param {boolean} log If true than log this message to the server log file
      * @param {function} callback
      */
-    this.send = function (cmd, username, callback) {
+    this.cmd = function (cmd, user, log, callback) {
         if (this.connected) {
-            this.con.send(cmd, username, function (result) {
+            this.con.send(cmd, user, log, function (result) {
                 callback(result.toString());
             });
             return;
@@ -102,6 +103,8 @@ function RconServer(id, serverData) {
      * @param {object} data
      */
     this.logMessage = function (data) {
+        // if log is disabled than stop here
+        if(data.log === false) return;
         if (typeof data.body != "string") data.body = data.body.toString();
         data.timestamp = new Date().toString();
         data.server = self.id;
@@ -134,7 +137,7 @@ function RconServer(id, serverData) {
         }
         // authenticate
         self.logMessage({"body": "Rcon authentication by rcon web admin..."});
-        self.con.send(self.serverData.rcon_password, null, function (success) {
+        self.con.send(self.serverData.rcon_password, null, true, function (success) {
             self.logMessage({"body": "Rcon authentication " + (success ? "successfull" : "invalid")});
             if (!success) {
                 console.error("Invalid rcon password for server " + self.serverData.name + ":" + self.serverData.rcon_port);

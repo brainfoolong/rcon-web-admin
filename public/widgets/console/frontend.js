@@ -12,7 +12,7 @@ Widget.register(function (widget) {
         '<select class="selectpicker">' +
         '<option value="yes">' + widget.t("autoscroll.enabled") + '</option>' +
         '<option value="no">' + widget.t("autoscroll.disabled") + '</option>' +
-        '</select>'+
+        '</select>' +
         '</div>');
     var cmdSelect = $('<div class="cmd-select">' +
         '<select class="selectpicker" data-live-search="true">' +
@@ -27,22 +27,24 @@ Widget.register(function (widget) {
      */
     var addMessage = function (log) {
         var cl = "";
-        if (widget.getOptionValue("hideUserCommands") && (log.username)) {
+        if (widget.getOptionValue("hideUserCommands") && (log.user)) {
             cl = "collapsed";
         }
         if (widget.getOptionValue("hideServerLogs") && (log.type === 4)) {
             cl = "collapsed";
         }
+        cl += " logtype-" + log.type;
         var e = $('<div class="message ' + cl + '">' +
             '<div class="header"><span class="glyphicon glyphicon-chevron-down"></span>' +
-            '<span class="glyphicon glyphicon-chevron-right"></span></div>' +
+            '<span class="glyphicon glyphicon-chevron-right"></span>' +
+            '<span class="glyphicon glyphicon-info-sign"></span></div>' +
             '<div class="text"></div>' +
             '</div>'
         );
         e.find(".header").append($('<span class="timestamp"></span>').html(new Date(log.timestamp).toLocaleString()));
-        if (log.username) {
+        if (log.user) {
             e.find(".header").append('<span class="glyphicon glyphicon-user"></span>' +
-                '<span class="username">' + log.username + '</span>');
+                '<span class="username">' + log.user.username + '</span>');
         }
         e.find(".text").html(escapeHtml(log.body));
         consoleEl.append(e);

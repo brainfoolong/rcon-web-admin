@@ -1,5 +1,5 @@
 "use strict";
-View.register("index", function (messageData, firstLoad) {
+View.register("index", function (messageData) {
 
     var c = $("#content");
     var pickServer = c.find(".pick-server");

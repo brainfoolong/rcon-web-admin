@@ -31,12 +31,20 @@
     transition: 0.4s;
 }
 
+.widget-console .console .message:not(.logtype-4) .glyphicon-info-sign{
+    display: none;
+}
+
 .widget-console .console .message .header:hover{
     opacity:1;
 }
 
 .widget-console .console .message .header .glyphicon{
     padding-right: 10px;
+}
+
+.widget-console .console .message .header .glyphicon-user{
+    padding-left: 10px;
 }
 
 .widget-console .console .message.collapsed .header .glyphicon-chevron-down{

@@ -119,9 +119,9 @@ function WebSocketUser(socket) {
                         if (self.server && self.server.connected) {
                             self.server.logMessage({
                                 "body": "> " + messageData.cmd,
-                                "username": self.userData.username
+                                "user": self
                             });
-                            self.server.send(messageData.cmd, self.userData.username, function (serverMessage) {
+                            self.server.cmd(messageData.cmd, self, true, function (serverMessage) {
                                 sendCallback({"message": serverMessage});
                             });
                             return;
@@ -200,6 +200,14 @@ function WebSocketUser(socket) {
             }
         }
         return null;
+    };
+
+    /**
+     * Convert to json
+     * @returns {object}
+     */
+    this.toJSON = function () {
+        return {"username": this.userData.username};
     };
 }
 
