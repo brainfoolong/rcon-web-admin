@@ -29,7 +29,7 @@ Storage.get = function (key) {
  */
 Storage.set = function (key, value, session) {
     var storage = session ? sessionStorage : localStorage;
-    if (value === null) {
+    if (value === null || typeof value == "undefined") {
         storage.removeItem(key);
     } else {
         storage.setItem(key, JSON.stringify(value))

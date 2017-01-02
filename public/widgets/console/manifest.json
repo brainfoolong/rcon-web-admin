@@ -7,6 +7,10 @@
     "medium"
   ],
   "options": {
+    "showOldLogs": {
+      "type": "switch",
+      "default": false
+    },
     "limit": {
       "type": "switch",
       "default": true
@@ -32,6 +36,8 @@
       "title": "Console",
       "autoscroll.enabled": "Automatic scroll",
       "autoscroll.disabled": "Manual scroll",
+      "option.showOldLogs.title": "Show old logs",
+      "option.showOldLogs.info": "If you open up the dashboard, should we show old messages loaded in the console log. If not enabled than you only will see messages that comes in when you've opened the dashboard page. No panic, old logs are still saved in the background.",
       "option.limit.title": "Limit messages",
       "option.limit.info": "Just display the last x messages (defined with next option), if disabled than the full log will be loaded (max. 1 MegaByte)",
       "option.limitNr.title": "Number of messages",

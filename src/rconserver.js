@@ -135,15 +135,16 @@ function RconServer(id, serverData) {
     /**
      * Simulate the onServerMessage event by passing a simple string message
      * @param {string} message
+     * @param {WebSocketUser=} user
      */
-    this.injectServerMessage = function (message) {
+    this.injectServerMessage = function (message, user) {
         this.onServerMessage({
             "id": -1,
             "type": Rcon.SERVERDATA_RESPONSE_VALUE,
             "size": message.length,
             "log": true,
             "timestamp": new Date(),
-            "user": null,
+            "user": user || null,
             "server": this,
             "body": message
         });

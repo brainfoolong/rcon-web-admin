@@ -123,10 +123,7 @@ function WebSocketUser(socket) {
                         break;
                     case "cmd":
                         if (self.server && self.server.connected) {
-                            self.server.logMessage({
-                                "body": "> " + messageData.cmd,
-                                "user": self
-                            });
+                            self.server.injectServerMessage("> " + messageData.cmd, self);
                             self.server.cmd(messageData.cmd, self, true, function (serverMessage) {
                                 sendCallback({"message": serverMessage});
                             });

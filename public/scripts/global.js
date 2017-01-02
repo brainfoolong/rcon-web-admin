@@ -131,7 +131,7 @@ $(function () {
     body.addClass(hasTouch ? "no-touch" : "touch");
     // bind tooltips
     $(document).tooltip({
-        "selector": '.tooltipme',
+        "selector": '[title]',
         "container": "body"
     }).on("inserted.bs.tooltip", function (ev) {
         var tt = $("#" + $(ev.target).attr("aria-describedby"));

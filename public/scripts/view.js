@@ -112,15 +112,6 @@ View.load = function (view, messageData, callback) {
         if (viewData.note) {
             note(viewData.note[0], viewData.note[1]);
         }
-        if (viewData.error) {
-            var message = "Server Error: " + viewData.error.message;
-            if (viewData.error.stack) {
-                message = "<strong>Server Error</strong>\n" + viewData.error.stack;
-            }
-            $("#content").html($('<div class="alert alert-danger" style="white-space: pre-wrap"></div>').html(message));
-            if (callback) callback(null);
-            return;
-        }
         var loadCallback = function (firstLoad) {
             var hash = viewData.view;
             // only change the hash if no form data has been sent back or if redirect is given

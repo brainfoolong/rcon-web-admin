@@ -75,10 +75,12 @@ function Widget(name) {
      * @param {RconServer} server
      * @param {string} key
      * @param {*} value
+     * @param {number=} lifetime Lifetime of the stored data in seconds, ommit if not timeout
      */
-    this.storage.set = function (server, key, value) {
+    this.storage.set = function (server, key, value, lifetime) {
         var data = this.getObject(server);
         data[key] = value;
+        data[key + ".lifetime"] = lifetime ? (new Date().getTime() / 1000) + lifetime : -1;
         var entry = self.getDbEntry(server);
         if (entry) {
             entry.set("storage", data).value();
@@ -92,7 +94,14 @@ function Widget(name) {
      * @returns {*|null} Null if not found
      */
     this.storage.get = function (server, key) {
-        return this.getObject(server)[key] || null;
+        var data = this.getObject(server)[key];
+        if (typeof data == "undefined") return null;
+        var lifetime = this.getObject(server)[key + ".lifetime"];
+        if (lifetime > -1) {
+            // if lifetime has ended than return null
+            if (lifetime < new Date().getTime() / 1000) return null;
+        }
+        return data;
     };
 
     /**
@@ -168,10 +177,11 @@ function Widget(name) {
      * On frontend message
      * @param {RconServer} server
      * @param {WebSocketUser} user
+     * @param {string} action The action
      * @param {*} messageData Any message data received from frontend
      * @param {function} callback Pass an object as message data response for the frontend
      */
-    this.onFrontendMessage = function (server, user, messageData, callback) {
+    this.onFrontendMessage = function (server, user, action, messageData, callback) {
         // override this function in the child widget
     };
 

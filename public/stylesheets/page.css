@@ -347,6 +347,13 @@ h1 {
     padding-left: 20px;
 }
 
+h2 {
+    font-size: 24px;
+    color: white;
+    border-left: 2px solid #6cfeae;
+    padding-left: 20px;
+}
+
 .title {
     border-left: 2px solid #5a9031;
     padding-left: 20px;
@@ -481,26 +488,33 @@ body.is-not-admin [data-role='admin'] {
     padding-right: 90px;
 }
 
-.widget .widget-options-icon,
-.widget .widget-layout-icon {
+.widget .widget-icons{
     position: absolute;
     right: 10px;
     top: 10px;
-    width: 24px;
     height: 24px;
     font-size: 24px;
+}
+
+.widget .widget-icons .icon{
     opacity: 0.5;
     cursor: pointer;
     transition: 0.4s;
-    line-height: 1;
+    display: inline-block;
 }
 
-.widget .widget-layout-icon {
-    right: 45px;
+.widget .widget-readme h1,
+.widget .widget-readme h2{
+    margin-bottom:20px;
+    margin-top: 20px;
 }
 
-.widget .widget-options-icon:hover,
-.widget .widget-layout-icon:hover {
+.widget .widget-readme code{
+    overflow: auto;
+    white-space: pre;
+}
+
+.widget .widget-icons .icon:hover {
     opacity: 1;
     transform: rotate(10deg);
 }

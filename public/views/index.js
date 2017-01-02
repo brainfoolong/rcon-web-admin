@@ -82,6 +82,9 @@ View.register("index", function (messageData) {
                             widget.container = c.find(".templates .widget").clone().attr("id", widget.id);
                             widget.container.addClass("widget-" + widget.name);
                             widget.container.find(".widget-title").text(widget.t("title"));
+                            $.get("widgets/" + widgetData.name + "/README.md", function (data) {
+                                widget.container.find(".widget-readme").html(new showdown.Converter().makeHtml(data));
+                            });
                             // copy to hidden widgets form, set position later
                             $(".widgets-unsorted").append(widget.container);
                             widget.content = widget.container.find(".widget-content");
@@ -181,7 +184,7 @@ View.register("index", function (messageData) {
         if (lastArea === area) {
             area = "content";
         }
-        widget.container.find(".widget-content, .widget-options, .widget-layout").addClass("hidden");
+        widget.container.find(".widget-content, .widget-options, .widget-layout, .widget-readme").addClass("hidden");
         widget.container.find(".widget-" + area).removeClass("hidden");
         widget.container.data("area", area);
         widget.container.attr("data-area", area);
@@ -247,15 +250,18 @@ View.register("index", function (messageData) {
                     "action": "widget",
                     "type": "remove",
                     "server": messageData.server,
-                    "widget": widget.id
+                    "widget": widget.id,
+                    "name" : widget.name
                 }, function () {
                     widget.remove();
                 });
             }
         }
-    }).on("click.index", ".widget .widget-show-area", function () {
-        var w = $(this).closest(".widget");
+    }).on("click.index", ".widget .widget-icons .icon", function (ev) {
+        ev.stopPropagation();
         showArea(Widget.getByElement(this), $(this).attr("data-id"));
+    }).on("click.index", ".widget .widget-title", function () {
+        showArea(Widget.getByElement(this), "content");
     }).on("input.index change.index", ".widget-options .option :input", function () {
         var e = $(this);
         clearTimeout(e.data("optionTimeout"));

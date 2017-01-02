@@ -136,19 +136,22 @@ function Widget(name) {
      * Set a value in the widget storage
      * @param {string} key
      * @param {*} value
+     * @param {number=} lifetime Lifetime of the stored data in seconds, ommit if not timeout
+     * @param {function=} callback
      */
-    this.storage.set = function (key, value) {
+    this.storage.set = function (key, value, lifetime, callback) {
+        lifetime = lifetime ? (new Date().getTime() / 1000) + lifetime : -1;
+        self.data.storage[key] = value;
+        self.data.storage[key + ".lifetime"] = lifetime;
         self.send("view", {
             "view": "index",
             "action": "widget",
             "widget": self.id,
             "type": "storage",
+            "lifetime": lifetime,
             "key": key,
             "value": value
-        }, function () {
-            if (callback) callback();
-            self.data.storage[key] = value;
-        });
+        }, callback);
     };
 
     /**
@@ -157,7 +160,15 @@ function Widget(name) {
      * @returns {*|null} Null if not found
      */
     this.storage.get = function (key) {
-        return self.data.storage[key] || null;
+        var data = self.data.storage[key];
+        if (typeof data == "undefined") return null;
+        var lifetime = self.data.storage[key + ".lifetime"];
+        console.log(data, lifetime, new Date().getTime() / 1000);
+        if (lifetime > -1) {
+            // if lifetime has ended than return null
+            if (lifetime < new Date().getTime() / 1000) return null;
+        }
+        return data;
     };
 
     /**

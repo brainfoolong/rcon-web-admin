@@ -21,6 +21,9 @@ Widget.register(function (widget) {
         '</div>');
     var autoscrollInp = searchEl.find("select");
 
+    var initialServerLog = [];
+    var receivedServerMessages = [];
+
     /**
      * Add a message to console
      * @param {object} messageData
@@ -55,20 +58,14 @@ Widget.register(function (widget) {
      */
     var reloadServerLog = function () {
         consoleEl.html('');
-        var data = {};
-        if (widget.options.get("limit")) {
-            data.limit = widget.options.get("limitNr");
-        }
-        widget.backend("server-log", data, function (messageData) {
-            var logData = messageData.log.split("\n");
-            for (var i in logData) {
-                try {
-                    addMessage(JSON.parse(logData[i]));
-                } catch (e) {
-
-                }
+        if (widget.options.get("showOldLogs")) {
+            for (var i = 0; i < initialServerLog.length; i++) {
+                addMessage(JSON.parse(initialServerLog[i]));
             }
-        });
+        }
+        for (var j = 0; j < receivedServerMessages.length; j++) {
+            addMessage(receivedServerMessages[i]);
+        }
         widget.createInterval("scroll", function () {
             if (consoleEl.length && autoscrollInp.length && autoscrollInp[0].value == "yes") {
                 var elem = consoleEl[0];
@@ -192,8 +189,19 @@ Widget.register(function (widget) {
         widget.content.append(cmdEl);
         widget.content.append(cmdSelect);
         widget.content.find(".selectpicker").selectpicker();
-        widget.onRconMessage(addMessage);
-        reloadServerLog();
+        widget.onRconMessage(function (message) {
+            receivedServerMessages.push(message);
+            addMessage(message);
+        });
+
+        var serverLogOptions = {};
+        if (widget.options.get("limit")) {
+            serverLogOptions.limit = widget.options.get("limitNr");
+        }
+        widget.backend("server-log", serverLogOptions, function (messageData) {
+            initialServerLog = messageData.log.split("\n");
+            reloadServerLog();
+        });
     };
 
     /**

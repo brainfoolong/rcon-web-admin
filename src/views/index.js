@@ -85,16 +85,19 @@ var View = function (user, messageData, callback) {
                             "position": list.size().value(),
                             "size": widget.manifest.compatibleSizes[0],
                             "options": {},
-                            "storage" : {}
+                            "storage": {}
                         }).value();
                     }
                     deeperCallback({"widget": widgetId});
                     break;
                 case "remove":
+                    widget = Widget.get(messageData.name);
                     wdb.get("list").remove({
                         "id": messageData.widget,
                         "user": user.userData.id
                     }).value();
+                    delete widget.storageCache[currentServer.id];
+                    delete widget.optionsCache[currentServer.id];
                     deeperCallback({});
                     break;
                 case "layout":
@@ -118,7 +121,8 @@ var View = function (user, messageData, callback) {
                     });
                     if (widgetEntry.size()) {
                         var storage = widgetEntry.get("storage").value();
-                        storage[messageData.option] = messageData.value;
+                        storage[messageData.key] = messageData.value;
+                        storage[messageData.key + ".lifetime"] = messageData.lifetime;
                         widgetEntry.set("storage", storage).value();
                     }
                     deeperCallback({});

@@ -112,6 +112,7 @@ lang.values.en = {
     "index.widget.layout.save": "You need to reload the page to see the changes",
     "index.tooltip.options": "Options",
     "index.tooltip.layout": "Layout",
+    "index.tooltip.readme": "Readme",
     "cancel": "Cancel",
     "save": "Save",
     "save.edited": "Save edited data",

@@ -132,7 +132,18 @@ Socket.connectAndLoadView = function () {
  * @param {function=} callback
  */
 Socket.send = function (action, messageData, callback) {
-    if (!callback) callback = function () {
+    var receiveCallback = function (receivedMessage) {
+        console.log(receivedMessage);
+        if (receivedMessage.error) {
+            var message = "Server Error: " + receivedMessage.error.message;
+            if (receivedMessage.error.stack) {
+                message = "<strong>Server Error</strong>\n" + receivedMessage.error.stack;
+            }
+            $("#content").html($('<div class="alert alert-danger" style="white-space: pre-wrap"></div>').html(message));
+            Socket.callbacks = [];
+            return;
+        }
+        if (callback) callback(receivedMessage);
     };
     if (typeof messageData == "undefined") {
         messageData = null;
@@ -153,6 +164,6 @@ Socket.send = function (action, messageData, callback) {
         "loginName": Storage.get("loginName"),
         "loginHash": Storage.get("loginHash")
     };
-    Socket.callbacks.push(callback);
+    Socket.callbacks.push(receiveCallback);
     Socket.con.send(JSON.stringify(data));
 };

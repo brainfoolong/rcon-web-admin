@@ -6,15 +6,21 @@
     "large",
     "medium"
   ],
-  "options": {
-    "foo": {
-      "type": "switch",
-      "default": true
-    }
-  },
+  "options": {},
   "locale": {
     "en": {
-      "title": "Chatbot"
+      "title": "Chatbot",
+      "title.placeholder": "Name your bot script",
+      "save.changes": "Save changes",
+      "missing.title": "Please name your script",
+      "missing.script": "Well, without a script to execute we cannot do anything for you",
+      "list.programs": "Choose an existing program to edit",
+      "new.program": "Create a new program",
+      "saved": "Program saved",
+      "delete.program" : "Delete program",
+      "sure" : "Are you sure?",
+      "program.enabled" : "Active",
+      "program.disabled" : "Inactive"
     }
   }
 }
