@@ -129,6 +129,14 @@ Widget.register(function (widget) {
             aceEditor.on("change", function () {
                 actionBtns.find(".btn.save").removeClass("hidden");
             });
+
+            // update programs after ace is ready
+            updatePrograms(function () {
+                editId = Storage.get("widget.chatbot.id");
+                if (editId) {
+                    loadProgram(editId);
+                }
+            });
         };
         if (!window.ace) {
             $.getScript("widgets/chatbot/ace/ace.js", aceCallback);
@@ -153,13 +161,6 @@ Widget.register(function (widget) {
         widget.content.append(programSelect);
         widget.content.append(actionBtns);
         widget.content.find(".selectpicker").selectpicker();
-
-        updatePrograms(function () {
-            editId = Storage.get("widget.chatbot.id");
-            if (editId) {
-                loadProgram(editId);
-            }
-        });
 
         actionBtns.find(".btn.save").on("click", saveProgram);
         actionBtns.find(".btn.delete").on("click", function () {

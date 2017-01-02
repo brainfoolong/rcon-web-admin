@@ -163,7 +163,6 @@ function Widget(name) {
         var data = self.data.storage[key];
         if (typeof data == "undefined") return null;
         var lifetime = self.data.storage[key + ".lifetime"];
-        console.log(data, lifetime, new Date().getTime() / 1000);
         if (lifetime > -1) {
             // if lifetime has ended than return null
             if (lifetime < new Date().getTime() / 1000) return null;
