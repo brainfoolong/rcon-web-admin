@@ -2,7 +2,6 @@
     background: #00FFFD;
     background: radial-gradient(ellipse at center, #00FFFD 0%, #008692 100%);
     transition: 0.4s;
-
 }
 
 .widget-restart .widget-content {
@@ -12,6 +11,7 @@
     height: 90px;
     transition: 0.4s;
     cursor: pointer;
+    overflow: hidden;
 }
 
 .widget-restart .widget-content:hover {

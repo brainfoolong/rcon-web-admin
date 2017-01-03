@@ -471,8 +471,23 @@ body.is-not-admin [data-role='admin'] {
     border: 1px solid rgba(0, 0, 0, 0.6);
 }
 
+.widget:not(.collapsed) .widget-title .glyphicon-chevron-right{
+    display: none;
+}
+
+.widget.collapsed .widget-title .glyphicon-chevron-down{
+    display: none;
+}
+
+.widget.collapsed .widget-content{
+    overflow:hidden;
+    height:0;
+    padding:0;
+}
+
 .widget[data-area='options'],
-.widget[data-area='layout'] {
+.widget[data-area='layout'],
+.widget[data-area='readme'] {
     background: rgba(255, 255, 255, 0.1) !important;
 }
 
@@ -481,12 +496,18 @@ body.is-not-admin [data-role='admin'] {
 }
 
 .widget .widget-title {
+    cursor: pointer;
     color: white;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     padding-bottom: 10px;
     margin-bottom: 10px;
     padding-right: 90px;
 }
+
+.widget .widget-title .glyphicon{
+    margin-right: 10px;
+}
+
 
 .widget .widget-icons{
     position: absolute;

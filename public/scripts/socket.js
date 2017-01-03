@@ -73,6 +73,7 @@ Socket.connect = function (callback) {
     con.onmessage = function (e) {
         if (e.data) {
             var data = JSON.parse(e.data);
+            debug("Socket receive message", data);
             if (data.action) {
                 if (typeof data.callbackId != "undefined") {
                     var callbackId = data.callbackId;
@@ -165,4 +166,5 @@ Socket.send = function (action, messageData, callback) {
     };
     Socket.callbacks.push(receiveCallback);
     Socket.con.send(JSON.stringify(data));
+    debug("Socket sent message", data);
 };

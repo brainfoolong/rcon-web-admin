@@ -23,6 +23,8 @@ Widget.register(function (widget) {
 
     var initialServerLog = [];
     var receivedServerMessages = [];
+    var searchTimeout = null;
+    var searchMatchTimeout = null;
 
     /**
      * Add a message to console
@@ -47,10 +49,26 @@ Widget.register(function (widget) {
         e.find(".header").append($('<span class="timestamp"></span>').html(new Date(messageData.timestamp).toLocaleString()));
         if (messageData.user) {
             e.find(".header").append('<span class="glyphicon glyphicon-user"></span>' +
-                '<span class="username">' + messageData.user.username + '</span>');
+                '<span class="username">' + messageData.user + '</span>');
         }
         e.find(".text").html(escapeHtml(messageData.body));
         consoleEl.append(e);
+        if (autoscrollInp.length && autoscrollInp[0].value == "yes") {
+            scrollTo(999999999);
+        }
+    };
+
+    /**
+     * Scroll console to given position
+     * @param {number} pos
+     */
+    var scrollTo = function (pos) {
+        $({"pos": consoleEl.scrollTop()}).animate({"pos": pos}, {
+            duration : 300,
+            step: function () {
+                consoleEl.scrollTop(this.pos);
+            }
+        });
     };
 
     /**
@@ -60,18 +78,13 @@ Widget.register(function (widget) {
         consoleEl.html('');
         if (widget.options.get("showOldLogs")) {
             for (var i = 0; i < initialServerLog.length; i++) {
+                if (!initialServerLog[i].length) continue;
                 addMessage(JSON.parse(initialServerLog[i]));
             }
         }
         for (var j = 0; j < receivedServerMessages.length; j++) {
             addMessage(receivedServerMessages[i]);
         }
-        widget.createInterval("scroll", function () {
-            if (consoleEl.length && autoscrollInp.length && autoscrollInp[0].value == "yes") {
-                var elem = consoleEl[0];
-                elem.scrollTop = 99999999999;
-            }
-        }, 50);
     };
 
     /**
@@ -117,6 +130,7 @@ Widget.register(function (widget) {
         });
         widget.content.on("click", ".timestamp", function (ev) {
             $(this).closest(".message").toggleClass("collapsed");
+            scrollTo($(this).closest(".message")[0].offsetTop - 40);
         });
         widget.content.on("change", ".cmd-select select", function (ev) {
             var v = $(this).val();
@@ -131,58 +145,74 @@ Widget.register(function (widget) {
                 }, 100);
             }
         });
-        widget.content.on("input", ".search input", function () {
+        widget.content.on("keyup", ".search input", function (ev) {
             var messages = widget.content.find(".console .message");
-            if (this.value.length <= 1 && $(this).data("searched")) {
-                $(this).data("searched", 0);
-                reloadServerLog();
-            }
-            if (this.value.length > 1) {
-                $(this).data("searched", 1);
-                var s = this.value.trim().split(" ");
-                var sRegex = s;
-                for (var i in sRegex) {
-                    sRegex[i] = {
-                        "regex": new RegExp(sRegex[i].replace(/[^0-9a-z\/\*]/ig, "\\$&").replace(/\*/ig, ".*?"), "ig"),
-                        "val": s[i]
-                    };
+            if (ev.keyCode == 13) {
+                messages.find(".match").not(".skip").first().addClass("skip");
+                var firstMatch = messages.find(".match").not(".skip").first();
+                if (firstMatch.length) {
+                    scrollTo(firstMatch[0].offsetTop - 30);
                 }
-                messages.addClass("hidden").each(function () {
-                    var f = $(this);
-                    var value = f.find("*").text();
-                    if (!f.data("searchelements")) {
-                        f.data("searchelements", [
-                            {"el": f.find(".header .username"), "value": f.find(".header .username").text()},
-                            {"el": f.find(".header .timestamp"), "value": f.find(".header .timestamp").text()},
-                            {"el": f.find(".text"), "value": f.find(".text").text()}
-                        ]);
-                    }
-                    var elements = f.data("searchelements");
-                    for (var i in elements) {
-                        var data = elements[i];
-                        var html = data.value;
-                        var matches = [];
-                        var fail = false;
-                        sRegex.forEach(function (val) {
-                            var m = value.match(val.regex);
-                            if (!value.match(val.regex)) {
-                                fail = true;
-                                return true;
-                            } else {
-                                matches.push(m[0]);
-                                html = html.replace(val.regex, "_" + (matches.length - 1) + "_");
-                            }
-                        });
-                        if (!fail) f.removeClass("hidden collapsed");
-                        for (var m in matches) {
-                            html = html.replace(new RegExp("_" + m + "_", "ig"), '<span class="match">' + matches[m] + '</span>');
-                        }
-                        data.el.html(html);
-                    }
-                });
+                return;
             }
-            var elem = consoleEl[0];
-            elem.scrollTop = elem.scrollHeight;
+            clearTimeout(searchTimeout);
+            var value = this.value;
+            searchTimeout = setTimeout(function () {
+                if (value.length <= 1 && $(this).data("searched")) {
+                    $(this).data("searched", 0);
+                    reloadServerLog();
+                }
+                if (value.length > 1) {
+                    $(this).data("searched", 1);
+                    var s = value.trim().split(" ");
+                    var sRegex = s;
+                    for (var i in sRegex) {
+                        sRegex[i] = {
+                            "regex": new RegExp(sRegex[i].replace(/[^0-9a-z\/\*]/ig, "\\$&").replace(/\*/ig, ".*?"), "ig"),
+                            "val": s[i]
+                        };
+                    }
+                    messages.addClass("hidden").each(function () {
+                        var f = $(this);
+                        var value = f.find("*").text();
+                        if (!f.data("searchelements")) {
+                            f.data("searchelements", [
+                                {"el": f.find(".header .username"), "value": f.find(".header .username").text()},
+                                {"el": f.find(".header .timestamp"), "value": f.find(".header .timestamp").text()},
+                                {"el": f.find(".text"), "value": f.find(".text").text()}
+                            ]);
+                        }
+                        var elements = f.data("searchelements");
+                        for (var i in elements) {
+                            var data = elements[i];
+                            var html = data.value;
+                            var matches = [];
+                            var fail = false;
+                            sRegex.forEach(function (val) {
+                                var m = value.match(val.regex);
+                                if (!value.match(val.regex)) {
+                                    fail = true;
+                                    return true;
+                                } else {
+                                    matches.push(m[0]);
+                                    html = html.replace(val.regex, "_" + (matches.length - 1) + "_");
+                                }
+                            });
+                            if (!fail) {
+                                f.removeClass("hidden collapsed");
+                            }
+                            for (var m in matches) {
+                                html = html.replace(new RegExp("_" + m + "_", "ig"), '<span class="match">' + matches[m] + '</span>');
+                            }
+                            data.el.html(html);
+                        }
+                    });
+                    var firstMatch = messages.find(".match").not(".skip").first();
+                    if (firstMatch.length) {
+                        scrollTo(firstMatch[0].offsetTop - 30);
+                    }
+                }
+            }, 100);
         });
         widget.content.append(consoleEl);
         widget.content.append(searchEl);

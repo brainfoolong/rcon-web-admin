@@ -108,7 +108,7 @@ function RconServer(id, serverData) {
         var rconMessageJson = {
             "type": rconMessage.type,
             "body": rconMessage.body,
-            "user": rconMessage.user ? rconMessage.user.id : null,
+            "user": rconMessage.user ? rconMessage.user.userData.username : null,
             "server": rconMessage.server.id,
             "timestamp": rconMessage.timestamp.toString()
         };
@@ -117,7 +117,7 @@ function RconServer(id, serverData) {
             var user = WebSocketUser.instances[i];
             var server = user.getServerById(self.id);
             if (server) {
-                user.send("server-message", rconMessageJson);
+                user.send("serverMessage", rconMessageJson);
             }
         }
         // also send to all active widgets

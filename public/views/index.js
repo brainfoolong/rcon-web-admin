@@ -72,7 +72,12 @@ View.register("index", function (messageData) {
                         widget.data = widgetData;
                         widgetLoadedCallback();
                     } else {
+                        // a fix to catch non existing script file errors
+                        var loadTo = setTimeout(function () {
+                            widgetLoadedCallback();
+                        }, 1000);
                         $.getScript("widgets/" + widgetData.name + "/frontend.js", function () {
+                            clearTimeout(loadTo);
                             var widget = new Widget(widgetData.name);
                             Widget.widgets[widgetData.id] = widget;
                             widget.id = widgetData.id;
@@ -81,7 +86,10 @@ View.register("index", function (messageData) {
                             // some html stuff
                             widget.container = c.find(".templates .widget").clone().attr("id", widget.id);
                             widget.container.addClass("widget-" + widget.name);
-                            widget.container.find(".widget-title").text(widget.t("title"));
+                            widget.container.find(".widget-title").append($('<span>').text(widget.t("title")));
+                            if (Storage.get("widget.collapsed." + widget.id)) {
+                                widget.container.addClass("collapsed");
+                            }
                             $.get("widgets/" + widgetData.name + "/README.md", function (data) {
                                 widget.container.find(".widget-readme").html(new showdown.Converter().makeHtml(data));
                             });
@@ -251,7 +259,7 @@ View.register("index", function (messageData) {
                     "type": "remove",
                     "server": messageData.server,
                     "widget": widget.id,
-                    "name" : widget.name
+                    "name": widget.name
                 }, function () {
                     widget.remove();
                 });
@@ -261,7 +269,9 @@ View.register("index", function (messageData) {
         ev.stopPropagation();
         showArea(Widget.getByElement(this), $(this).attr("data-id"));
     }).on("click.index", ".widget .widget-title", function () {
-        showArea(Widget.getByElement(this), "content");
+        var widget = Widget.getByElement(this);
+        widget.container.toggleClass("collapsed");
+        Storage.set("widget.collapsed."+widget.id, widget.container.hasClass("collapsed"))
     }).on("input.index change.index", ".widget-options .option :input", function () {
         var e = $(this);
         clearTimeout(e.data("optionTimeout"));

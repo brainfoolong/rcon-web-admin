@@ -1,5 +1,5 @@
 {
-  "name": "chatbot",
+  "name": "autobot",
   "version": "0.9.0",
   "compatibleGames": "all",
   "compatibleSizes": [
@@ -9,7 +9,7 @@
   "options": {},
   "locale": {
     "en": {
-      "title": "Chatbot",
+      "title": "Autobot",
       "title.placeholder": "Name your bot script",
       "save.changes": "Save changes",
       "missing.title": "Please name your script",

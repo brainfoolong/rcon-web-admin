@@ -287,7 +287,7 @@ Widget.updateAllActive = function () {
         if (users.hasOwnProperty(usersIndex)) {
             var usersRow = users[usersIndex];
             if (usersRow.server) {
-                usersRow.send("widget-update-done", {"server": usersRow.server.id});
+                usersRow.send("widgetUpdateDone", {"server": usersRow.server.id});
             }
         }
     }

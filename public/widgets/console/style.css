@@ -4,6 +4,7 @@
     white-space: pre-wrap;
     overflow: auto;
     margin-bottom: 10px;
+    position: relative;
 }
 
 .widget-console .console .message {

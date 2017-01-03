@@ -1,6 +1,23 @@
 "use strict";
 
 /**
+ * Simple debug message, must be enabled via debug.set() in browser console
+ */
+function debug() {
+    var flag = sessionStorage.getItem("debug");
+    if (!flag) return;
+    console[flag].apply(this, arguments);
+}
+
+/**
+ * Set debug flag
+ * @param {string} flag Set to "log" or "trace", set false to disable it
+ */
+debug.set = function (flag) {
+    sessionStorage.setItem("debug", flag ? flag : "");
+};
+
+/**
  * Just get a translation value for given key
  * @param {string} key
  * @param {object=} params
@@ -131,14 +148,14 @@ $(function () {
     body.addClass(hasTouch ? "no-touch" : "touch");
     // bind tooltips
     $(document).tooltip({
-        "selector": '[title]',
-        "container": "body"
+        "selector": '[data-tooltip]',
+        "container": "body",
+        "title" : function () {
+            return t($(this).attr("data-tooltip"));
+        }
     }).on("inserted.bs.tooltip", function (ev) {
-        var tt = $("#" + $(ev.target).attr("aria-describedby"));
-        var i = tt.find(".tooltip-inner");
-        i.html(t(i.html()));
         // hide if we are on mobile touch device
-        if(hasTouch){
+        if (hasTouch) {
             setTimeout(function () {
                 $(ev.target).trigger("mouseout");
             }, 1000);

@@ -41,8 +41,8 @@ Widget.register(function (widget) {
             return;
         }
         widget.backend("validate-script", {"script": script}, function (messageData) {
-            if (messageData !== true) {
-                note(messageData.replace(/\n/g, "<br/>"), "danger");
+            if (messageData.error) {
+                note(messageData.error.replace(/\n/g, "<br/>"), "danger");
                 return;
             }
             widget.backend("save", {
@@ -55,7 +55,7 @@ Widget.register(function (widget) {
                 loadProgram(editId);
                 updatePrograms(function () {
                     programSelect.find("select").selectpicker("val", editId);
-                    Storage.set("widget.chatbot.id", editId);
+                    Storage.set("widget.autobot.id", editId);
                     note(widget.t("saved"), "success");
                 });
             });
@@ -85,7 +85,7 @@ Widget.register(function (widget) {
             titleEl.find("input").val(messageData ? messageData.title : "");
             titleEl.find("select").selectpicker("val", !messageData || messageData.active ? "yes" : "no");
             aceSession.setValue(messageData ? messageData.script : "");
-            Storage.set("widget.chatbot.id", id);
+            Storage.set("widget.autobot.id", id);
             actionBtns.find(".btn.save").addClass("hidden");
         });
     };
@@ -115,7 +115,7 @@ Widget.register(function (widget) {
             aceEditor = ace.edit(editor[0]);
             aceEditor.$blockScrolling = Infinity;
             aceSession = aceEditor.getSession();
-            ace.config.set('basePath', 'widgets/chatbot/ace');
+            ace.config.set('basePath', 'widgets/autobot/ace');
             aceEditor.setOptions({
                 fontSize: "14px"
             });
@@ -132,14 +132,14 @@ Widget.register(function (widget) {
 
             // update programs after ace is ready
             updatePrograms(function () {
-                editId = Storage.get("widget.chatbot.id");
+                editId = Storage.get("widget.autobot.id");
                 if (editId) {
                     loadProgram(editId);
                 }
             });
         };
         if (!window.ace) {
-            $.getScript("widgets/chatbot/ace/ace.js", aceCallback);
+            $.getScript("widgets/autobot/ace/ace.js", aceCallback);
         } else {
             aceCallback();
         }
@@ -166,6 +166,25 @@ Widget.register(function (widget) {
         actionBtns.find(".btn.delete").on("click", function () {
             if (confirm(widget.t("sure"))) {
                 deleteProgram(editId);
+            }
+        });
+
+        Socket.onMessage(function (data) {
+            if (data.action == "autobotExecutedScript") {
+                if (data.messageData.logs) {
+                    var logs = data.messageData.logs;
+                    for (var i = 0; i < logs.length; i++) {
+                        var log = logs[i];
+                        log.unshift("Autobot execution log for '" + data.messageData.program.title + "'");
+                        console.log.apply(this, log);
+                    }
+                }
+                if (data.messageData.error) {
+                    console.error(
+                        "Autobot execution error for '" + data.messageData.program.title + "'",
+                        data.messageData.error
+                    );
+                }
             }
         });
     };

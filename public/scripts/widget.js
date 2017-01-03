@@ -50,7 +50,7 @@ function Widget(name) {
      */
     this.onRconMessage = function (callback) {
         var socketCallback = function (data) {
-            if (data.action == "server-message" && self.server == data.messageData.server) {
+            if (data.action == "serverMessage" && self.server == data.messageData.server) {
                 callback(data.messageData);
             }
         };
@@ -249,7 +249,7 @@ function Widget(name) {
     // bind a message handler to call the update method when the backend send that request
     (function () {
         var socketCallback = function (data) {
-            if (data.action == "widget-update-done" && self.server == data.messageData.server) {
+            if (data.action == "widgetUpdateDone" && self.server == data.messageData.server) {
                 self.onBackendUpdate();
             }
         };

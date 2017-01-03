@@ -113,6 +113,7 @@ lang.values.en = {
     "index.tooltip.options": "Options",
     "index.tooltip.layout": "Layout",
     "index.tooltip.readme": "Readme",
+    "dashboard": "Dashboard",
     "cancel": "Cancel",
     "save": "Save",
     "save.edited": "Save edited data",

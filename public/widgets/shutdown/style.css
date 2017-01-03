@@ -12,6 +12,7 @@
     height: 90px;
     transition: 0.4s;
     cursor: pointer;
+    overflow: hidden;
 }
 
 .widget-shutdown .widget-content:hover {
