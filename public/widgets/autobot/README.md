@@ -22,8 +22,10 @@ The name is program. Automate commands, schedule commands, simply do "if this th
         count++;
         storage.set(storageKey, count, 10);
         if(count > 3) {
-            say("Sorry " + user.name + ", get a kick for your saltyness");
-            cmd("kick " + user.id);
+            // notice this callback, you must wait for the say command to finish
+            say("Sorry " + user.name + ", get a kick for your saltyness", function() {
+                cmd("kick " + user.id);
+            });
         }else{
             say("Keep your language friendly, you've done that "+count+" times");
         }
@@ -89,8 +91,8 @@ You can use this pre-defined variables in your script.
 
 You can use this methods to send a chat message or to execute any command you like.
 
-* **say(message)** = say a chat message as server
-* **cmd(cmd)** = execute any rcon command
+* **say(message, callback)** = say a chat message as server, the callback will be called when say command have been executed
+* **cmd(cmd, callback)** = execute any rcon command, the callback will be called when the command have been executed
 * **storage.set(key, value, lifetime)** = set value in permanent storage, lifetime in seconds, ommit if no timeout
 * **storage.get(key)** = get value from permanent storage
     
