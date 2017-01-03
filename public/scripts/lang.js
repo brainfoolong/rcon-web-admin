@@ -129,6 +129,12 @@ lang.values.en = {
     "on": "On",
     "off": "Off",
     "sure": "Are you sure?",
+    "modal.ok" : "Ok",
+    "modal.accept" : "Accept",
+    "modal.cancel" : "Cancel",
+    "modal.title.alert" : "Information",
+    "modal.title.confirm" : "Confirmation",
+    "modal.title.prompt" : "Prompt",
     "access.denied": "Access denied",
     "socket.disconnect": "Connection to backend closed, automatically trying to reconnect in 5 seconds..."
 };

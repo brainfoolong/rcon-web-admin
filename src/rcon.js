@@ -35,9 +35,9 @@ function Rcon(host, port) {
 
     /**
      * Callback store.
-     * @type {{}}
+     * @type {[]}
      */
-    this.callbacks = {};
+    this.callbacks = [];
 
     /**
      * RCON connection.
@@ -140,11 +140,11 @@ Rcon.prototype.send = function (cmd, user, log, callback, type) {
     if (type == Rcon.SERVERDATA_AUTH) {
         this.authCallback = callback;
     } else {
-        this.callbacks[this.packetId] = {
+        this.callbacks.push({
             "callback": callback,
             "user": user,
             "log": log
-        };
+        });
     }
     // write request
     this.socket.write(this._pack(this.packetId, type, cmd));
@@ -197,15 +197,8 @@ Rcon.prototype._data = function () {
 
         // SERVERDATA_RESPONSE_VALUE is the response to SERVERDATA_EXECCOMMAND
         // so we collect buffer information everytime we have such a request
-        if (response.id > 0 && response.type == Rcon.SERVERDATA_RESPONSE_VALUE) {
-            this.lastResponseId = response.id;
+        if (response.id >= 0 && response.type == Rcon.SERVERDATA_RESPONSE_VALUE) {
             this.bodyBuffer = Buffer.concat([this.bodyBuffer, response.body]);
-        }
-
-        // get user to the response if possible
-        if (response.id > 0 && typeof this.callbacks[response.id] != "undefined") {
-            response.user = this.callbacks[response.id].user || null;
-            response.log = this.callbacks[response.id].log === true;
         }
 
         // auth response is special handled, just callback if success auth or not
@@ -213,13 +206,11 @@ Rcon.prototype._data = function () {
             if (this.authCallback) this.authCallback(response.id !== -1);
         }
         // if we receive an empty package than the SERVERDATA_EXECCOMMAND is finally done
-        if (response.type == Rcon.SERVERDATA_RESPONSE_VALUE && response.body.length === 0 && this.lastResponseId > 0) {
-            if (typeof this.callbacks[this.lastResponseId] != "undefined") {
-                var cb = this.callbacks[this.lastResponseId];
-                delete this.callbacks[this.lastResponseId];
+        if (response.type == Rcon.SERVERDATA_RESPONSE_VALUE && response.body.length === 0) {
+            var cb = this.callbacks.shift();
+            if(cb){
                 if (cb.callback) cb.callback(this.bodyBuffer);
                 this.bodyBuffer = new Buffer(0);
-                this.lastResponseId = 0;
             }
         }
         response.body = response.body.toString();

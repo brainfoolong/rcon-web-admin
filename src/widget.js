@@ -64,7 +64,7 @@ function Widget(name) {
             self.storageCache[server.id] = {};
             var entry = self.getDbEntry(server);
             if (entry) {
-                self.storageCache[server.id] = entry.get("storage").cloneDeep().value();
+                self.storageCache[server.id] = entry.get("storage").cloneDeep().value() || {};
             }
         }
         return self.storageCache[server.id];
@@ -134,7 +134,6 @@ function Widget(name) {
      */
     this.options.set = function (server, key, value) {
         var option = self.manifest.options[key];
-        console.log(self.manifest, option, key);
         if (option) {
             if (option.type == "switch") value = value === "1" || value === true;
             if (option.type == "number") value = parseFloat(value);

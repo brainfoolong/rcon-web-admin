@@ -1,0 +1,33 @@
+.widget-rustboard table{
+    width:100%;
+    margin-top: 20px;
+}
+
+.widget-rustboard table th{
+    text-align: left;
+}
+
+.widget-rustboard table td{
+    vertical-align: middle !important;
+}
+
+.widget-rustboard table td.id div,
+.widget-rustboard table td.name div,
+.widget-rustboard table td.ip div{
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.widget-rustboard table td:hover div{
+    max-width: none;
+    overflow: visible;
+}
+
+.widget-rustboard .icons{
+    font-size: 90%;
+}
+
+.widget-rustboard .icons .glyphicon{
+    margin-right: 10px;
+}

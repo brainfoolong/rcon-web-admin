@@ -15,16 +15,23 @@ var widget = new Widget();
 widget.onServerMessage = function (server, message) {
     var sandboxData = {
         "context": message.type === 4 ? "serverMessageLog" : "serverMessage",
-        "message": message.body,
-        "username": null,
-        "userid": null
+        "message": message.body
     };
     var chatMsg = message.body.match(/^\[CHAT\] (.*?)\[([0-9]+)\/([0-9]+)\] \: (.*)/i);
+    var joinMsg = message.body.match(/([0-9]+)\/([0-9]+)\/(.*?) (joined|disconnect)/i);
     if (chatMsg) {
         sandboxData.context = "chat";
-        sandboxData.username = chatMsg[1];
-        sandboxData.userid = chatMsg[3];
-        sandboxData.message = chatMsg[4];
+        sandboxData.user = {
+            name : chatMsg[1],
+            id: chatMsg[3]
+        };
+        sandboxData.chatMessage = chatMsg[4];
+    }else if(joinMsg){
+        sandboxData.context = joinMsg[4] == "joined" ? "connect" : "disconnect";
+        sandboxData.user = {
+            name : joinMsg[3],
+            id: joinMsg[2]
+        };
     }
     widget.executeAllScripts(server, sandboxData);
 };
@@ -129,14 +136,14 @@ widget.executeAllScripts = function (server, sandboxData) {
  */
 widget.executeUserScript = function (server, programId, script, simulate, sandboxData) {
     var logs = [];
-    sandboxData.say = function (message) {
+    sandboxData.say = function (message, callback) {
         server.cmd("say " + message, null, true, function () {
-
+            if(callback) callback();
         });
     };
-    sandboxData.cmd = function (message) {
+    sandboxData.cmd = function (message, callback) {
         server.cmd(message, null, true, function () {
-
+            if(callback) callback();
         });
     };
     sandboxData.log = function () {

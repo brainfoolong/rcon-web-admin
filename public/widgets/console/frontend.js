@@ -64,7 +64,7 @@ Widget.register(function (widget) {
      */
     var scrollTo = function (pos) {
         $({"pos": consoleEl.scrollTop()}).animate({"pos": pos}, {
-            duration : 300,
+            duration: 300,
             step: function () {
                 consoleEl.scrollTop(this.pos);
             }
@@ -83,6 +83,7 @@ Widget.register(function (widget) {
             }
         }
         for (var j = 0; j < receivedServerMessages.length; j++) {
+            if (!receivedServerMessages[i]) continue;
             addMessage(receivedServerMessages[i]);
         }
     };

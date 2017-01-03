@@ -1,0 +1,15 @@
+{
+  "name": "rustboard",
+  "version": "0.9.0",
+  "compatibleGames": "all",
+  "compatibleSizes": [
+    "large"
+  ],
+  "options": {},
+  "locale": {
+    "en": {
+      "title": "Rustboard",
+      "kickban.reason" : "(Optional) Enter a reason for the kick/ban"
+    }
+  }
+}

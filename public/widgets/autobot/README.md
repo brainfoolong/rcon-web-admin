@@ -17,13 +17,13 @@ The name is program. Automate commands, schedule commands, simply do "if this th
 ## Example: Warn/Kick user for salty language, count up variable
 
     if(context == "chat" && message.match(/fuck/i)) {
-        var storageKey = "abuse.user." + user;
+        var storageKey = "abuse.user." + user.id;
         var count = storage.get(storageKey) || 0;
         count++;
         storage.set(storageKey, count, 10);
         if(count > 3) {
-            say("Sorry " + user + ", get a kick for your saltyness");
-            cmd("kick " + user);
+            say("Sorry " + user.name + ", get a kick for your saltyness");
+            cmd("kick " + user.id);
         }else{
             say("Keep your language friendly, you've done that "+count+" times");
         }
@@ -54,6 +54,15 @@ The name is program. Automate commands, schedule commands, simply do "if this th
         }
     }
     
+## Example: Say hello and goodbye to connect and disconnect
+
+    if(context == "connect") {
+        say("Welcome " + user.name);
+    }
+    if(context == "disconnect") {
+        say("Good bye " + user.name);
+    }
+    
 ## Pre-defined variables
 
 You can use this pre-defined variables in your script.
@@ -63,20 +72,18 @@ You can use this pre-defined variables in your script.
     Defines in which context this script execution is currently in.  
     * ***update*** = Everytime the backend call the update procedure. Every 10 seconds.
     * ***chat*** = When an user send a chat message.
+    * ***connect*** = A player connected to the server.
+    * ***disconnect*** = A player disconnected from the server.
     * ***serverMessage*** = A raw rcon message.
     * ***serverMessageLog*** = A raw rcon message log. This is used by some games, like Rust.
-        
-* username
-
-    Is always `null` except if context is `chat`. Than this will contain the username that have sent the chat message.    
-        
-* userid
-
-    Is always `null` except if context is `chat`. Than this will contain the steamid for the user that have sent the chat message. 
     
 * message
     
-    The message from the server. In case of `chat` it's the raw chat message. Just use `log(message)` to see what you get.
+    The raw string message from the server. Just use `log(message)` to see what you get.
+    
+* user.name, user.id
+    
+    Automatic filtered data from the raw message. Only available if context is `chat, connect, disconnect`.
 
 ## Pre-defined methods
 
