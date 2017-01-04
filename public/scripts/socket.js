@@ -37,6 +37,18 @@ Socket.offMessage = function (callback) {
 };
 
 /**
+ * Send the queue
+ */
+Socket.sendQueue = function () {
+    // send all messages in the queue
+    for (var i in Socket.queue) {
+        var q = Socket.queue[i];
+        Socket.send(q.action, q.messageData, q.callback);
+    }
+    Socket.queue = [];
+};
+
+/**
  * Connect to websocket
  * @param {function=} callback If connection is established
  */
@@ -50,12 +62,7 @@ Socket.connect = function (callback) {
         // send init ping to backend
         Socket.send("init", null, function () {
             if (callback) callback();
-            // send all messages in the queue
-            for (var i in Socket.queue) {
-                var q = Socket.queue[i];
-                Socket.send(q.action, q.messageData, q.callback);
-            }
-            Socket.queue = [];
+            Socket.sendQueue();
         });
     };
 
@@ -90,6 +97,7 @@ Socket.connect = function (callback) {
                         if (cb) cb(data);
                     }
                 }
+                //
             }
         }
     };

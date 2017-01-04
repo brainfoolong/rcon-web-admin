@@ -56,6 +56,29 @@ function Rcon(host, port) {
      * @type string
      */
     this.bodyBuffer = new Buffer(0);
+
+    /**
+     * Send queue
+     * @type {Array}
+     */
+    this.queue = [];
+
+    /**
+     * If send is blocked
+     * @type {boolean}
+     */
+    this.sendBlocked = false;
+
+    /**
+     * Process queue send
+     */
+    this.processQueue = function () {
+        if (!this.queue.length) return;
+        // a minimal delay because sending multiple request quickly will swallow some of them
+        var self = this;
+        var nextQueue = self.queue.shift();
+        self.send.apply(self, nextQueue);
+    };
 }
 
 Rcon.prototype = Object.create(events.EventEmitter.prototype);
@@ -116,6 +139,14 @@ Rcon.prototype.connect = function (callback) {
  * @param {number=} type Message type
  */
 Rcon.prototype.send = function (cmd, user, log, callback, type) {
+    // it could happen that we send multiple requests at once without receiving data inbetween
+    // this will swallow the send request
+    // we fix this by queue send requests and processing them only after we received some data
+    if (this.sendBlocked) {
+        this.queue.push(Array.prototype.slice.call(arguments));
+        return;
+    }
+    this.sendBlocked = true;
     if (typeof type !== 'number') {
         type = Rcon.SERVERDATA_EXECCOMMAND;
     }
@@ -141,14 +172,15 @@ Rcon.prototype.send = function (cmd, user, log, callback, type) {
         });
     }
     // write request
-    this.socket.write(this._pack(this.packetId, type, cmd));
-    this.packetId = this.nextPacketId();
-
-    // write extra empty request to be able to find multipart message boundings
-    if (type != Rcon.SERVERDATA_AUTH) {
-        this.socket.write(this._pack(this.packetId, Rcon.SERVERDATA_RESPONSE_VALUE, new Buffer(0)));
-        this.packetId = this.nextPacketId();
-    }
+    var self = this;
+    self.socket.write(self._pack(this.packetId, type, cmd), null, function () {
+        self.packetId = self.nextPacketId();
+        // write an extra empty request to be able to find multipart message boundings
+        if (type != Rcon.SERVERDATA_AUTH) {
+            self.socket.write(self._pack(self.packetId, Rcon.SERVERDATA_RESPONSE_VALUE, new Buffer(0)));
+            self.packetId = self.nextPacketId();
+        }
+    });
 };
 
 /**
@@ -184,9 +216,9 @@ Rcon.prototype._data = function () {
             "id": this.dataBuffer.readInt32LE(4),
             "type": this.dataBuffer.readInt32LE(8),
             "body": this.dataBuffer.slice(12, 4 + size - 2),
-            "user" : null,
-            "timestamp" : new Date(),
-            "log" : true
+            "user": null,
+            "timestamp": new Date(),
+            "log": true
         };
 
         // SERVERDATA_RESPONSE_VALUE is the response to SERVERDATA_EXECCOMMAND
@@ -202,10 +234,12 @@ Rcon.prototype._data = function () {
         // if we receive an empty package than the SERVERDATA_EXECCOMMAND is finally done
         if (response.type == Rcon.SERVERDATA_RESPONSE_VALUE && response.body.length === 0) {
             var cb = this.callbacks.shift();
-            if(cb){
+            if (cb) {
                 if (cb.callback) cb.callback(this.bodyBuffer);
                 this.bodyBuffer = new Buffer(0);
             }
+            this.sendBlocked = false;
+            this.processQueue();
         }
         response.body = response.body.toString();
         // just pipe each raw response to the event listener

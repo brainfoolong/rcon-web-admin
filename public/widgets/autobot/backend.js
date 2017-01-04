@@ -20,6 +20,7 @@ widget.onServerMessage = function (server, message) {
     var chatMsg = message.body.match(/^\[CHAT\] (.*?)\[([0-9]+)\/([0-9]+)\] \: (.*)/i);
     var joinMsg = message.body.match(/([0-9]+)\/([0-9]+)\/(.*?) (joined|disconnect)/i);
     var banKickMsg = message.body.match(/^(banned|kicked):(.*)/i);
+    var unbanMsg = message.body.match(/^Unbanned User:(.*)/i);
     if (chatMsg) {
         sandboxData.context = "chat";
         sandboxData.user = {
@@ -38,12 +39,17 @@ widget.onServerMessage = function (server, message) {
         sandboxData.user = {
             name: banKickMsg[2].trim()
         };
+    } else if (unbanMsg) {
+        sandboxData.context = "unban";
+        sandboxData.user = {
+            id: unbanMsg[1].trim()
+        };
     }
     widget.executeAllScripts(server, sandboxData);
 };
 
 /**
- * On widget update cycle - Fired every 10 seconds for each server
+ * On widget update cycle - Fired every 30 seconds for each server
  * @param {RconServer} server
  */
 widget.onUpdate = function (server) {
@@ -95,7 +101,6 @@ widget.onFrontendMessage = function (server, user, action, messageData, callback
             callback(this, false);
             break;
         case "list":
-            console.log(widget.storage.get(server, "programs"));
             callback(this, widget.storage.get(server, "programs") || {});
             break;
         case "validate-script":

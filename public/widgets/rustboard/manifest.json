@@ -9,7 +9,10 @@
   "locale": {
     "en": {
       "title": "Rustboard",
-      "kickban.reason" : "(Optional) Enter a reason for the kick/ban"
+      "kickban.reason" : "(Optional) Enter a reason for the kick/ban",
+      "serverstatus" : "Serverstatus",
+      "playerlist" : "Playerlist",
+      "banlist" : "Banlist"
     }
   }
 }

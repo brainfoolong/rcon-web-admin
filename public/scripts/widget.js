@@ -246,8 +246,10 @@ function Widget(id) {
         this.container.remove();
     };
 
-    // bind a message handler to call the update method when the backend send that request
-    (function () {
+    /**
+     * Bind the socket listener
+     */
+    this.bindSocketListener = function () {
         var socketCallback = function (data) {
             if (data.action == "widgetUpdateDone" && self.server == data.messageData.server) {
                 self.onBackendUpdate();
@@ -255,7 +257,7 @@ function Widget(id) {
         };
         Socket.onMessage(socketCallback);
         self.socketMessageHandlers.push(socketCallback);
-    })();
+    };
 }
 
 /**

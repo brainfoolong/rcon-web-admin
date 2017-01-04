@@ -77,7 +77,8 @@ option.createHtmlFromData = function (id, label, info, value, data) {
  */
 option.htmlValueToDb = function (type, value) {
     if (type == "switch") return value == "1";
-    if (type == "number") return  parseFloat(value);
+    if (type == "text") return !value.length ? null : value;
+    if (type == "number") return !value.length ? null : parseFloat(value);
     return value;
 };
 
@@ -89,5 +90,6 @@ option.htmlValueToDb = function (type, value) {
  */
 option.dbValueToHtml = function (type, value) {
     if (type == "switch") return value ? "1" : "0";
+    if ((type == "text" || type == "number") && value === null) return "";
     return value;
 };

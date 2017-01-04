@@ -78,14 +78,18 @@ var View = function (user, messageData, callback) {
                     var widget = Widget.get(messageData.widget);
                     if (widget) {
                         var widgetId = widget.id;
-                        list.push({
-                            "id": widgetId,
-                            "user": user.userData.id,
-                            "position": list.size().value(),
-                            "size": widget.manifest.compatibleSizes[0],
-                            "options": {},
-                            "storage": {}
-                        }).value();
+                        if (list.find({"id": widget.id}).size().value()) {
+                            widgetId = null;
+                        } else {
+                            list.push({
+                                "id": widgetId,
+                                "user": user.userData.id,
+                                "position": list.size().value(),
+                                "size": widget.manifest.compatibleSizes[0],
+                                "options": {},
+                                "storage": {}
+                            }).value();
+                        }
                     }
                     deeperCallback({"widget": widgetId});
                     break;

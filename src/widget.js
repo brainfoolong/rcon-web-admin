@@ -165,7 +165,7 @@ function Widget(id) {
     };
 
     /**
-     * On widget update cycle - Fired every 10 seconds for each server
+     * On widget update cycle - Fired every 30 seconds for each server
      * @param {RconServer} server
      */
     this.onUpdate = function (server) {
@@ -292,8 +292,8 @@ Widget.updateAllActive = function () {
     }
 };
 
-// each 10 seconds call the updates for each active widget
-setInterval(Widget.updateAllActive, 10000);
+// each 30 seconds call the updates for each active widget
+setInterval(Widget.updateAllActive, 30000);
 // and call 1 second after server startup
 setTimeout(Widget.updateAllActive, 1000);
 

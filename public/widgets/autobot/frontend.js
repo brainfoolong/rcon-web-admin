@@ -2,7 +2,7 @@
 
 Widget.register(function (widget) {
 
-    var titleEl = $('<div class="form-group has-feedback input-group form-inline">' +
+    var titleEl = $('<div class="form-group has-feedback input-group form-inline collapsable-target" data-collapsable-id="autobot.editor">' +
         '<input type="text" class="form-control" placeholder="' + widget.t("title.placeholder") + '">' +
         '<select class="selectpicker">' +
         '<option value="yes" selected>' + widget.t("program.enabled") + '</option>' +
@@ -13,17 +13,17 @@ Widget.register(function (widget) {
         '<span class="btn btn-info hidden save">' + widget.t("save.changes") + '</span>' +
         '<span class="btn btn-danger hidden delete">' + widget.t("delete.program") + '</span>' +
         '</div>');
-    var programSelect = $('<div class="spacer"></div>' +
-        '<h3 class="collapsable-trigger" data-collapsable-target="autobot.list">' + widget.t("list") + '</h3>' +
+    var programSelect = $(
+        '<h2 class="collapsable-trigger" data-collapsable-target="autobot.list">' + widget.t("list") + '</h2>' +
         '<div class="collapsable-target program-select" data-collapsable-id="autobot.list">' +
-        '<select class="selectpicker" data-live-search="true">' +
+        '<select class="selectpicker">' +
         '<option value="" data-keep="1">' + widget.t("list.programs") + '</option>' +
         '<option value="-" data-keep="1">' + widget.t("new.program") + '</option>' +
         '</select>' +
-        '</div>');
-    var editorHeader = $($('<h3 class="collapsable-trigger" data-collapsable-target="autobot.editor">').text(widget.t("editor")));
+        '</div><div class="spacer"></div>');
+    var editorHeader = $($('<h2 class="collapsable-trigger" data-collapsable-target="autobot.editor">').text(widget.t("editor")));
     var editor = $('<div class="editor collapsable-target" data-collapsable-id="autobot.editor">');
-    var options = $('<h3 class="collapsable-trigger" data-collapsable-target="autobot.options">' + widget.t("variables") + '</h3>' +
+    var options = $('<h2 class="collapsable-trigger" data-collapsable-target="autobot.options">' + widget.t("variables") + '</h2>' +
         '<div class="options collapsable-target" data-collapsable-id="autobot.options"><div></div></div>');
 
     var scriptTemplates = ["echobot", "nextwipe", "repeatchat", "restart", "warnsalty", "welcomegoodbye"];
@@ -99,8 +99,17 @@ Widget.register(function (widget) {
     var loadProgram = function (id) {
         var tplSplit = id ? id.split("_") : null;
         if (tplSplit && tplSplit.length > 1) {
-            id = null;
-            editId = null;
+            $.ajax({
+                "url": "widgets/autobot/script-templates/" + tplSplit[1] + ".js",
+                "dataType": "text",
+                "success": function (content) {
+                    aceSession.setValue(content);
+                    aceEditor.renderer.updateFull();
+                    programSelect.find("select").selectpicker("val", editId);
+                }
+            });
+
+            return;
         }
         actionBtns.find(".btn.delete").toggleClass("hidden", id === null);
         widget.backend("load", {"id": id}, function (messageData) {
@@ -108,6 +117,7 @@ Widget.register(function (widget) {
             titleEl.find("input").val(messageData ? messageData.title : "");
             titleEl.find("select").selectpicker("val", !messageData || messageData.active ? "yes" : "no");
             aceSession.setValue(messageData ? messageData.script : "");
+            aceEditor.renderer.updateFull();
             Storage.set("widget.autobot.id", id);
             actionBtns.find(".btn.save").addClass("hidden");
 
@@ -129,17 +139,6 @@ Widget.register(function (widget) {
             options.addClass("hidden");
             if (haveOptions) {
                 options.removeClass("hidden");
-            }
-            // if we've got a template than inject it
-            if (tplSplit && tplSplit[1]) {
-                if (editor.hasClass("hidden")) editorHeader.trigger("click");
-                $.ajax({
-                    "url": "widgets/autobot/script-templates/" + tplSplit[1] + ".js",
-                    "dataType": "text",
-                    "success": function (content) {
-                        aceSession.setValue(content);
-                    }
-                });
             }
         });
     };
@@ -204,22 +203,24 @@ Widget.register(function (widget) {
         }
 
         widget.content.on("change", ".program-select select", function (ev) {
-            editId = $(this).val();
-            if (editId.length) {
-                if (editId === "-") {
+            var v = $(this).val();
+            if (v.length) {
+                if (v === "-") {
                     editId = null;
+                } else if (!v.match("tpl_")) {
+                    editId = v;
                 }
-                loadProgram(editId);
+                loadProgram(v);
             }
         }).on("change input", function (ev) {
             actionBtns.find(".btn.save").removeClass("hidden");
         });
 
-        widget.content.append(titleEl);
+        widget.content.append(programSelect);
         widget.content.append(editorHeader);
+        widget.content.append(titleEl);
         widget.content.append(editor);
         widget.content.append(options);
-        widget.content.append(programSelect);
         widget.content.append(actionBtns);
         widget.content.find(".selectpicker").selectpicker();
 

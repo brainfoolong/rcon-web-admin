@@ -158,6 +158,7 @@ $(function () {
     $(document).tooltip({
         "selector": '[data-tooltip]',
         "container": "body",
+        "html": true,
         "title": function () {
             return t($(this).attr("data-tooltip"));
         }

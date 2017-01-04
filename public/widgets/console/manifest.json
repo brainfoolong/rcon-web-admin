@@ -22,7 +22,9 @@
       "input.search": "Search in the rcon console log",
       "input.cmd": "Execute a rcon command, press enter",
       "list.commands": "List of all commands and variables",
-      "download.logfiles" : "Download logfiles"
+      "download.logfiles" : "Download logfiles",
+      "messages" : "Messages",
+      "commands.title" : "Commands"
     }
   }
 }

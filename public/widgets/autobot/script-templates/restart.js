@@ -14,7 +14,7 @@ if (context == "update") {
     if (!storage.get(storageKey)) storage.set(storageKey, thisDay);
     // only go in when 10 o'clock and only between the first 5 minutes
     // so in worst case this script only fires 5 minutes a day
-    if (thisHour == 10 && thisMinute <= 30 && lastRestart != thisDay) {
+    if (thisHour == 10 && thisMinute <= 5 && lastRestart != thisDay) {
         storage.set(storageKey, thisDay);
         cmd("restart " + restarttime);
     }

@@ -1,15 +1,17 @@
 "use strict";
 
 Widget.register(function (widget) {
-    var serverLogsBtn = $('<div style="text-align: right">' +
-        '<div class="btn btn-info btn-sm serverlogs">' + widget.t("download.logfiles") + '</div><div class="spacer"></div> ' +
-        '</div>');
-    var consoleEl = $('<div class="console">');
-    var cmdEl = $('<div class="cmd form-group has-feedback input-group">' +
+    var serverLogsBtn = $('<div class="spacer"></div>' +
+        '<div class="btn btn-info btn-sm serverlogs">' + widget.t("download.logfiles") + '</div><div class="spacer"></div> '
+        );
+    var consoleHeader = '<h2 class="collapsable-trigger" data-collapsable-target="console.log">' + widget.t("messages") + '</h2>';
+    var consoleEl = $('<div class="console collapsable-target" data-collapsable-id="console.log">');
+    var cmdEl = $('<div class="cmd form-group has-feedback input-group collapsable-target" data-collapsable-id="console.commands">' +
         '<span class="input-group-addon"><i class="glyphicon glyphicon-chevron-right"></i></span>' +
         '<input type="search" class="form-control" placeholder="' + widget.t("input.cmd") + '">' +
         '</div>');
-    var searchEl = $('<div class="search form-group has-feedback input-group form-inline">' +
+    var searchHeader = '<h2 class="collapsable-trigger" data-collapsable-target="console.commands">' + widget.t("commands.title") + '</h2>';
+    var searchEl = $('<div class="search form-group has-feedback input-group form-inline collapsable-target" data-collapsable-id="console.commands">' +
         '<span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>' +
         '<input type="search" class="form-control" placeholder="' + widget.t("input.search") + '">' +
         '<select class="selectpicker">' +
@@ -17,7 +19,7 @@ Widget.register(function (widget) {
         '<option value="no">' + widget.t("autoscroll.disabled") + '</option>' +
         '</select>' +
         '</div>');
-    var cmdSelect = $('<div class="cmd-select">' +
+    var cmdSelect = $('<div class="cmd-select collapsable-target" data-collapsable-id="console.commands">' +
         '<select class="selectpicker" data-live-search="true">' +
         '<option value="">' + widget.t("list.commands") + '</option>' +
         '</select>' +
@@ -177,6 +179,7 @@ Widget.register(function (widget) {
             }
             if (ev.keyCode == 13) {
                 widget.cmd(this.value);
+                cmdEl.find("input").blur();
                 this.value = "";
             }
         });
@@ -269,11 +272,13 @@ Widget.register(function (widget) {
                 }
             }, 100);
         });
-        widget.content.append(serverLogsBtn);
+        widget.content.append(consoleHeader);
         widget.content.append(consoleEl);
+        widget.content.append(searchHeader);
         widget.content.append(searchEl);
         widget.content.append(cmdEl);
         widget.content.append(cmdSelect);
+        widget.content.append(serverLogsBtn);
         widget.content.find(".selectpicker").selectpicker();
         widget.onRconMessage(function (message) {
             receivedServerMessages.push(message);

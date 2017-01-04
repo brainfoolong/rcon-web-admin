@@ -19,6 +19,7 @@ You can use this pre-defined variables in your script.
     * ***disconnect*** = A player disconnected from the server.
     * ***ban*** = A player got banned from server.
     * ***kick*** = A player got kicked from server.
+    * ***unban*** = A player got unbanned from server.
     * ***serverMessage*** = A raw rcon message.
     * ***serverMessageLog*** = A raw rcon message log. This is used by some games, like Rust.
     
@@ -29,6 +30,10 @@ You can use this pre-defined variables in your script.
 * user.name, user.id
     
     Automatic filtered data from the raw message. Only available if context is `chat, connect, disconnect, ban(name only), kick(name only)`.
+   
+* chatMessage
+    
+    Only set when context is `chat`. Contains the raq chat message.
 
 ## Pre-defined methods
 

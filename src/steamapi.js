@@ -9,25 +9,26 @@ var db = require(__dirname + "/db");
 var steamapi = {};
 
 /**
- * Get player bans for given ids
+ * Request to our api
+ * @param {string} type
  * @param {string[]} ids
  * @param {function} callback
  */
-steamapi.getPlayerBans = function (ids, callback) {
+steamapi.request = function (type, ids, callback) {
     var res = {};
     var sdb = db.get("steamapi");
     var missingIds = [];
     for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
-        var playerData = sdb.get(id).value();
-        if (playerData && playerData.ban && playerData.ban.timestamp >= ((new Date().getTime() / 1000) - 86400)) {
-            res[id] = playerData.ban;
+        var banData = steamapi.getDataForId(type, id);
+        if (banData) {
+            res[id] = banData;
         } else {
             missingIds.push(id);
         }
     }
     if (missingIds.length) {
-        https.get("https://0x.at/steamapi/api.php?action=bans&ids=" + missingIds.join(","), function (result) {
+        https.get("https://0x.at/steamapi/api.php?action=" + type + "&ids=" + missingIds.join(","), function (result) {
             var body = '';
             result.on('data', function (chunk) {
                 body += chunk;
@@ -37,15 +38,12 @@ steamapi.getPlayerBans = function (ids, callback) {
                     var data = JSON.parse(body);
                     for (var i = 0; i < data.players.length; i++) {
                         var banData = data.players[i];
-                        banData.timestamp = new Date().getTime() / 1000;
-                        var playerData = sdb.get(banData.SteamId).value() || {};
-                        playerData.ban = banData;
-                        sdb.set(banData.SteamId, playerData).value();
+                        steamapi.saveDataForId(type, banData.SteamId, banData);
                         res[banData.SteamId] = banData;
                     }
                     callback(res);
                 }
-                catch(e){
+                catch (e) {
                     callback(res);
                 }
             });
@@ -55,8 +53,62 @@ steamapi.getPlayerBans = function (ids, callback) {
     }
 };
 
-steamapi.getPlayerBans(["76561198351490334"], function (data) {
-    console.log(data);
-});
+/**
+ * Get db data for steamid
+ * @param {string} type
+ * @param {string} id
+ * @returns {*}
+ */
+steamapi.getDataForId = function (type, id) {
+    var sdb = db.get("steamapi");
+    var playerData = sdb.get(id).value();
+    if (!playerData || !playerData[type]) return null;
+    if (playerData[type].timestamp < (new Date().getTime() / 1000 - 86400)) {
+        delete playerData[type];
+    }
+    return playerData[type] || null;
+};
+
+/**
+ * Save db data for steamid
+ * @param {string} type
+ * @param {string} id
+ * @param {object} data
+ * @returns {*}
+ */
+steamapi.saveDataForId = function (type, id, data) {
+    var sdb = db.get("steamapi");
+    var playerData = sdb.get(id).value();
+    if (!playerData) playerData = {};
+    data.timestamp = new Date().getTime() / 1000;
+    playerData[type] = data;
+    sdb.set(id, playerData).value();
+};
+
+/**
+ * Delete old entries
+ */
+steamapi.cleanup = function () {
+    var data = db.get("steamapi").value();
+    var timeout = new Date() / 1000 - 86400;
+    for (var steamId in data) {
+        if (data.hasOwnProperty(steamId)) {
+            var entries = data[steamId];
+            for (var entryIndex in entries) {
+                if (entries.hasOwnProperty(entryIndex)) {
+                    var entryRow = entries[entryIndex];
+                    if (entryRow.timestamp < timeout) {
+                        delete entries[entryIndex];
+                    }
+                }
+            }
+        }
+    }
+    db.get("steamapi").setState(data);
+};
+
+// each 30 minutes cleanup the steamapi db and remove old entries
+setInterval(steamapi.cleanup, 30 * 60 * 1000);
+steamapi.cleanup();
 
 module.exports = steamapi;

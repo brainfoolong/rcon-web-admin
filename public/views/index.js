@@ -60,6 +60,12 @@ View.register("index", function (messageData) {
                         lastSize = widget.size;
                         count++;
                     }
+                    // delete old containers
+                    rowContainer.find(".grid-row").each(function () {
+                        if (!$(this).find(".widget").length) {
+                            $(this).remove();
+                        }
+                    });
                     collapsable(c);
                 }
             };
@@ -146,6 +152,7 @@ View.register("index", function (messageData) {
                             Widget.registerCallback(widget);
                             Widget.registerCallback = null;
                             widget.onInit();
+                            widget.bindSocketListener();
                         });
                     }
                 })();
@@ -197,7 +204,7 @@ View.register("index", function (messageData) {
         return true;
     };
 
-    // ping the server each 10 seconds for some checks
+    // ping the server each 30 seconds for some checks
     Interval.create("index.server.ping", function () {
         if (View.current != "index") return;
         Socket.send("view", {
@@ -223,7 +230,11 @@ View.register("index", function (messageData) {
                 "type": "add",
                 "server": messageData.server,
                 "widget": $(this).val()
-            }, function () {
+            }, function (responseData) {
+                if(!responseData.widget){
+                    note(t("index.widget.add.error"), "danger");
+                    return;
+                }
                 loadAllWidgets();
             });
             $(this).val('').selectpicker("refresh");
