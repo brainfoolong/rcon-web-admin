@@ -90,7 +90,7 @@ function WebSocketUser(socket) {
                                         console.trace("Widget.onFrontendMessage callback need a widget instance as first parameter");
                                         return;
                                     }
-                                    if (widget.id === frontendData.widget) {
+                                    if (widget.id === messageData.widget) {
                                         sendCallback({"widgetMessageData": widgetMessageData});
                                     }
                                 }

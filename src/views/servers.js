@@ -18,6 +18,21 @@ var View = function (user, messageData, callback) {
         callback({redirect: "index", "note": ["access.denied", "danger"]});
         return;
     }
+
+    var deleteFolderRecursive = function (path) {
+        if (fs.existsSync(path)) {
+            fs.readdirSync(path).forEach(function (file) {
+                var curPath = path + "/" + file;
+                if (fs.lstatSync(curPath).isDirectory()) {
+                    deleteFolderRecursive(curPath);
+                } else {
+                    fs.unlinkSync(curPath);
+                }
+            });
+            fs.rmdirSync(path);
+        }
+    };
+
     var deeperCallback = function (sendMessageData) {
         sendMessageData.servers = db.get("servers").cloneDeep().value();
         if (messageData.id) {
@@ -38,6 +53,7 @@ var View = function (user, messageData, callback) {
             // delete server folder
             var dir = __dirname + "/../../db/server_" + messageData.id;
             if (fs.existsSync(dir)) {
+                deleteFolderRecursive
                 var files = fs.readdirSync(dir);
                 for (var i = 0; i < files.length; i++) {
                     var file = files[i];

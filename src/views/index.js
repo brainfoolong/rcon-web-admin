@@ -30,7 +30,7 @@ var View = function (user, messageData, callback) {
             sendMessageData.gridrows = wdb.get("gridrows").value();
             if (sendMessageData.myWidgets) {
                 for (var i in sendMessageData.myWidgets) {
-                    sendMessageData.myWidgets[i].manifest = sendMessageData.widgets[sendMessageData.myWidgets[i].name];
+                    sendMessageData.myWidgets[i].manifest = sendMessageData.widgets[sendMessageData.myWidgets[i].id];
                 }
             }
             sendMessageData.server = messageData.server;
@@ -63,7 +63,7 @@ var View = function (user, messageData, callback) {
         for (var allWidgetsIndex in allWidgets) {
             if (allWidgets.hasOwnProperty(allWidgetsIndex)) {
                 var allWidgetsRow = allWidgets[allWidgetsIndex];
-                widgets[allWidgetsRow.name] = allWidgetsRow.manifest;
+                widgets[allWidgetsRow.id] = allWidgetsRow.manifest;
             }
         }
     })();
@@ -74,13 +74,12 @@ var View = function (user, messageData, callback) {
         if (user.userData !== null && currentServer) {
             switch (messageData.type) {
                 case "add":
-                    var widgetId = "w" + hash.random(64);
                     var list = wdb.get("list");
-                    var widget = Widget.get(messageData.name);
+                    var widget = Widget.get(messageData.widget);
                     if (widget) {
+                        var widgetId = widget.id;
                         list.push({
                             "id": widgetId,
-                            "name": messageData.name,
                             "user": user.userData.id,
                             "position": list.size().value(),
                             "size": widget.manifest.compatibleSizes[0],
@@ -91,7 +90,7 @@ var View = function (user, messageData, callback) {
                     deeperCallback({"widget": widgetId});
                     break;
                 case "remove":
-                    widget = Widget.get(messageData.name);
+                    widget = Widget.get(messageData.widget);
                     wdb.get("list").remove({
                         "id": messageData.widget,
                         "user": user.userData.id

@@ -22,12 +22,10 @@ function RconServer(id, serverData) {
     this.con = new Rcon(serverData.host, serverData.rcon_port);
     /** @type {boolean} */
     this.connected = false;
-    /** @type {string} */
-    this.serverDbFolder = __dirname + "/../db/server_" + self.id;
-    /** @type {string} */
-    this.serverLogFile = this.serverDbFolder + "/messages.log";
     /** @type {number|null} */
     this.widgetIv = null;
+    /** @type {string} */
+    this.serverDbFolder = __dirname + "/../db/server_" + self.id;
 
     // require this here to not get a loop because websocketuser itself require the RconServer module
     var WebSocketUser = require(__dirname + "/websocketuser");
@@ -65,40 +63,6 @@ function RconServer(id, serverData) {
     };
 
     /**
-     * Check if log is too big, cut it if necessary
-     */
-    this.logRoll = function () {
-        try {
-            var fileData = this.getLogData();
-            // keep 1mb of logs and start progress if over 1.3mb
-            var max = 1024 * 1024;
-            if (fileData.length > max * 1.3) {
-                fileData = fileData.toString().substr(-max);
-                // find last first line end
-                var i = fileData.indexOf("\n");
-                if (i > -1) {
-                    fileData = fileData.substr(i);
-                }
-                fs.writeFileSync(this.serverLogFile, fileData);
-            }
-        } catch (e) {
-
-        }
-    };
-
-    /**
-     * Get log messages
-     * @return {Buffer}
-     */
-    this.getLogData = function () {
-        try {
-            return fs.readFileSync(this.serverLogFile).toString();
-        } catch (e) {
-            return new Buffer(0);
-        }
-    };
-
-    /**
      * On receive a rcon socket message
      * @param {RconMessage} rconMessage
      */
@@ -122,14 +86,6 @@ function RconServer(id, serverData) {
         }
         // also send to all active widgets
         Widget.callMethodForAllWidgetsIfActive("onServerMessage", this, rconMessage);
-        // log to disk
-        try {
-            if (rconMessage.log === true) {
-                fs.appendFileSync(this.serverLogFile, JSON.stringify(rconMessageJson) + "\n", "utf8");
-            }
-        } catch (e) {
-
-        }
     };
 
     /**
@@ -158,7 +114,7 @@ function RconServer(id, serverData) {
     // connect to server
     this.con.connect(function (err) {
         if (err) {
-            console.trace(err);
+            console.error("RconServer connection failed", err);
             return;
         }
         // authenticate

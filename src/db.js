@@ -1,6 +1,7 @@
 "use strict";
 
 var Low = require("lowdb");
+var fs = require("fs");
 var hash = require(__dirname + "/hash");
 
 /**
@@ -14,6 +15,7 @@ var db = {};
  * @private
  */
 db._defaults = {
+    "steamapi": {},
     "servers": {},
     "settings": {},
     "users": {},

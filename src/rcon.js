@@ -56,13 +56,7 @@ function Rcon(host, port) {
      * @type string
      */
     this.bodyBuffer = new Buffer(0);
-
-    /**
-     * The last valid response id
-     * @type {number}
-     */
-    this.lastResponseId = 0;
-};
+}
 
 Rcon.prototype = Object.create(events.EventEmitter.prototype);
 

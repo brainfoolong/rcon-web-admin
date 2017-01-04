@@ -471,20 +471,6 @@ body.is-not-admin [data-role='admin'] {
     border: 1px solid rgba(0, 0, 0, 0.6);
 }
 
-.widget:not(.collapsed) .widget-title .glyphicon-chevron-right{
-    display: none;
-}
-
-.widget.collapsed .widget-title .glyphicon-chevron-down{
-    display: none;
-}
-
-.widget.collapsed .widget-content{
-    overflow:hidden;
-    height:0;
-    padding:0;
-}
-
 .widget[data-area='options'],
 .widget[data-area='layout'],
 .widget[data-area='readme'] {
@@ -504,20 +490,20 @@ body.is-not-admin [data-role='admin'] {
     padding-right: 90px;
 }
 
-.widget .widget-title .glyphicon{
+.widget .widget-title .glyphicon {
     margin-right: 10px;
 }
 
-
-.widget .widget-icons{
+.widget .widget-icons {
     position: absolute;
     right: 10px;
     top: 10px;
     height: 24px;
     font-size: 24px;
+    color:white;
 }
 
-.widget .widget-icons .icon{
+.widget .widget-icons .icon {
     opacity: 0.5;
     cursor: pointer;
     transition: 0.4s;
@@ -525,12 +511,12 @@ body.is-not-admin [data-role='admin'] {
 }
 
 .widget .widget-readme h1,
-.widget .widget-readme h2{
-    margin-bottom:20px;
+.widget .widget-readme h2 {
+    margin-bottom: 20px;
     margin-top: 20px;
 }
 
-.widget .widget-readme code{
+.widget .widget-readme code {
     overflow: auto;
     white-space: pre;
 }
@@ -544,4 +530,32 @@ body.is-not-admin [data-role='admin'] {
     background: rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     transition: 0.3s;
+}
+
+.collapsable-trigger {
+    cursor: pointer;
+}
+
+.collapsable-trigger::before {
+    content: "\e114";
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: normal;
+    font-size: 80%;
+    padding-right: 10px;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    transition: 0.2s;
+}
+
+.collapsable-trigger.collapsed::before {
+    top:-6px;
+    transform: rotate(-90deg);
+}
+
+.collapsable-target.collapsed{
+    display: none;
 }

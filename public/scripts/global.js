@@ -97,6 +97,14 @@ function escapeHtml(string) {
 }
 
 /**
+ * Initialize all collapsables in given container
+ * @param {jQuery} container
+ */
+function collapsable(container) {
+    container.find(".collapsable-trigger").not("activated").addClass("activated").trigger("collapsable-init");
+}
+
+/**
  * The escape html mapping
  * @type {{}}
  */
@@ -150,7 +158,7 @@ $(function () {
     $(document).tooltip({
         "selector": '[data-tooltip]',
         "container": "body",
-        "title" : function () {
+        "title": function () {
             return t($(this).attr("data-tooltip"));
         }
     }).on("inserted.bs.tooltip", function (ev) {
@@ -160,7 +168,24 @@ $(function () {
                 $(ev.target).trigger("mouseout");
             }, 1000);
         }
+    }).on("click collapsable-init", ".collapsable-trigger", function (ev) {
+        var e = $(this);
+        var targetId = e.attr("data-collapsable-target");
+        var target = $(".collapsable-target").filter("[data-collapsable-id='" + targetId + "']");
+        if (target.length) {
+            if (ev.type != "collapsable-init") {
+                e.toggleClass("collapsed");
+                target.toggleClass("collapsed");
+                Storage.set("collapsable." + targetId, target.hasClass("collapsed"));
+            } else {
+                // collapsed is stored or initially collapsed
+                var flag = Storage.get("collapsable." + targetId) || target.hasClass("collapsed") || false;
+                e.toggleClass("collapsed", flag);
+                target.toggleClass("collapsed", flag);
+            }
+        }
     });
+    collapsable(body);
     // socket stuff
     Socket.connectAndLoadView();
 });

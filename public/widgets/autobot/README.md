@@ -1,69 +1,10 @@
 # Autobot Widget
 
-The name is program. Automate commands, schedule commands, simply do "if this than that". You can listen for events, such as incoming chat message, player join. You can do some periodic tasks like sending a server message out every 30 minutes or restart server each day at 06:00 am. You can do an auto-kick/auto-ban feature. We provide many examples for you in this readme to get started. Fully scriptable with, easy to use, all time best, javascript.
+The name is program. Automate commands, schedule commands, simply do "if this than that". You can listen for events, such as incoming chat message, player join. You can do some periodic tasks like sending a server message out every 30 minutes or restart server each day at 06:00 am. You can do an auto-kick/auto-ban feature. We provide many examples for you in this readme to get started. Fully scriptable with, easy to use, all time best, javascript. It's basically a widget in a widget in the rcon web admin, magic, isn't it?
 
-## Example: Simple echobot
-    
-    if(context == "chat") {
-        say("Echobot: " + message);
-    }
-    
-## Example: Next wipe date when user enter #nextwipe
+## Templates
 
-    if(context == "chat" && message == "#nextwipe") {
-        say("Next wipe on 22.02.2022");
-    }
-    
-## Example: Warn/Kick user for salty language, count up variable
-
-    if(context == "chat" && message.match(/fuck/i)) {
-        var storageKey = "abuse.user." + user.id;
-        var count = storage.get(storageKey) || 0;
-        count++;
-        storage.set(storageKey, count, 10);
-        if(count > 3) {
-            // notice this callback, you must wait for the say command to finish
-            say("Sorry " + user.name + ", get a kick for your saltyness", function() {
-                cmd("kick " + user.id);
-            });
-        }else{
-            say("Keep your language friendly, you've done that "+count+" times");
-        }
-    }
-    
-## Example: Send a server chat message every 30 minutes
-
-    if(context == "update") {
-        var storageKey = "lastsend";
-        var lastSend = storage.get(storageKey) || 0;
-        var unixtime = new Date().getTime() / 1000;
-        if(lastSend <= unixtime) {
-            storage.set(storageKey, unixtime + 60 * 30);
-            say("This server give a hug to you all, every 30 minutes");
-        }
-    }
-    
-## Example: Schedule server restart every day at 10:00
-
-    if(context == "update") {
-        var storageKey = "lastrestart";
-        var thisDay = new Date().getDay();
-        var thisHour = new Date().getHours();
-        var lastRestart = storage.get(storageKey) || thisDay;
-        if(thisHour == 10) {
-            storage.set(storageKey, thisDay);
-            cmd("restart 300");
-        }
-    }
-    
-## Example: Say hello and goodbye to connect and disconnect
-
-    if(context == "connect") {
-        say("Welcome " + user.name);
-    }
-    if(context == "disconnect") {
-        say("Good bye " + user.name);
-    }
+There are a lot of ready to start templates that you can choose from. Use this templates also to see what all is possible and how you can do something.
     
 ## Pre-defined variables
 
@@ -76,6 +17,8 @@ You can use this pre-defined variables in your script.
     * ***chat*** = When an user send a chat message.
     * ***connect*** = A player connected to the server.
     * ***disconnect*** = A player disconnected from the server.
+    * ***ban*** = A player got banned from server.
+    * ***kick*** = A player got kicked from server.
     * ***serverMessage*** = A raw rcon message.
     * ***serverMessageLog*** = A raw rcon message log. This is used by some games, like Rust.
     
@@ -85,7 +28,7 @@ You can use this pre-defined variables in your script.
     
 * user.name, user.id
     
-    Automatic filtered data from the raw message. Only available if context is `chat, connect, disconnect`.
+    Automatic filtered data from the raw message. Only available if context is `chat, connect, disconnect, ban(name only), kick(name only)`.
 
 ## Pre-defined methods
 
@@ -95,6 +38,11 @@ You can use this methods to send a chat message or to execute any command you li
 * **cmd(cmd, callback)** = execute any rcon command, the callback will be called when the command have been executed
 * **storage.set(key, value, lifetime)** = set value in permanent storage, lifetime in seconds, ommit if no timeout
 * **storage.get(key)** = get value from permanent storage
+* **variable(name, type, label, defaultValue)** 
+    * Add a variable to the script interface. This could be used to allow the script define UI form elements where the user can enter the variable values. See templates for examples.
+    * **name** = The name of the variable that than can be used in the script
+    * **type** = The variable type, available types: switch, number, text
+    * **defaultValue** = The default value of the variable if the user don't change it
     
 ## FAQ
 

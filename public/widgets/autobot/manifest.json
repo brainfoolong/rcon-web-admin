@@ -14,13 +14,17 @@
       "save.changes": "Save changes",
       "missing.title": "Please name your script",
       "missing.script": "Well, without a script to execute we cannot do anything for you",
-      "list.programs": "Choose an existing program to edit",
+      "list.programs": "Choose",
       "new.program": "Create a new program",
       "saved": "Program saved",
       "delete.program" : "Delete program",
       "sure" : "Are you sure?",
       "program.enabled" : "Active",
-      "program.disabled" : "Inactive"
+      "program.disabled" : "Inactive",
+      "editor": "Editor",
+      "variables" : "Variables",
+      "list" : "Choose or create a new program",
+      "template" : "Template"
     }
   }
 }

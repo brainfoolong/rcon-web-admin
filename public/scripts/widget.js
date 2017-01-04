@@ -3,15 +3,17 @@
 /**
  * Widget Management
  */
-function Widget(name) {
+function Widget(id) {
     /** @type {Widget} */
     var self = this;
     /** @type {string} */
+    this.id = id;
+    /** @type {string} */
     this.server = "";
+    /** @type {object} */
+    this.serverData = "";
     /** @type {string} */
-    this.name = name;
-    /** @type {string} */
-    this.id = "";
+    this.id = id;
     /** @type {NodeMessageCallback[]} */
     this.socketMessageHandlers = [];
     /** @type {jQuery} */
@@ -185,8 +187,6 @@ function Widget(name) {
     this.options.set = function (key, value, callback) {
         var option = self.data.manifest.options[key];
         if (option) {
-            if (option.type == "switch") value = value === "1" || value === true;
-            if (option.type == "number") value = parseFloat(value);
             self.send("view", {
                 "view": "index",
                 "action": "widget",
@@ -224,7 +224,7 @@ function Widget(name) {
      * @param {number} step
      */
     this.createInterval = function (id, func, step) {
-        Interval.create("widget." + self.name + "." + id, func, step);
+        Interval.create("widget." + self.id + "." + id, func, step);
     };
 
     /**
@@ -232,7 +232,7 @@ function Widget(name) {
      * @param {string} id
      */
     this.destroyInterval = function (id) {
-        Interval.destroy("widget." + self.name + "." + id);
+        Interval.destroy("widget." + self.id + "." + id);
     };
 
     /**
@@ -278,8 +278,8 @@ Widget.widgets = {};
 Widget.getByElement = function (el) {
     var w = $(el).closest(".widget");
     if (w.length) {
-        if (typeof Widget.widgets[w.attr("id")] != "undefined") {
-            return Widget.widgets[w.attr("id")];
+        if (typeof Widget.widgets[w.attr("data-id")] != "undefined") {
+            return Widget.widgets[w.attr("data-id")];
         }
     }
     return null;

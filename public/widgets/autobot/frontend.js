@@ -13,13 +13,20 @@ Widget.register(function (widget) {
         '<span class="btn btn-info hidden save">' + widget.t("save.changes") + '</span>' +
         '<span class="btn btn-danger hidden delete">' + widget.t("delete.program") + '</span>' +
         '</div>');
-    var programSelect = $('<div class="spacer"></div><div class="program-select">' +
+    var programSelect = $('<div class="spacer"></div>' +
+        '<h3 class="collapsable-trigger" data-collapsable-target="autobot.list">' + widget.t("list") + '</h3>' +
+        '<div class="collapsable-target program-select" data-collapsable-id="autobot.list">' +
         '<select class="selectpicker" data-live-search="true">' +
         '<option value="" data-keep="1">' + widget.t("list.programs") + '</option>' +
         '<option value="-" data-keep="1">' + widget.t("new.program") + '</option>' +
         '</select>' +
         '</div>');
-    var editor = $('<div class="editor">');
+    var editorHeader = $($('<h3 class="collapsable-trigger" data-collapsable-target="autobot.editor">').text(widget.t("editor")));
+    var editor = $('<div class="editor collapsable-target" data-collapsable-id="autobot.editor">');
+    var options = $('<h3 class="collapsable-trigger" data-collapsable-target="autobot.options">' + widget.t("variables") + '</h3>' +
+        '<div class="options collapsable-target" data-collapsable-id="autobot.options"><div></div></div>');
+
+    var scriptTemplates = ["echobot", "nextwipe", "repeatchat", "restart", "warnsalty", "welcomegoodbye"];
 
     var aceEditor = null;
     var aceSession = null;
@@ -45,11 +52,22 @@ Widget.register(function (widget) {
                 note(messageData.error.replace(/\n/g, "<br/>"), "danger");
                 return;
             }
+            var variableValues = {};
+            options.find(".option").each(function () {
+                var type = $(this).attr("data-type");
+                var value = $(this).find("input").val();
+                if ($(this).find("select").length) value = $(this).find("select").val();
+                variableValues[$(this).attr("data-id")] = option.htmlValueToDb(
+                    type,
+                    value
+                );
+            });
             widget.backend("save", {
                 "id": editId,
                 "script": script,
                 "title": title,
-                "active": titleEl.find("select").val() == "yes"
+                "active": titleEl.find("select").val() == "yes",
+                "variableValues": variableValues
             }, function (messageData) {
                 editId = messageData.id;
                 loadProgram(editId);
@@ -76,9 +94,14 @@ Widget.register(function (widget) {
 
     /**
      * Load a program into interface
-     * @param {string} id
+     * @param {string|null} id
      */
     var loadProgram = function (id) {
+        var tplSplit = id ? id.split("_") : null;
+        if (tplSplit && tplSplit.length > 1) {
+            id = null;
+            editId = null;
+        }
         actionBtns.find(".btn.delete").toggleClass("hidden", id === null);
         widget.backend("load", {"id": id}, function (messageData) {
             programSelect.find("select").selectpicker("val", id);
@@ -87,6 +110,37 @@ Widget.register(function (widget) {
             aceSession.setValue(messageData ? messageData.script : "");
             Storage.set("widget.autobot.id", id);
             actionBtns.find(".btn.save").addClass("hidden");
+
+            // add options for variables
+            var c = options.children("div");
+            c.html('');
+            var haveOptions = false;
+            for (var varIndex in messageData.variables) {
+                if (messageData.variables.hasOwnProperty(varIndex)) {
+                    haveOptions = true;
+                    var varRow = messageData.variables[varIndex];
+                    var value =
+                        typeof messageData.variableValues[varIndex] != "undefined"
+                        && messageData.variableValues[varIndex] !== null
+                            ? messageData.variableValues[varIndex] : varRow.default;
+                    c.append(option.createHtmlFromData(varIndex, varRow.label, null, value, varRow));
+                }
+            }
+            options.addClass("hidden");
+            if (haveOptions) {
+                options.removeClass("hidden");
+            }
+            // if we've got a template than inject it
+            if (tplSplit && tplSplit[1]) {
+                if (editor.hasClass("hidden")) editorHeader.trigger("click");
+                $.ajax({
+                    "url": "widgets/autobot/script-templates/" + tplSplit[1] + ".js",
+                    "dataType": "text",
+                    "success": function (content) {
+                        aceSession.setValue(content);
+                    }
+                });
+            }
         });
     };
 
@@ -95,13 +149,18 @@ Widget.register(function (widget) {
      * @param {function=} callback
      */
     var updatePrograms = function (callback) {
-        // load existing programs
         widget.backend("list", null, function (messageData) {
             var s = programSelect.find("select");
             s.find("option").not("[data-keep]").remove();
             $.each(messageData, function (programKey, programValue) {
                 s.append($('<option>').attr("value", programValue.id).html(programValue.title));
             });
+            // append templates
+            for (var i = 0; i < scriptTemplates.length; i++) {
+                var tpl = scriptTemplates[i];
+                s.append($('<option>').attr("value", "tpl_" + tpl).html(widget.t("template") + ": " + tpl));
+            }
+
             s.selectpicker("refresh");
             if (callback) callback();
         });
@@ -117,7 +176,7 @@ Widget.register(function (widget) {
             aceSession = aceEditor.getSession();
             ace.config.set('basePath', 'widgets/autobot/ace');
             aceEditor.setOptions({
-                fontSize: "14px"
+                fontSize: "12px"
             });
             aceEditor.setTheme("ace/theme/monokai");
             aceSession.setMode("ace/mode/javascript");
@@ -157,7 +216,9 @@ Widget.register(function (widget) {
         });
 
         widget.content.append(titleEl);
+        widget.content.append(editorHeader);
         widget.content.append(editor);
+        widget.content.append(options);
         widget.content.append(programSelect);
         widget.content.append(actionBtns);
         widget.content.find(".selectpicker").selectpicker();
@@ -168,6 +229,8 @@ Widget.register(function (widget) {
                 deleteProgram(editId);
             }
         });
+
+        collapsable(widget.content);
 
         Socket.onMessage(function (data) {
             if (data.action == "autobotExecutedScript") {

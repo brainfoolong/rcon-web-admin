@@ -1,3 +1,16 @@
 .widget-autobot .editor{
     min-height: 300px;
 }
+
+.widget-autobot .widget-content h3{
+    font-size: 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    cursor: pointer;
+    padding-bottom: 5px;
+}
+
+.widget-autobot .widget-content h3 .glyphicon{
+    font-size: 70%;
+    margin-right: 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}

@@ -56,17 +56,18 @@ View.register("index", function (messageData) {
                             rowContainer.append(container);
                         }
                         // append the widget to the grid
-                        container.find(".grid-column").eq(count - 1).append($("#" + widget.id));
+                        container.find(".grid-column").eq(count - 1).append($("#widget-" + widget.id));
                         lastSize = widget.size;
                         count++;
                     }
+                    collapsable(c);
                 }
             };
             widgetLoadedCallback.count = 0;
             for (var i in data.myWidgets) {
                 (function () {
                     var widgetData = data.myWidgets[i];
-                    allWidgets = allWidgets.not("#" + widgetData.id);
+                    allWidgets = allWidgets.not("#widget-" + widgetData.id);
                     if (typeof Widget.widgets[widgetData.id] != "undefined") {
                         var widget = Widget.widgets[widgetData.id];
                         widget.data = widgetData;
@@ -76,21 +77,27 @@ View.register("index", function (messageData) {
                         var loadTo = setTimeout(function () {
                             widgetLoadedCallback();
                         }, 1000);
-                        $.getScript("widgets/" + widgetData.name + "/frontend.js", function () {
+                        $.getScript("widgets/" + widgetData.id + "/frontend.js", function () {
                             clearTimeout(loadTo);
-                            var widget = new Widget(widgetData.name);
+                            var widget = new Widget(widgetData.id);
                             Widget.widgets[widgetData.id] = widget;
                             widget.id = widgetData.id;
                             widget.server = messageData.server;
+                            widget.serverData = messageData.myServers[messageData.server];
                             widget.data = widgetData;
-                            // some html stuff
-                            widget.container = c.find(".templates .widget").clone().attr("id", widget.id);
-                            widget.container.addClass("widget-" + widget.name);
-                            widget.container.find(".widget-title").append($('<span>').text(widget.t("title")));
-                            if (Storage.get("widget.collapsed." + widget.id)) {
-                                widget.container.addClass("collapsed");
+                            if (!widgetData.id.match(/^[a-z]/) || widgetData.id.match(/[^a-z0-9-_]/)) {
+                                Modal.alert(t("index.widget.error.id"));
                             }
-                            $.get("widgets/" + widgetData.name + "/README.md", function (data) {
+                            widget.container = c.find(".templates .widget").clone();
+                            widget.container.attr("data-id", widget.id).attr("id", "widget-" + widget.id);
+                            widget.container.addClass("widget-" + widget.id);
+                            widget.container.find(".widget-title")
+                                .attr("data-collapsable-target", "widget.content." + widget.id)
+                                .append($('<span>').text(widget.t("title")));
+                            widget.container.find(".widget-content")
+                                .attr("data-collapsable-id", "widget.content." + widget.id);
+
+                            $.get("widgets/" + widgetData.id + "/README.md", function (data) {
                                 widget.container.find(".widget-readme").html(new showdown.Converter().makeHtml(data));
                             });
                             // copy to hidden widgets form, set position later
@@ -118,52 +125,23 @@ View.register("index", function (messageData) {
                             var options = widget.data.manifest.options;
                             // create options html
                             var optionsEl = widget.container.find(".widget-options .options");
-                            for (var i in options) {
-                                var option = options[i];
-                                var optionEl = c.find(".templates .option." + option.type).clone();
-                                if (optionEl.length) {
-                                    optionEl.attr("data-id", i);
-                                    optionEl.find("strong").html(widget.t("option." + i + ".title"));
-                                    optionEl.find("small").html(widget.t("option." + i + ".info"));
-                                    optionsEl.append(optionEl);
-                                    var input = optionEl.find("input");
-                                    if (option.type == "number") {
-                                        if (typeof option.min == "number") {
-                                            input.attr("min", option.min);
-                                        }
-                                        if (typeof option.max == "number") {
-                                            input.attr("max", option.max);
-                                        }
-                                        if (typeof option.step == "number") {
-                                            input.attr("step", option.step);
-                                        }
-                                    }
-                                    if (option.type == "text" || option.type == "number") {
-                                        if (typeof option.default != "undefined") {
-                                            input.attr("placeholder", option.default);
-                                        }
-                                        input.val(widget.options.get(i));
-                                    }
-                                    if (option.type == "switch") {
-                                        input = optionEl.find("select");
-                                        input.val(widget.options.get(i) ? "1" : "0").selectpicker();
-                                    }
-                                    if (option.type == "select") {
-                                        input = optionEl.find("select");
-                                        for (var j = 0; j < option.values.length; j++) {
-                                            input.append($('<option></option>')
-                                                .attr("value", option.values[j])
-                                                .html(widget.t("option." + i + ".value." + option.values[j]))
-                                            );
-                                        }
-                                        input.val(widget.options.get(i)).selectpicker();
-                                    }
+                            for (var optionIndex in options) {
+                                if (options.hasOwnProperty(optionIndex)) {
+                                    var optionRow = options[optionIndex];
+                                    optionsEl.append(
+                                        option.createHtmlFromData(
+                                            optionIndex,
+                                            widget.t("option." + optionIndex + ".title"),
+                                            widget.t("option." + optionIndex + ".info"),
+                                            widget.options.get(optionIndex),
+                                            optionRow
+                                        )
+                                    );
                                 }
                             }
 
-
                             widgetLoadedCallback();
-                            $("head").append('<link type="text/css" href="widgets/' + widgetData.name + '/style.css" ' +
+                            $("head").append('<link type="text/css" href="widgets/' + widgetData.id + '/style.css" ' +
                                 'rel="stylesheet" media="all" id="css-' + widgetData.id + '">');
                             Widget.registerCallback(widget);
                             Widget.registerCallback = null;
@@ -221,6 +199,7 @@ View.register("index", function (messageData) {
 
     // ping the server each 10 seconds for some checks
     Interval.create("index.server.ping", function () {
+        if (View.current != "index") return;
         Socket.send("view", {
             "view": "index",
             "action": "widget",
@@ -243,7 +222,7 @@ View.register("index", function (messageData) {
                 "action": "widget",
                 "type": "add",
                 "server": messageData.server,
-                "name": $(this).val()
+                "widget": $(this).val()
             }, function () {
                 loadAllWidgets();
             });
@@ -258,8 +237,7 @@ View.register("index", function (messageData) {
                     "action": "widget",
                     "type": "remove",
                     "server": messageData.server,
-                    "widget": widget.id,
-                    "name": widget.name
+                    "widget": widget.id
                 }, function () {
                     widget.remove();
                 });
@@ -268,17 +246,14 @@ View.register("index", function (messageData) {
     }).on("click.index", ".widget .widget-icons .icon", function (ev) {
         ev.stopPropagation();
         showArea(Widget.getByElement(this), $(this).attr("data-id"));
-    }).on("click.index", ".widget .widget-title", function () {
-        var widget = Widget.getByElement(this);
-        widget.container.toggleClass("collapsed");
-        Storage.set("widget.collapsed."+widget.id, widget.container.hasClass("collapsed"))
     }).on("input.index change.index", ".widget-options .option :input", function () {
         var e = $(this);
         clearTimeout(e.data("optionTimeout"));
         e.data("optionTimeout", setTimeout(function () {
             var widget = Widget.getByElement(e);
-            var id = e.closest(".option").attr("data-id");
-            widget.options.set(id, e.val());
+            var o = e.closest(".option");
+            var id = o.attr("data-id");
+            widget.options.set(id, option.htmlValueToDb(o.attr("data-type"), e.val()));
             note("saved", "success");
         }, 600));
     }).on("click.index", ".widget-layout .save-layout", function () {

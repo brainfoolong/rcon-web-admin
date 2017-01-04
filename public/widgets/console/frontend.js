@@ -1,6 +1,9 @@
 "use strict";
 
 Widget.register(function (widget) {
+    var serverLogsBtn = $('<div style="text-align: right">' +
+        '<div class="btn btn-info btn-sm serverlogs">' + widget.t("download.logfiles") + '</div><div class="spacer"></div> ' +
+        '</div>');
     var consoleEl = $('<div class="console">');
     var cmdEl = $('<div class="cmd form-group has-feedback input-group">' +
         '<span class="input-group-addon"><i class="glyphicon glyphicon-chevron-right"></i></span>' +
@@ -21,10 +24,64 @@ Widget.register(function (widget) {
         '</div>');
     var autoscrollInp = searchEl.find("select");
 
-    var initialServerLog = [];
     var receivedServerMessages = [];
     var searchTimeout = null;
-    var searchMatchTimeout = null;
+
+    var downloadFile = (function () {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        return function (data, fileName) {
+            var blob = new Blob([data], {type: "octet/stream"}),
+                url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    }());
+
+    var showRawServerLogs = function () {
+        widget.backend("logfiles", null, function (files) {
+            var el = $('<div>');
+            files.sort(function (a, b) {
+                if (new Date(a.time) > new Date(b.time)) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            });
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                el.append(
+                    '<div data-id="' + file.file + '">' +
+                    '<div class="btn btn-info download btn-sm">' +
+                    'Log ' + file.file + ' ' + (file.size / 1024 / 1024).toFixed(3) + 'MB (Last modified: ' + new Date(file.time).toLocaleString() + ')' +
+                    '</div>' +
+                    '<div class="btn btn-danger delete btn-sm">' +
+                    t("delete") +
+                    '</div>' +
+                    '</div>'
+                );
+            }
+            el.on("click", ".btn.download", function () {
+                var id = $(this).parent().attr("data-id");
+                widget.backend("logfileGet", {"id": id}, function (content) {
+                    downloadFile(content, "serverlog" + id + ".txt");
+                });
+            }).on("click", ".btn.delete", function () {
+                var e = $(this);
+                var id = e.parent().attr("data-id");
+                Modal.confirm(t("sure"), function (success) {
+                    if (success) {
+                        e.parent().remove();
+                        widget.backend("logfileDelete", {"id": id});
+                    }
+                })
+            });
+            Modal.alert(el);
+        });
+    };
 
     /**
      * Add a message to console
@@ -34,9 +91,9 @@ Widget.register(function (widget) {
         var cl = "";
         if (widget.options.get("hideUserCommands") && (messageData.user)) {
             cl = "collapsed";
-        }
-        if (widget.options.get("hideServerLogs") && (messageData.type === 4)) {
-            cl = "collapsed";
+        } else if (widget.serverData.game == "rust" && messageData.type === 4 && !widget.options.get("allLogs")) {
+            // for rust ignore all messages with the log flag
+            return false;
         }
         cl += " logtype-" + messageData.type;
         var e = $('<div class="message ' + cl + '">' +
@@ -76,15 +133,9 @@ Widget.register(function (widget) {
      */
     var reloadServerLog = function () {
         consoleEl.html('');
-        if (widget.options.get("showOldLogs")) {
-            for (var i = 0; i < initialServerLog.length; i++) {
-                if (!initialServerLog[i].length) continue;
-                addMessage(JSON.parse(initialServerLog[i]));
-            }
-        }
         for (var j = 0; j < receivedServerMessages.length; j++) {
-            if (!receivedServerMessages[i]) continue;
-            addMessage(receivedServerMessages[i]);
+            if (!receivedServerMessages[j]) continue;
+            addMessage(receivedServerMessages[j]);
         }
     };
 
@@ -132,6 +183,9 @@ Widget.register(function (widget) {
         widget.content.on("click", ".timestamp", function (ev) {
             $(this).closest(".message").toggleClass("collapsed");
             scrollTo($(this).closest(".message")[0].offsetTop - 40);
+        });
+        widget.content.on("click", ".btn.serverlogs", function (ev) {
+            showRawServerLogs();
         });
         widget.content.on("change", ".cmd-select select", function (ev) {
             var v = $(this).val();
@@ -215,6 +269,7 @@ Widget.register(function (widget) {
                 }
             }, 100);
         });
+        widget.content.append(serverLogsBtn);
         widget.content.append(consoleEl);
         widget.content.append(searchEl);
         widget.content.append(cmdEl);
@@ -223,15 +278,6 @@ Widget.register(function (widget) {
         widget.onRconMessage(function (message) {
             receivedServerMessages.push(message);
             addMessage(message);
-        });
-
-        var serverLogOptions = {};
-        if (widget.options.get("limit")) {
-            serverLogOptions.limit = widget.options.get("limitNr");
-        }
-        widget.backend("server-log", serverLogOptions, function (messageData) {
-            initialServerLog = messageData.log.split("\n");
-            reloadServerLog();
         });
     };
 

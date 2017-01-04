@@ -113,6 +113,7 @@ lang.values.en = {
     "index.tooltip.options": "Options",
     "index.tooltip.layout": "Layout",
     "index.tooltip.readme": "Readme",
+    "index.widget.error.id": "Widget.id must begin with an a-z character and should only contain: a-z, 0-9, -, _",
     "dashboard": "Dashboard",
     "cancel": "Cancel",
     "save": "Save",

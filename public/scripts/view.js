@@ -141,6 +141,7 @@ View.load = function (view, messageData, callback) {
                 lang.replaceInHtml();
                 // init selectpicker
                 $('.selectpicker').selectpicker();
+                collapsable(c);
             });
         };
         if (typeof View.views[viewData.view] == "undefined") {

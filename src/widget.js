@@ -5,17 +5,17 @@ var db = require(__dirname + "/db");
 
 /**
  * A widget
- * @param {string} name
+ * @param {string} id
  * @constructor
  */
-function Widget(name) {
+function Widget(id) {
     /** @type {Widget} */
     var self = this;
     /**
      * The widget internal name
      * @type {string}
      */
-    this.name = name;
+    this.id = id;
     /**
      * The widget manifest data
      * @type {{}}
@@ -40,7 +40,7 @@ function Widget(name) {
     this.getDbEntry = function (server) {
         var wdb = db.get("widgets", "server_" + server.id).get("list");
         var found = wdb.find({
-            "name": this.name
+            "id": this.id
         });
         if (found.size()) {
             return found;
@@ -201,10 +201,10 @@ function Widget(name) {
 Widget.widgets = {};
 
 /**
- * Get a list of all widget names
+ * Get a list of all widget ids
  * @return {string[]}
  */
-Widget.getAllWidgetNames = function () {
+Widget.getAllWidgetIds = function () {
     var dir = __dirname + "/../public/widgets";
     return fs.readdirSync(dir);
 };
@@ -214,13 +214,13 @@ Widget.getAllWidgetNames = function () {
  * @return {{string: Widget}}
  */
 Widget.getAllWidgets = function () {
-    var names = Widget.getAllWidgetNames();
+    var ids = Widget.getAllWidgetIds();
     var widgets = {};
-    for (var i = 0; i < names.length; i++) {
-        var name = names[i];
-        var widget = Widget.get(name);
+    for (var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        var widget = Widget.get(id);
         if (widget) {
-            widgets[name] = widget;
+            widgets[id] = widget;
         }
     }
     return widgets;
@@ -250,22 +250,22 @@ Widget.callMethodForAllWidgetsIfActive = function (method, server) {
 };
 
 /**
- * Get a single widget by name
- * @param {string} name
+ * Get a single widget by id
+ * @param {string} id
  * @return {Widget|null}
  */
-Widget.get = function (name) {
-    if (typeof Widget.widgets[name] == "undefined") {
-        Widget.widgets[name] = null;
-        var dir = __dirname + "/../public/widgets/" + name;
+Widget.get = function (id) {
+    if (typeof Widget.widgets[id] == "undefined") {
+        Widget.widgets[id] = null;
+        var dir = __dirname + "/../public/widgets/" + id;
         var widget = require(dir + "/backend");
         if (widget) {
+            widget.id = id;
             widget.manifest = require(dir + "/manifest.json");
-            widget.name = name;
-            Widget.widgets[name] = widget;
+            Widget.widgets[id] = widget;
         }
     }
-    return Widget.widgets[name];
+    return Widget.widgets[id];
 };
 
 /**
