@@ -109,6 +109,8 @@ Rcon.prototype.nextPacketId = function () {
 Rcon.prototype.connect = function (callback) {
     if (this.socket) return false;
     this.socket = new net.Socket();
+    // initial timeout is 10 seconds, if server is connected than unset this timeout
+    this.socket.setTimeout(10 * 1000);
 
     this.socket.on("error", function (err) {
         if (callback) callback(err);
@@ -120,6 +122,7 @@ Rcon.prototype.connect = function (callback) {
     }.bind(this));
 
     this.socket.connect(this.port, this.host, function (err) {
+        this.socket.setTimeout(0);
         this.socket.on("data", function (data) {
             this.dataBuffer = Buffer.concat([this.dataBuffer, data]);
             this._data();
