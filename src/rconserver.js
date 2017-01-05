@@ -125,8 +125,9 @@ function RconServer(id, serverData) {
     this.con.connect(function (err) {
         var serverName = serverData.host + ":" + serverData.rcon_port;
         if (err) {
-            self.removeInstance(true);
             console.error(new Date(), "RconServer [" + serverName + "]: Connection failed");
+            self.con.disconnect();
+            delete RconServer.instances[self.id];
             return;
         }
         // authenticate
@@ -134,8 +135,9 @@ function RconServer(id, serverData) {
         self.con.send(self.serverData.rcon_password, null, true, function (success) {
             self.injectServerMessage("Rcon authentication " + (success ? "successfull" : "invalid"));
             if (!success) {
-                self.removeInstance(true);
                 console.error(new Date(), "Invalid rcon password for server " + self.serverData.name + ":" + self.serverData.rcon_port);
+                self.con.disconnect();
+                delete RconServer.instances[self.id];
                 return;
             }
             self.connected = true;
