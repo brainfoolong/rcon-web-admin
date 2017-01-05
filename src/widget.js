@@ -345,6 +345,9 @@ Widget.get = function (id) {
         Widget.widgets[id] = null;
         var dir = __dirname + "/../public/widgets/" + id;
         if (fs.existsSync(dir + "/backend.js")) {
+            // invalidate require cache also before fetching
+            // because it's possible that the widget code has been reloaded
+            delete require.cache[dir + "/backend"];
             var widget = require(dir + "/backend");
             if (widget) {
                 widget.id = id;
