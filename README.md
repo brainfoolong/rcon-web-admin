@@ -40,13 +40,13 @@ Installation FAQ see bellow.
     cd rcon-web-admin
     npm update
     
-# Start/Stop on linux
+## Start/Stop on linux
 
     sh startscripts/start-linux.sh start
     sh startscripts/start-linux.sh stop
     sh startscripts/start-linux.sh restart
     
-# Start/Stop on windows - Close cmd window to close
+## Start/Stop on windows - Close cmd window to close
 
     startscripts/start-windows.bat
     
