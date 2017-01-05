@@ -29,6 +29,7 @@ function RconServer(id, serverData) {
 
     // require this here to not get a loop because websocketuser itself require the RconServer module
     var WebSocketUser = require(__dirname + "/websocketuser");
+    var serverName = serverData.host + ":" + serverData.rcon_port;
 
     /**
      * Temove this instance from server list
@@ -64,7 +65,11 @@ function RconServer(id, serverData) {
     this.cmd = function (cmd, user, log, callback) {
         if (this.connected) {
             this.con.send(cmd, user, log, function (result) {
-                callback(result.toString());
+                try {
+                    callback(result.toString());
+                } catch (e) {
+                    console.error(new Date(), "RconServer [" + serverName + "]: Command error", e, e.stack);
+                }
             });
             return;
         }
@@ -123,7 +128,6 @@ function RconServer(id, serverData) {
 
     // connect to server
     this.con.connect(function (err) {
-        var serverName = serverData.host + ":" + serverData.rcon_port;
         if (err) {
             console.error(new Date(), "RconServer [" + serverName + "]: Connection failed");
             return;

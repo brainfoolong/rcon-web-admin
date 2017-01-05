@@ -39,6 +39,7 @@ Installation FAQ see bellow.
     git clone https://github.com/brainfoolong/rcon-web-admin.git
     cd rcon-web-admin
     npm update
+    chmod 0755 -R startscripts *
     
 ## Start/Stop on linux
 

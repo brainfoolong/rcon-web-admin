@@ -230,7 +230,7 @@ Widget.install = function (repository, callback) {
         if (callback) callback(true);
     };
     if (fs.existsSync(repoDir)) {
-        exec("cd " + repoDir + " && git pull origin master", cb);
+        exec("cd " + repoDir + " && git pull", cb);
     } else {
         var cmd = "cd " + dir + " && git clone https://github.com/" + repository + ".git";
         exec(cmd, cb);
@@ -360,19 +360,23 @@ Widget.get = function (id) {
  * Call onUpdate methods for all active widgets for all connected servers
  */
 Widget.updateAllActive = function () {
-    var RconServer = require(__dirname + "/rconserver");
-    var WebSocketUser = require(__dirname + "/websocketuser");
-    for (var serverIndex in RconServer.instances) {
-        if (RconServer.instances.hasOwnProperty(serverIndex)) {
-            var server = RconServer.instances[serverIndex];
-            Widget.callMethodForAllWidgetsIfActive("onUpdate", server);
+    try {
+        var RconServer = require(__dirname + "/rconserver");
+        var WebSocketUser = require(__dirname + "/websocketuser");
+        for (var serverIndex in RconServer.instances) {
+            if (RconServer.instances.hasOwnProperty(serverIndex)) {
+                var server = RconServer.instances[serverIndex];
+                Widget.callMethodForAllWidgetsIfActive("onUpdate", server);
+            }
         }
-    }
-    // send a ping to the frontend for all user's that have a server currently opened on the dashboard
-    for (var i = 0; i < WebSocketUser.instances.length; i++) {
-        var user = WebSocketUser.instances[i];
-        if (!user || !user.server) continue;
-        user.send("widgetUpdateDone", {"server": user.server.id});
+        // send a ping to the frontend for all user's that have a server currently opened on the dashboard
+        for (var i = 0; i < WebSocketUser.instances.length; i++) {
+            var user = WebSocketUser.instances[i];
+            if (!user || !user.server) continue;
+            user.send("widgetUpdateDone", {"server": user.server.id});
+        }
+    } catch (e) {
+        console.error(new Date(), "Widget update all active error", e);
     }
 };
 

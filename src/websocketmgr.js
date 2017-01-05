@@ -46,7 +46,7 @@ WebSocketMgr.startServer = function () {
             });
         }
     } catch (e) {
-        console.error(new Date(), e.stack);
+        console.error(new Date(), "Start Websocket Server error", e);
     }
 };
 

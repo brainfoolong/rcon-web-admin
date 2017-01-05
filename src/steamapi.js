@@ -32,7 +32,7 @@ steamapi.request = function (type, ids, callback) {
     }
     if (missingIds.length) {
         request.get("https://0x.at/steamapi/api.php?action=" + type + "&ids=" + missingIds.join(","), function (result) {
-            if(result !== null){
+            if (result !== null) {
                 var data = JSON.parse(result);
                 for (var i = 0; i < data.players.length; i++) {
                     var banData = data.players[i];
@@ -83,22 +83,26 @@ steamapi.saveDataForId = function (type, id, data) {
  * Delete old entries
  */
 steamapi.cleanup = function () {
-    var data = db.get("steamapi").value();
-    var timeout = new Date() / 1000 - 86400;
-    for (var steamId in data) {
-        if (data.hasOwnProperty(steamId)) {
-            var entries = data[steamId];
-            for (var entryIndex in entries) {
-                if (entries.hasOwnProperty(entryIndex)) {
-                    var entryRow = entries[entryIndex];
-                    if (entryRow.timestamp < timeout) {
-                        delete entries[entryIndex];
+    try {
+        var data = db.get("steamapi").value();
+        var timeout = new Date() / 1000 - 86400;
+        for (var steamId in data) {
+            if (data.hasOwnProperty(steamId)) {
+                var entries = data[steamId];
+                for (var entryIndex in entries) {
+                    if (entries.hasOwnProperty(entryIndex)) {
+                        var entryRow = entries[entryIndex];
+                        if (entryRow.timestamp < timeout) {
+                            delete entries[entryIndex];
+                        }
                     }
                 }
             }
         }
+        db.get("steamapi").setState(data);
+    } catch (e) {
+        console.error(new Date(), "Steamapi cleanup failed", e, e.stack);
     }
-    db.get("steamapi").setState(data);
 };
 
 // each 30 minutes cleanup the steamapi db and remove old entries
