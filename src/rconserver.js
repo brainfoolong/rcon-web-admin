@@ -19,7 +19,7 @@ function RconServer(id, serverData) {
     /** @type {object} */
     this.serverData = serverData;
     /** @type {Rcon} */
-    this.con = new Rcon(serverData.host, serverData.rcon_port);
+    this.con = new Rcon(serverData.host, serverData.rcon_port, this);
     /** @type {boolean} */
     this.connected = false;
     /** @type {number|null} */

@@ -6,7 +6,7 @@ var events = require("events");
 /**
  * RCON socket connection
  */
-function Rcon(host, port) {
+function Rcon(host, port, server) {
     events.EventEmitter.call(this);
 
     /**
@@ -20,6 +20,12 @@ function Rcon(host, port) {
      * @type {number}
      */
     this.port = port;
+
+    /**
+     * The server instance
+     * @type {RconServer}
+     */
+    this.server = server;
 
     /**
      * Next packet id.
@@ -108,6 +114,8 @@ Rcon.prototype.nextPacketId = function () {
  */
 Rcon.prototype.connect = function (callback) {
     if (this.socket) return false;
+    var self = this;
+
     this.socket = new net.Socket();
     // initial timeout is 10 seconds, if server is connected than unset this timeout
     this.socket.setTimeout(10 * 1000);
@@ -118,6 +126,8 @@ Rcon.prototype.connect = function (callback) {
     }.bind(this));
 
     this.socket.on("timeout", function () {
+        var serverName = self.server.serverData.host + ":" + self.server.serverData.rcon_port;
+        console.error(new Date(), "RconServer [" + serverName + "]: Connection timed out");
         this.disconnect();
     }.bind(this));
 
