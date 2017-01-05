@@ -27,26 +27,14 @@ It is required to have `npm`, `node` and `git` properly installed.
 * https://nodejs.org
 * https://git-scm.com/downloads
 
-On linux you may execute to git the newest verions of required packages.
+On linux you may execute this to git the newest verions of required packages.
 
     sudo apt-get install nodejs npm git
     sudo npm update npm -g
-    
-Linux: If you've installed it and `node` as not available but `nodejs` is, than create a symlink with 
 
-    sudo ln -s `which nodejs` /usr/bin/node
-    
-RaspberryPi: You may not be able to run the server or `npm update` that is required bellow, or the node modules do not download. This will be because of a very old npm/nodejs version (for old raspberry pi for example). So you have to update nodejs and npm to a new version. **Warning**: This will delete old nodejs and npm installation. Make some backups before you do this.
+Installation FAQ see bellow.
 
-    sudo apt-get purge nodejs npm
-    ## Pi2 -> wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv7l.tar.xz -O node.tar.xz
-    ## Pi A/A+, B/B+ und Zero (ARMv6) -> wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv6l.tar.xz -O node.tar.xz
-    tar -xvf node.tar.xz
-    cd node-v6.9.3-linux-armv*
-    sudo cp -R * /usr/local/
-    
-
-## Installation and start RCON web admin
+## Installation
 
     git clone https://github.com/brainfoolong/rcon-web-admin.git
     cd rcon-web-admin
@@ -72,3 +60,19 @@ For linux you can start the rcon web admin with your server start. For example o
 
 ## Widget developers
 Goto https://github.com/brainfoolong/rcon-web-admin/tree/master/public/widgets for more information.
+
+## Installation FAQ
+    
+Linux: If you've installed it and `node` as not available but `nodejs` is, than create a symlink with 
+
+    sudo ln -s `which nodejs` /usr/bin/node
+    
+RaspberryPi: You may not be able to run the server or `npm update` that is required bellow, or the node modules do not download. This will be because of a very old npm/nodejs version (for old raspberry pi for example). So you have to update nodejs and npm to a new version. **Warning**: This will delete old nodejs and npm installation. Make some backups before you do this.
+
+    sudo apt-get purge nodejs npm
+    ## Pi2 -> wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv7l.tar.xz -O node.tar.xz
+    ## Pi A/A+, B/B+ und Zero (ARMv6) -> wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv6l.tar.xz -O node.tar.xz
+    tar -xvf node.tar.xz
+    cd node-v6.9.3-linux-armv*
+    sudo cp -R * /usr/local/
+    
