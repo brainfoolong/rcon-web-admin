@@ -20,7 +20,7 @@ function View(user, messageData, callback) {
             sendMessageData.editData.admin = sendMessageData.editData.admin ? "yes" : "no";
         }
         callback(sendMessageData);
-    }
+    };
     // access denied if users are in database and user is not admin
     if (usersCount && (!user.userData || !user.userData.admin)) {
         callback({redirect: "index", "note": ["access.denied", "danger"]});

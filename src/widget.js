@@ -2,6 +2,7 @@
 
 var fs = require("fs");
 var db = require(__dirname + "/db");
+var exec = require('child_process').exec;
 
 /**
  * A widget
@@ -201,12 +202,27 @@ function Widget(id) {
 Widget.widgets = {};
 
 /**
- * The default widget repositories, they are always included
+ * The default widget repositories, that will be installed on first installation
  * @type {Array}
  */
 Widget.defaultWidgets = [
     "brainfoolong/rwa-autobot"
 ];
+
+/**
+ * Install a widget from a git repository
+ * If already exist try to update
+ * @param {string} repository
+ */
+Widget.install = function (repository) {
+    var dir = __dirname + "/../public/widgets";
+    var repoDir = dir + "/" + repository;
+    if (fs.existsSync(repoDir)) {
+        exec("cd " + repoDir + " && git pull origin master");
+    } else {
+        exec("cd " + dir + " && git clone https://github.com/brainfoolong/" + repository + ".git");
+    }
+};
 
 /**
  * Get a list of all widget ids

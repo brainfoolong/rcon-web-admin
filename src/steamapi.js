@@ -1,6 +1,6 @@
 "use strict";
 
-var https = require("https");
+var request = require(__dirname + "/request");
 var db = require(__dirname + "/db");
 
 /**
@@ -31,27 +31,15 @@ steamapi.request = function (type, ids, callback) {
         }
     }
     if (missingIds.length) {
-        var req = https.get("https://0x.at/steamapi/api.php?action=" + type + "&ids=" + missingIds.join(","), function (result) {
-            var body = '';
-            result.on('data', function (chunk) {
-                body += chunk;
-            });
-            result.on('end', function () {
-                try {
-                    var data = JSON.parse(body);
-                    for (var i = 0; i < data.players.length; i++) {
-                        var banData = data.players[i];
-                        steamapi.saveDataForId(type, banData.SteamId, banData);
-                        res[banData.SteamId] = banData;
-                    }
-                    callback(res);
+        request.get("https://0x.at/steamapi/api.php?action=" + type + "&ids=" + missingIds.join(","), function (result) {
+            if(result !== null){
+                var data = JSON.parse(result);
+                for (var i = 0; i < data.players.length; i++) {
+                    var banData = data.players[i];
+                    steamapi.saveDataForId(type, banData.SteamId, banData);
+                    res[banData.SteamId] = banData;
                 }
-                catch (e) {
-                    callback(res);
-                }
-            });
-        });
-        req.on('error', function (err) {
+            }
             callback(res);
         });
     } else {
