@@ -104,7 +104,11 @@ View.register("index", function (messageData) {
                                 .attr("data-collapsable-id", "widget.content." + widget.id);
 
                             $.get("widgets/" + widgetData.id + "/README.md", function (data) {
-                                widget.container.find(".widget-readme").html(new showdown.Converter().makeHtml(data));
+                                var container = widget.container.find(".widget-readme");
+                                container.html(new showdown.Converter().makeHtml(data));
+                                container.prepend('<div class="github-info">' +
+                                    '<a href="https://github.com/' + widget.data.manifest.repository + '" ' +
+                                    'target="_blank">Version ' + widget.data.manifest.version + ' on Github</a></div>')
                             });
                             // copy to hidden widgets form, set position later
                             $(".widgets-unsorted").append(widget.container);

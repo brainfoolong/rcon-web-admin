@@ -58,8 +58,11 @@ Socket.connect = function (callback) {
     con.onopen = function () {
         Socket.con = con;
         // send init ping to backend
-        Socket.send("init", null, function () {
-            if (callback) callback();
+        Socket.send("init", null, function (messageData) {
+            if(messageData.version){
+                $(".app-version").text(messageData.version);
+            }
+            if (callback) callback(messageData);
             Socket.sendQueue();
         });
     };

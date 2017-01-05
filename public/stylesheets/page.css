@@ -501,6 +501,11 @@ body.is-not-admin [data-role='admin'] {
     margin-right: 10px;
 }
 
+.widget .widget-readme .github-info{
+    text-align: right;
+    font-size: 80%;
+}
+
 .widget .widget-icons {
     position: absolute;
     right: 10px;

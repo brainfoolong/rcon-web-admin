@@ -136,6 +136,9 @@ function WebSocketUser(socket) {
                         self.socket = null;
                         self.userData = null;
                         break;
+                    case "init":
+                        sendCallback(require(__dirname + "/../package"));
+                        break;
                     default:
                         sendCallback();
                         break;
