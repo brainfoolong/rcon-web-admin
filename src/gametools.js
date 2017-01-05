@@ -22,11 +22,12 @@ gametools.rust._serverstatus = {};
 /**
  * Get the rust serverstatus
  * @param {RconServer} server
+ * @param {boolean} forceUpdate
  * @param {function} callback
  */
-gametools.rust.serverstatus = function (server, callback) {
-    // cached for 30 seconds
-    if (gametools.rust._serverstatus[server.id] && new Date(gametools.rust._serverstatus[server.id].timestamp) > new Date() / 1000 - 29) {
+gametools.rust.serverstatus = function (server, forceUpdate, callback) {
+    // cached for 30 seconds if not forced
+    if (!forceUpdate && gametools.rust._serverstatus[server.id] && new Date(gametools.rust._serverstatus[server.id].timestamp) > new Date() / 1000 - 29) {
         return callback(gametools.rust._serverstatus[server.id]);
     }
     gametools.rust._serverstatus[server.id] = null;
@@ -71,8 +72,8 @@ gametools.rust.serverstatus = function (server, callback) {
                         playerLower[playerIndex.toLowerCase()] = player[playerIndex];
                     }
                 }
+                playerLower.vacstatus = {};
                 playerlistObject[playerLower.steamid] = playerLower;
-                player.vacstatus = {};
                 ids.push(playerLower.steamid);
             }
             newStatus.players.onlineCount = playerlist.length;
@@ -88,14 +89,14 @@ gametools.rust.serverstatus = function (server, callback) {
                                 var steamValue = banRow[steamIndex];
                                 steamIndex = steamIndex.toLowerCase();
                                 if (steamIndex == "economyban") steamValue = steamValue != "none";
-                                if (steamIndex != "timestamp" && steamValue != "steamid" && value) {
+                                if (steamIndex != "timestamp" && steamIndex != "steamid" && steamValue) {
                                     status = "suspicious";
                                 }
                                 newBanRow[steamIndex] = steamValue;
                             }
                         }
                         newBanRow.status = status;
-                        newStatus.players.online[newBanRow.steamid] = newBanRow;
+                        newStatus.players.online[newBanRow.steamid].vacstatus = newBanRow;
                     }
                 }
 
@@ -108,7 +109,7 @@ gametools.rust.serverstatus = function (server, callback) {
                     var bans = JSON.parse(messageData);
                     newStatus.players.bannedCount = bans.length;
                     for (var i = 0; i < bans.length; i++) {
-                        newStatus.players.banned.push(bans[i]);
+                        newStatus.players.banned[bans[i].steamid] = bans[i];
                     }
                     newStatus.timestamp = new Date();
                     gametools.rust._serverstatus[server.id] = newStatus;
