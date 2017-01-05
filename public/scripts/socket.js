@@ -72,7 +72,7 @@ Socket.connect = function (callback) {
      * @param error
      */
     con.onerror = function (error) {
-        console.error('WebSocket Error ' + error);
+        console.error(new Date(), 'WebSocket Error ' + error);
     };
 
     /**
@@ -86,7 +86,7 @@ Socket.connect = function (callback) {
                 if (typeof data.callbackId != "undefined") {
                     var callbackId = data.callbackId;
                     if (Socket.callbacks[callbackId] === null) {
-                        console.error("No socket callback for id " + callbackId + ", maybe dupe callback in backend?");
+                        console.error(new Date(), "No socket callback for id " + callbackId + ", maybe dupe callback in backend?");
                     } else {
                         Socket.callbacks[callbackId](data.messageData);
                         Socket.callbacks[callbackId] = null;

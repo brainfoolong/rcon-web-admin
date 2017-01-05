@@ -331,7 +331,7 @@ Widget.callMethodForAllWidgetsIfActive = function (method, server) {
             }
         }
     } catch (e) {
-        console.error(e.stack);
+        console.error(new Date(), e.stack);
     }
 };
 
