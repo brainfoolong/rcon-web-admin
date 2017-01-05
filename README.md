@@ -1,6 +1,6 @@
 # RCON Web Admin
 
-<img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/dashboard.jpg" width="30%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/autobot.jpg" width="30%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/server-management.jpg" width="30%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/ucc.jpg" width="30%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/widgets.jpg" width="30%">
+<img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/dashboard.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/autobot.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/server-management.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/ucc.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/widgets.jpg" width="19%">
 
 RCON Web Admin as a powerful web interface to control your RCON server, e.g: for Rust game servers, but not limited to. Every RCON server will work.
 
@@ -31,7 +31,9 @@ On linux you may execute
 
     apt-get install nodejs npm git
     
-Linux: If you've installed it and `node` as not available but `nodejs` is, than create a symlink with `sudo ln -s `which nodejs` /usr/bin/node`
+Linux: If you've installed it and `node` as not available but `nodejs` is, than create a symlink with 
+
+    sudo ln -s `which nodejs` /usr/bin/node
 
 ## Installation and start RCON web admin
 
