@@ -64,7 +64,7 @@ case "$1" in
 		fi
 	;;
 	restart)
-		$0 stop && $0 start || exit 1
+		start-linux.sh stop && start-linux.sh start || exit 1
 	;;
 	status)
 		if [ -e rconwebadmin.pid ]; then
