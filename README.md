@@ -50,7 +50,8 @@ Installation FAQ see bellow.
 
     startscripts/start-windows.bat
     
-Then goto: http://yourserverip:4326 (You can also use your hostname instead of ip)
+Then goto: http://yourserverip:4326 (You can also use your hostname instead of ip).
+To modify the :4326 port or allowed hosts, have a look in the `config.template.js` file in the root folder.
 
 ## Startup/Shutdown scripts
 

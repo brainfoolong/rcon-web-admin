@@ -53,13 +53,7 @@ var View = function (user, messageData, callback) {
             // delete server folder
             var dir = __dirname + "/../../db/server_" + messageData.id;
             if (fs.existsSync(dir)) {
-                deleteFolderRecursive
-                var files = fs.readdirSync(dir);
-                for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
-                    fs.unlinkSync(dir + "/" + file);
-                }
-                fs.unlinkSync(dir);
+                deleteFolderRecursive(dir);
             }
             deeperCallback({
                 "note": ["deleted", "success"],

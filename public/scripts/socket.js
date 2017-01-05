@@ -51,73 +51,76 @@ Socket.sendQueue = function () {
  * @param {function=} callback If connection is established
  */
 Socket.connect = function (callback) {
-    var con = new WebSocket('ws://' + window.location.hostname + ':4325');
-    /**
-     * On open connection
-     */
-    con.onopen = function () {
-        Socket.con = con;
-        // send init ping to backend
-        Socket.send("init", null, function (messageData) {
-            if(messageData.version){
-                $(".app-version").text(messageData.version);
-            }
-            if (callback) callback(messageData);
-            Socket.sendQueue();
-        });
-    };
+    // load the required port number
+    $.get("wsport", function (port) {
+        var con = new WebSocket('ws://' + window.location.hostname + ':' + port);
+        /**
+         * On open connection
+         */
+        con.onopen = function () {
+            Socket.con = con;
+            // send init ping to backend
+            Socket.send("init", null, function (messageData) {
+                if (messageData.version) {
+                    $(".app-version").text(messageData.version);
+                }
+                if (callback) callback(messageData);
+                Socket.sendQueue();
+            });
+        };
 
-    /**
-     * On websocket error
-     * @param error
-     */
-    con.onerror = function (error) {
-        console.error('WebSocket Error ' + error);
-    };
+        /**
+         * On websocket error
+         * @param error
+         */
+        con.onerror = function (error) {
+            console.error('WebSocket Error ' + error);
+        };
 
-    /**
-     * On message received from backend
-     */
-    con.onmessage = function (e) {
-        if (e.data) {
-            var data = JSON.parse(e.data);
-            debug("Socket receive message", data);
-            if (data.action) {
-                if (typeof data.callbackId != "undefined") {
-                    var callbackId = data.callbackId;
-                    if (Socket.callbacks[callbackId] === null) {
-                        console.error("No socket callback for id " + callbackId + ", maybe dupe callback in backend?");
-                    } else {
-                        Socket.callbacks[callbackId](data.messageData);
-                        Socket.callbacks[callbackId] = null;
+        /**
+         * On message received from backend
+         */
+        con.onmessage = function (e) {
+            if (e.data) {
+                var data = JSON.parse(e.data);
+                debug("Socket receive message", data);
+                if (data.action) {
+                    if (typeof data.callbackId != "undefined") {
+                        var callbackId = data.callbackId;
+                        if (Socket.callbacks[callbackId] === null) {
+                            console.error("No socket callback for id " + callbackId + ", maybe dupe callback in backend?");
+                        } else {
+                            Socket.callbacks[callbackId](data.messageData);
+                            Socket.callbacks[callbackId] = null;
+                        }
+                    }
+                    for (var i in Socket.onMessageEvents) {
+                        if (Socket.onMessageEvents.hasOwnProperty(i)) {
+                            var cb = Socket.onMessageEvents[i];
+                            if (cb) cb(data);
+                        }
+                    }
+                    // show server disconnect message
+                    if (data.action == "serverDisconnect") {
+                        note(t("server.disconnect") + ": " + data.messageData.servername, "danger");
                     }
                 }
-                for (var i in Socket.onMessageEvents) {
-                    if (Socket.onMessageEvents.hasOwnProperty(i)) {
-                        var cb = Socket.onMessageEvents[i];
-                        if (cb) cb(data);
-                    }
-                }
-                // show server disconnect message
-                if (data.action == "serverDisconnect") {
-                    note(t("server.disconnect") + ": " + data.messageData.servername, "danger");
-                }
             }
-        }
-    };
+        };
 
-    /**
-     * On connection close
-     */
-    con.onclose = function () {
-        Socket.con = null;
-        // try reconnect
-        note("socket.disconnect", "danger");
-        spinner("#content");
-        setTimeout(function () {
-            Socket.connectAndLoadView();
-        }, 5000);
-    };
+        /**
+         * On connection close
+         */
+        con.onclose = function () {
+            Socket.con = null;
+            // try reconnect
+            note("socket.disconnect", "danger");
+            spinner("#content");
+            setTimeout(function () {
+                Socket.connectAndLoadView();
+            }, 5000);
+        };
+    });
 };
 
 /**

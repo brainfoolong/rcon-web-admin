@@ -5,9 +5,8 @@
 Error.stackTraceLimit = Infinity;
 
 require(__dirname + "/routes");
-
-var RconServer = require(__dirname + "/rconserver");
-var WebSocketMgr = require(__dirname + "/websocketmgr");
+require(__dirname + "/rconserver");
+require(__dirname + "/websocketmgr");
 var Widget = require(__dirname + "/widget");
 var steamapi = require(__dirname + "/steamapi");
 
