@@ -222,8 +222,8 @@ Widget.defaultWidgets = [
 Widget.install = function (repository, callback) {
     var dir = fs.realpathSync(__dirname + "/../public/widgets");
     dir = dir.replace(/\\/g, "/");
-    var repoDir = dir + "/" + repository;
     var id = repository.split("/")[1];
+    var repoDir = dir + "/" + id;
     var cb = function () {
         delete Widget.widgets[id];
         Widget.get(id);

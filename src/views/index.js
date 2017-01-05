@@ -46,7 +46,7 @@ var View = function (user, messageData, callback) {
             var users = server.users.split(",");
             if (users) {
                 for (var id in users) {
-                    if (users[id] == user.userData.username) {
+                    if (users[id] == user.userData.username || user.userData.admin) {
                         myServers[i] = {
                             "id": server.id,
                             "name": server.name,
