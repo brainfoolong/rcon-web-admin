@@ -29,7 +29,9 @@ It is required to have `npm`, `node` and `git` properly installed.
 
 On linux you may execute
 
-    apt-get install node git
+    apt-get install nodejs npm git
+    
+Linux: If you've installed it and `node` as not available but `nodejs` is, than create a symlink with `sudo ln -s `which nodejs` /usr/bin/node`
 
 ## Installation and start RCON web admin
 
@@ -37,6 +39,8 @@ On linux you may execute
     cd rcon-web-admin
     npm update
     node src/main.js
+    
+Then goto: http://yourserverip:4326 (You can also use your hostname instead of ip)
 
 ## Startup/Shutdown scripts
 
