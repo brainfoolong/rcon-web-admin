@@ -217,8 +217,9 @@ Widget.defaultWidgets = [
  * Install a widget from a git repository
  * If already exist try to update
  * @param {string} repository
+ * @param {function=} callback
  */
-Widget.install = function (repository) {
+Widget.install = function (repository, callback) {
     var dir = fs.realpathSync(__dirname + "/../public/widgets");
     dir = dir.replace(/\\/g, "/");
     var repoDir = dir + "/" + repository;
@@ -226,12 +227,55 @@ Widget.install = function (repository) {
     var cb = function () {
         delete Widget.widgets[id];
         Widget.get(id);
+        if (callback) callback(true);
     };
     if (fs.existsSync(repoDir)) {
         exec("cd " + repoDir + " && git pull origin master", cb);
     } else {
         var cmd = "cd " + dir + " && git clone https://github.com/" + repository + ".git";
         exec(cmd, cb);
+    }
+};
+
+/**
+ * Fully delete a widget from the disk
+ * @param {string} id
+ * @param {function=} callback
+ */
+Widget.delete = function (id, callback) {
+    var widget = Widget.get(id);
+    if (widget) {
+        var deleteFolderRecursive = function (path) {
+            if (fs.existsSync(path)) {
+                fs.readdirSync(path).forEach(function (file) {
+                    var curPath = path + "/" + file;
+                    if (fs.lstatSync(curPath).isDirectory()) {
+                        deleteFolderRecursive(curPath);
+                    } else {
+                        fs.unlinkSync(curPath);
+                    }
+                });
+                fs.rmdirSync(path);
+            }
+        };
+        deleteFolderRecursive(__dirname + "/../public/widgets/" + id);
+        // delete all entries with this widget in the server widgets
+        var RconServer = require(__dirname + "/rconserver");
+        for (var serverIndex in RconServer.instances) {
+            if (RconServer.instances.hasOwnProperty(serverIndex)) {
+                var server = RconServer.instances[serverIndex];
+                var list = db.get("widgets", server.id).get("list").values();
+                if (list) {
+                    var newList = [];
+                    for (var i = 0; i < list.length; i++) {
+                        var widgetEntry = list[i];
+                        if (widgetEntry.id !== id) newList.push(widgetEntry);
+                    }
+                    db.get("widgets", server.id).set("list", newList).value();
+                }
+            }
+        }
+
     }
 };
 

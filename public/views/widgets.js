@@ -18,7 +18,7 @@ View.register("widgets", function (messageData) {
             for (var i = 0; i < messageData.defaultWidgets.length; i++) {
                 var repository = messageData.defaultWidgets[i];
                 if (repository.match(new RegExp("/" + widgetIndex, "i"))) {
-                    widgetTpl.find(".actions .delete").remove();
+                    // .find(".actions .delete").remove();
                     break;
                 }
             }

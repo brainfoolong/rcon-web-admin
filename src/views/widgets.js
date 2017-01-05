@@ -15,21 +15,40 @@ function View(user, messageData, callback) {
         callback({redirect: "index", "note": ["access.denied", "danger"]});
         return;
     }
-    var widgets = {};
-    // get all widgets
-    (function () {
-        var allWidgets = Widget.getAllWidgets();
-        for (var allWidgetsIndex in allWidgets) {
-            if (allWidgets.hasOwnProperty(allWidgetsIndex)) {
-                var allWidgetsRow = allWidgets[allWidgetsIndex];
-                widgets[allWidgetsRow.id] = allWidgetsRow.manifest;
+    var widget = null;
+    switch (messageData.action) {
+        case "update":
+            widget = Widget.get(messageData.widget);
+            if (widget) {
+                Widget.install(messageData.widget, callback);
+                return;
             }
-        }
-    })();
-    callback({
-        "widgets": widgets,
-        "defaultWidgets": Widget.defaultWidgets
-    });
+            callback(false);
+            break;
+        case "delete":
+            widget = Widget.get(messageData.widget);
+            if (widget) {
+                Widget.delete(widget.id);
+                return;
+            }
+            break;
+        default:
+            var widgets = {};
+            // get all widgets
+            (function () {
+                var allWidgets = Widget.getAllWidgets();
+                for (var allWidgetsIndex in allWidgets) {
+                    if (allWidgets.hasOwnProperty(allWidgetsIndex)) {
+                        var allWidgetsRow = allWidgets[allWidgetsIndex];
+                        widgets[allWidgetsRow.id] = allWidgetsRow.manifest;
+                    }
+                }
+            })();
+            callback({
+                "widgets": widgets,
+                "defaultWidgets": Widget.defaultWidgets
+            });
+    }
 }
 
 module.exports = View;
