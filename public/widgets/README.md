@@ -19,6 +19,13 @@ If you've developed a widget and you think it's good for a core widget than you 
 * MIT License
 * Public github repository
 
+## List of core widgets
+* https://github.com/brainfoolong/rwa-autobot
+* https://github.com/brainfoolong/rwa-console
+* https://github.com/brainfoolong/rwa-restart
+* https://github.com/brainfoolong/rwa-rustboard
+* https://github.com/brainfoolong/rwa-shutdown
+
 ## More help coming soon
 Currently there is no more help.
 
