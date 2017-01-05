@@ -43,7 +43,7 @@ function Widget(id) {
         var found = wdb.find({
             "id": this.id
         });
-        if (found.size()) {
+        if (found.size().value()) {
             return found;
         }
         return null;
