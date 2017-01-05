@@ -280,7 +280,7 @@ Widget.register(function (widget) {
         widget.content.append(cmdSelect);
         widget.content.append(serverLogsBtn);
         widget.content.find(".selectpicker").selectpicker();
-        widget.onRconMessage(function (message) {
+        widget.onRconMessage("main", function (message) {
             receivedServerMessages.push(message);
             addMessage(message);
         });

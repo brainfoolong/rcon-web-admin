@@ -38,6 +38,15 @@ function RconServer(id, serverData) {
         if (disconnect) {
             self.con.disconnect();
         } else {
+            // send disconnect event to all clients
+            for (var i = 0; i < WebSocketUser.instances.length; i++) {
+                var user = WebSocketUser.instances[i];
+                if (!user) continue;
+                var server = user.getServerById(self.id);
+                if (server && server.connected) {
+                    user.send("serverDisconnect", {"serverid": self.id, "servername": self.serverData.name});
+                }
+            }
             clearInterval(self.widgetIv);
             self.con = null;
             self.connected = false;
@@ -77,8 +86,9 @@ function RconServer(id, serverData) {
             "timestamp": rconMessage.timestamp.toString()
         };
         // push this message to all connected clients that have access to this server
-        for (var i in WebSocketUser.instances) {
+        for (var i = 0; i < WebSocketUser.instances.length; i++) {
             var user = WebSocketUser.instances[i];
+            if (!user) continue;
             var server = user.getServerById(self.id);
             if (server) {
                 user.send("serverMessage", rconMessageJson);
@@ -113,8 +123,9 @@ function RconServer(id, serverData) {
 
     // connect to server
     this.con.connect(function (err) {
+        var serverName = serverData.host + ":" + serverData.rcon_port;
         if (err) {
-            console.error("RconServer connection failed", err);
+            console.error("RconServer [" + serverName + "]: Connection failed");
             return;
         }
         // authenticate
@@ -131,7 +142,7 @@ function RconServer(id, serverData) {
 
         // catch errors
         self.con.on("error", function (err) {
-            console.trace(err);
+            console.trace("RconServer [" + serverName + "]", err);
         });
 
         // on receive message

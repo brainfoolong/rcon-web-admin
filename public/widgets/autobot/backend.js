@@ -4,6 +4,7 @@ var Widget = require(__dirname + "/../../../src/widget");
 var WebSocketUser = require(__dirname + "/../../../src/websocketuser");
 var hash = require(__dirname + "/../../../src/hash");
 var vm = require('vm');
+var gametools = require(__dirname + "/../../../src/gametools");
 
 var widget = new Widget();
 
@@ -139,14 +140,10 @@ widget.executeAllScripts = function (server, sandboxData) {
                     "id": programsRow.id,
                     "title": programsRow.title
                 };
-                var users = WebSocketUser.instances;
-                for (var usersIndex in users) {
-                    if (users.hasOwnProperty(usersIndex)) {
-                        var usersRow = users[usersIndex];
-                        if (usersRow.server && server.id == usersRow.server.id) {
-                            usersRow.send("autobotExecutedScript", result);
-                        }
-                    }
+                for (var i = 0; i < WebSocketUser.instances.length; i++) {
+                    var user = WebSocketUser.instances[i];
+                    if (!user || !user.server || server.id !== user.server.id) continue;
+                    user.send("autobotExecutedScript", result);
                 }
             }
         }
@@ -220,23 +217,25 @@ widget.executeUserScript = function (server, programId, script, sandboxData) {
             return widget.storage.set(server, "autobot." + programId + "." + key, value, lifetime);
         }
     };
+    sandboxData.rust = {};
+    sandboxData.rust.serverstatus = function (callback) {
+        if (server.serverData.game != "rust") {
+            callback(null);
+            return;
+        }
+        gametools.rust.serverstatus(server, callback);
+    };
+    var empty = function () {
+
+    };
     if (sandboxData.context == "validate") {
-        sandboxData.say = function () {
-
-        };
-        sandboxData.cmd = function () {
-
-        };
-        sandboxData.storage.get = function () {
-            return null;
-        };
-        sandboxData.storage.set = function () {
-            return null;
-        };
+        sandboxData.say = empty;
+        sandboxData.cmd = empty;
+        sandboxData.storage.get = empty;
+        sandboxData.storage.set = empty;
+        sandboxData.rust.serverstatus = empty;
     } else {
-        sandboxData.variable = function () {
-
-        };
+        sandboxData.variable = empty;
     }
     try {
         var vmScript = new vm.Script(script, {"timeout": 5});

@@ -26,7 +26,7 @@ Widget.register(function (widget) {
     var options = $('<h2 class="collapsable-trigger" data-collapsable-target="autobot.options">' + widget.t("variables") + '</h2>' +
         '<div class="options collapsable-target" data-collapsable-id="autobot.options"><div></div></div>');
 
-    var scriptTemplates = ["echobot", "nextwipe", "repeatchat", "restart", "warnsalty", "welcomegoodbye"];
+    var scriptTemplates = ["echobot", "nextwipe", "repeatchat", "restart", "rust-autokick", "warnsalty", "welcomegoodbye"];
 
     var aceEditor = null;
     var aceSession = null;
@@ -233,7 +233,7 @@ Widget.register(function (widget) {
 
         collapsable(widget.content);
 
-        Socket.onMessage(function (data) {
+        Socket.onMessage("autobot", function (data) {
             if (data.action == "autobotExecutedScript") {
                 if (data.messageData.logs) {
                     var logs = data.messageData.logs;

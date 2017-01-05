@@ -17,6 +17,7 @@ Modal.alert = function (message, callback) {
             e.modal("hide");
         }
     );
+    e.find(".selectpicker").selectpicker();
 };
 
 /**
@@ -42,6 +43,7 @@ Modal.confirm = function (message, callback) {
             e.modal("hide");
         }
     );
+    e.find(".selectpicker").selectpicker();
 };
 
 /**
@@ -79,4 +81,5 @@ Modal.prompt = function (message, placeholder, callback) {
         }
     );
     i.focus();
+    e.find(".selectpicker").selectpicker();
 };

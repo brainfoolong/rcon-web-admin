@@ -14,26 +14,24 @@ Socket.callbacks = [];
 /** @type {object} */
 Socket.queue = [];
 
-/** @type {[]} */
-Socket.onMessageEvents = [];
+/** @type {{}} */
+Socket.onMessageEvents = {};
 
 /**
  * Bind a callback to be triggered everytime a message is received
+ * @param {string} id The handler id
  * @param {NodeMessageCallback} callback
  */
-Socket.onMessage = function (callback) {
-    Socket.onMessageEvents.push(callback);
+Socket.onMessage = function (id, callback) {
+    Socket.onMessageEvents[id] = callback;
 };
 
 /**
  * Unbind a callback
- * @param {NodeMessageCallback} callback
+ * @param {string} id
  */
-Socket.offMessage = function (callback) {
-    var index = Socket.onMessageEvents.indexOf(callback);
-    if (index > -1) {
-        Socket.onMessageEvents.slice(index, 1);
-    }
+Socket.offMessage = function (id) {
+    delete Socket.onMessageEvents[id];
 };
 
 /**
@@ -41,7 +39,7 @@ Socket.offMessage = function (callback) {
  */
 Socket.sendQueue = function () {
     // send all messages in the queue
-    for (var i in Socket.queue) {
+    for (var i = 0; i < Socket.queue.length; i++) {
         var q = Socket.queue[i];
         Socket.send(q.action, q.messageData, q.callback);
     }
@@ -97,7 +95,10 @@ Socket.connect = function (callback) {
                         if (cb) cb(data);
                     }
                 }
-                //
+                // show server disconnect message
+                if (data.action == "serverDisconnect") {
+                    note(t("server.disconnect") + ": " + data.messageData.servername, "danger");
+                }
             }
         }
     };

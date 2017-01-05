@@ -201,6 +201,14 @@ function Widget(id) {
 Widget.widgets = {};
 
 /**
+ * The default widget repositories, they are always included
+ * @type {Array}
+ */
+Widget.defaultWidgets = [
+    "brainfoolong/rwa-autobot"
+];
+
+/**
  * Get a list of all widget ids
  * @return {string[]}
  */
@@ -281,20 +289,16 @@ Widget.updateAllActive = function () {
         }
     }
     // send a ping to the frontend for all user's that have a server currently opened on the dashboard
-    var users = WebSocketUser.instances;
-    for (var usersIndex in users) {
-        if (users.hasOwnProperty(usersIndex)) {
-            var usersRow = users[usersIndex];
-            if (usersRow.server) {
-                usersRow.send("widgetUpdateDone", {"server": usersRow.server.id});
-            }
-        }
+    for (var i = 0; i < WebSocketUser.instances.length; i++) {
+        var user = WebSocketUser.instances[i];
+        if (!user || !user.server) continue;
+        user.send("widgetUpdateDone", {"server": user.server.id});
     }
 };
 
 // each 30 seconds call the updates for each active widget
 setInterval(Widget.updateAllActive, 30000);
-// and call 1 second after server startup
-setTimeout(Widget.updateAllActive, 1000);
+// and call 5 second after server startup
+setTimeout(Widget.updateAllActive, 5000);
 
 module.exports = Widget;

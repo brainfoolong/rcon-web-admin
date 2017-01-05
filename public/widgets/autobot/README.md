@@ -48,6 +48,7 @@ You can use this methods to send a chat message or to execute any command you li
     * **name** = The name of the variable that than can be used in the script
     * **type** = The variable type, available types: switch, number, text
     * **defaultValue** = The default value of the variable if the user don't change it
+* **rust.serverstatus(callback)** = Get a full serverstatus inclusive all players for the server.
     
 ## FAQ
 

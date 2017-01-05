@@ -115,6 +115,7 @@ lang.values.en = {
     "index.tooltip.readme": "Readme",
     "index.widget.error.id": "Widget.id must begin with an a-z character and should only contain: a-z, 0-9, -, _",
     "index.widget.add.error" : "Widget not added, it does already exist",
+    "server.disconnect" : "Rcon server disconnected",
     "dashboard": "Dashboard",
     "cancel": "Cancel",
     "save": "Save",

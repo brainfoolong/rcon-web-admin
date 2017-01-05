@@ -132,7 +132,7 @@ function WebSocketUser(socket) {
                         sendCallback({"error": {"message": "Not connected to RCON server"}});
                         break;
                     case "closed":
-                        delete WebSocketUser.instances[self.id];
+                        WebSocketUser.instances.splice(self.id, 1);
                         self.socket = null;
                         self.userData = null;
                         break;

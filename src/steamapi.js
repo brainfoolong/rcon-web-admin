@@ -15,8 +15,11 @@ var steamapi = {};
  * @param {function} callback
  */
 steamapi.request = function (type, ids, callback) {
+    if (!ids.length) {
+        callback({});
+        return;
+    }
     var res = {};
-    var sdb = db.get("steamapi");
     var missingIds = [];
     for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
@@ -28,7 +31,7 @@ steamapi.request = function (type, ids, callback) {
         }
     }
     if (missingIds.length) {
-        https.get("https://0x.at/steamapi/api.php?action=" + type + "&ids=" + missingIds.join(","), function (result) {
+        var req = https.get("https://0x.at/steamapi/api.php?action=" + type + "&ids=" + missingIds.join(","), function (result) {
             var body = '';
             result.on('data', function (chunk) {
                 body += chunk;
@@ -47,6 +50,9 @@ steamapi.request = function (type, ids, callback) {
                     callback(res);
                 }
             });
+        });
+        req.on('error', function (err) {
+            callback(res);
         });
     } else {
         callback(res);

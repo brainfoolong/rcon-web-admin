@@ -190,11 +190,9 @@ View.register("index", function (messageData) {
     var pingDataCheck = function (data) {
         // if server is down for some reason, reload view
         if (!data.server) {
-            Storage.set("server", null);
             View.changeHash("index");
             View.load("index");
             note("index.serveroffline", "danger", -1);
-            Interval.destroy("index.server.ping");
             return false;
         }
         if (!data.myWidgets) {
@@ -204,21 +202,9 @@ View.register("index", function (messageData) {
         return true;
     };
 
-    // ping the server each 30 seconds for some checks
-    Interval.create("index.server.ping", function () {
-        if (View.current != "index") return;
-        Socket.send("view", {
-            "view": "index",
-            "action": "widget",
-            "type": "ping",
-            "server": messageData.server
-        }, pingDataCheck);
-    }, 10000);
-
     // bind some events
     c.off(".index").on("change.index", ".pick-server", function () {
         if ($(this).val().length) {
-            Storage.set("server", $(this).val());
             View.changeHash("index-" + View.getAttributeMessage({"server": $(this).val()}));
             View.load("index", {"server": $(this).val()});
         }
@@ -231,7 +217,7 @@ View.register("index", function (messageData) {
                 "server": messageData.server,
                 "widget": $(this).val()
             }, function (responseData) {
-                if(!responseData.widget){
+                if (!responseData.widget) {
                     note(t("index.widget.add.error"), "danger");
                     return;
                 }
@@ -294,19 +280,36 @@ View.register("index", function (messageData) {
 
     // check if server is selected via hash
     var hashData = View.getViewDataByHash();
-    if (!hashData.messageData || !hashData.messageData.server) {
-        var savedServer = Storage.get("server");
-        if (savedServer) {
-            View.changeHash("index-" + View.getAttributeMessage({server: savedServer}));
-            View.load("index", {"server": savedServer});
-            return;
-        }
-    } else {
+    if (hashData.messageData && hashData.messageData.server) {
         pickServer.val(hashData.messageData.server);
     }
 
     // if server is selected
+    Interval.destroy("index.server.ping");
+    Socket.offMessage("index.disconnect");
     if (messageData.server) {
+        // ping the server each 30 seconds for some checks
+        Interval.create("index.server.ping", function () {
+            var hashData = View.getViewDataByHash();
+            // destroy interval if we are not in the right context anymore
+            if (View.current != "index" || !hashData || !hashData.server) {
+                Interval.destroy("index.server.ping");
+                Socket.offMessage("index.disconnect");
+                return;
+            }
+            Socket.send("view", {
+                "view": "index",
+                "action": "widget",
+                "type": "ping",
+                "server": messageData.server
+            }, pingDataCheck);
+        }, 30000);
+        // bind disconnect check
+        Socket.onMessage("index.disconnect", function (messageData) {
+            if (messageData.action == "serverDisconnect" && messageData.server == messageData.serverid) {
+                pingDataCheck({});
+            }
+        });
         loadAllWidgets();
     } else {
         rowContainer.html(t(!hashData.messageData ? "index.noserver" : "index.serveroffline"));

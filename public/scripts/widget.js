@@ -14,7 +14,7 @@ function Widget(id) {
     this.serverData = "";
     /** @type {string} */
     this.id = id;
-    /** @type {NodeMessageCallback[]} */
+    /** @type {string[]} */
     this.socketMessageHandlers = [];
     /** @type {jQuery} */
     this.container = null;
@@ -48,16 +48,18 @@ function Widget(id) {
 
     /**
      * Bind a callback when the rcon server send a message
+     * @param {string} id
      * @param {function} callback
      */
-    this.onRconMessage = function (callback) {
+    this.onRconMessage = function (id, callback) {
         var socketCallback = function (data) {
             if (data.action == "serverMessage" && self.server == data.messageData.server) {
                 callback(data.messageData);
             }
         };
-        Socket.onMessage(socketCallback);
-        this.socketMessageHandlers.push(socketCallback);
+        var msgId = "widget.onRconMessage." + self.id + "." + id;
+        Socket.onMessage(msgId, socketCallback);
+        this.socketMessageHandlers.push(msgId);
     };
 
     /**
@@ -255,8 +257,8 @@ function Widget(id) {
                 self.onBackendUpdate();
             }
         };
-        Socket.onMessage(socketCallback);
-        self.socketMessageHandlers.push(socketCallback);
+        Socket.onMessage("widget.widgetUpdateDone", socketCallback);
+        self.socketMessageHandlers.push("widget.widgetUpdateDone");
     };
 }
 
