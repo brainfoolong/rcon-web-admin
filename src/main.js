@@ -13,6 +13,6 @@ var steamapi = require(__dirname + "/steamapi");
 
 // install/update all default widgets on startup
 for (var i = 0; i < Widget.defaultWidgets.length; i++) {
-    var repository = Widget[i];
-
+    var repository = Widget.defaultWidgets[i];
+    Widget.install(repository);
 }

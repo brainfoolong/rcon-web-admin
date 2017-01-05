@@ -215,12 +215,19 @@ Widget.defaultWidgets = [
  * @param {string} repository
  */
 Widget.install = function (repository) {
-    var dir = __dirname + "/../public/widgets";
+    var dir = fs.realpathSync(__dirname + "/../public/widgets");
+    dir = dir.replace(/\\/g, "/");
     var repoDir = dir + "/" + repository;
+    var id = repository.split("/")[1];
+    var cb = function () {
+        delete Widget.widgets[id];
+        Widget.get(id);
+    };
     if (fs.existsSync(repoDir)) {
-        exec("cd " + repoDir + " && git pull origin master");
+        exec("cd " + repoDir + " && git pull origin master", cb);
     } else {
-        exec("cd " + dir + " && git clone https://github.com/brainfoolong/" + repository + ".git");
+        var cmd = "cd " + dir + " && git clone https://github.com/" + repository + ".git";
+        exec(cmd, cb);
     }
 };
 
@@ -230,7 +237,14 @@ Widget.install = function (repository) {
  */
 Widget.getAllWidgetIds = function () {
     var dir = __dirname + "/../public/widgets";
-    return fs.readdirSync(dir);
+    var files = fs.readdirSync(dir);
+    var f = [];
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        if (file.match(/^(\.|README.md)/i)) continue;
+        f.push(file);
+    }
+    return f;
 };
 
 /**

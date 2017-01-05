@@ -1,5 +1,7 @@
 "use strict";
 
+var Widget = require(__dirname + "/../widget");
+
 /**
  * The view
  * @param {WebSocketUser} user
@@ -13,7 +15,21 @@ function View(user, messageData, callback) {
         callback({redirect: "index", "note": ["access.denied", "danger"]});
         return;
     }
-    callback();
+    var widgets = {};
+    // get all widgets
+    (function () {
+        var allWidgets = Widget.getAllWidgets();
+        for (var allWidgetsIndex in allWidgets) {
+            if (allWidgets.hasOwnProperty(allWidgetsIndex)) {
+                var allWidgetsRow = allWidgets[allWidgetsIndex];
+                widgets[allWidgetsRow.id] = allWidgetsRow.manifest;
+            }
+        }
+    })();
+    callback({
+        "widgets": widgets,
+        "defaultWidgets": Widget.defaultWidgets
+    });
 }
 
 module.exports = View;
