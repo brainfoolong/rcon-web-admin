@@ -35,7 +35,7 @@ function RconServer(id, serverData) {
      * @param {boolean=} disconnect If true also do call disconnect
      */
     this.removeInstance = function (disconnect) {
-        if (disconnect) {
+        if (disconnect && self.con && self.connected) {
             self.con.disconnect();
         } else {
             // send disconnect event to all clients
@@ -125,7 +125,7 @@ function RconServer(id, serverData) {
     this.con.connect(function (err) {
         var serverName = serverData.host + ":" + serverData.rcon_port;
         if (err) {
-            self.removeInstance();
+            self.removeInstance(true);
             console.error(new Date(), "RconServer [" + serverName + "]: Connection failed");
             return;
         }
@@ -134,7 +134,7 @@ function RconServer(id, serverData) {
         self.con.send(self.serverData.rcon_password, null, true, function (success) {
             self.injectServerMessage("Rcon authentication " + (success ? "successfull" : "invalid"));
             if (!success) {
-                self.removeInstance();
+                self.removeInstance(true);
                 console.error(new Date(), "Invalid rcon password for server " + self.serverData.name + ":" + self.serverData.rcon_port);
                 return;
             }
