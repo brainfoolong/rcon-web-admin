@@ -264,19 +264,19 @@ Widget.delete = function (id, callback) {
         for (var serverIndex in RconServer.instances) {
             if (RconServer.instances.hasOwnProperty(serverIndex)) {
                 var server = RconServer.instances[serverIndex];
-                var list = db.get("widgets", server.id).get("list").values();
+                var list = db.get("widgets", "server_" + server.id).get("list").values();
                 if (list) {
                     var newList = [];
                     for (var i = 0; i < list.length; i++) {
                         var widgetEntry = list[i];
                         if (widgetEntry.id !== id) newList.push(widgetEntry);
                     }
-                    db.get("widgets", server.id).set("list", newList).value();
+                    db.get("widgets", "server_" + server.id).set("list", newList).value();
                 }
             }
         }
-
     }
+    callback();
 };
 
 /**

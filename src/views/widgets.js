@@ -20,17 +20,22 @@ function View(user, messageData, callback) {
         case "update":
             widget = Widget.get(messageData.widget);
             if (widget) {
-                Widget.install(messageData.widget, callback);
+                Widget.install(messageData.widget, function () {
+                    callback({});
+                });
                 return;
             }
-            callback(false);
+            callback({});
             break;
         case "delete":
             widget = Widget.get(messageData.widget);
             if (widget) {
-                Widget.delete(widget.id);
+                Widget.delete(widget.id, function () {
+                    callback({});
+                });
                 return;
             }
+            callback({});
             break;
         default:
             var widgets = {};

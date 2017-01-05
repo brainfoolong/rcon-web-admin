@@ -18,7 +18,7 @@ View.register("widgets", function (messageData) {
             for (var i = 0; i < messageData.defaultWidgets.length; i++) {
                 var repository = messageData.defaultWidgets[i];
                 if (repository.match(new RegExp("/" + widgetIndex, "i"))) {
-                    // .find(".actions .delete").remove();
+                    container.find(".actions .delete").remove();
                     break;
                 }
             }
@@ -27,31 +27,39 @@ View.register("widgets", function (messageData) {
     }
     container.on("click", ".delete", function () {
         var e = $(this).closest(".widget-row");
+        var btn = $(this);
         var id = e.attr("data-id");
         Modal.confirm(t("widgets.delete.confirm"), function (success) {
-            if(success){
+            if (success) {
+                btn.remove();
+                note(t("widgets.delete.progress"), "info");
                 Socket.send("view", {
                     "view": "widgets",
                     "action": "delete",
-                    "widget" : id
+                    "widget": id
                 }, function (data) {
+                    btn.remove();
                     note(t("widgets.delete.done"), "success");
-                    e.remove();
+                    View.load("widgets");
                 });
             }
         });
     });
     container.on("click", ".update", function () {
         var e = $(this).closest(".widget-row");
+        var btn = $(this);
         var id = e.attr("data-id");
         Modal.confirm(t("sure"), function (success) {
-            if(success){
+            if (success) {
+                btn.remove();
+                note(t("widgets.update.progress"), "info");
                 Socket.send("view", {
                     "view": "widgets",
                     "action": "update",
-                    "widget" : id
+                    "widget": id
                 }, function (data) {
                     note(t("widgets.update.done"), "success");
+                    View.load("widgets");
                 });
             }
         });

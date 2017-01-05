@@ -124,6 +124,8 @@ lang.values.en = {
     "widgets.delete.confirm": "This will delete all data for this widget. This cannot be undone.",
     "widgets.update.done" : "Widget update done",
     "widgets.delete.done" : "Widget deleted",
+    "widgets.delete.progress" : "Delete in progress, please wait until a success message comes in",
+    "widgets.update.progress" : "Update in progress, please wait until a success message comes in",
     "settings.update" : "Update Rcon Web Admin",
     "settings.update.done" : "Update done. You have to restart the server manually right now.",
     "settings.confirm" : "The updater simply call 'git pull' for your local repository. You have to restart the server manually after the update.",
