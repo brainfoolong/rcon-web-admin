@@ -38,13 +38,24 @@ Linux: If you've installed it and `node` as not available but `nodejs` is, than 
     git clone https://github.com/brainfoolong/rcon-web-admin.git
     cd rcon-web-admin
     npm update
-    node src/main.js
+    
+# Start/Stop on linux
+
+    sh startscripts/start-linux.sh start
+    sh startscripts/start-linux.sh stop
+    sh startscripts/start-linux.sh restart
+    
+# Start/Stop on windows - Close cmd window to close
+
+    startscripts/start-windows.bat
     
 Then goto: http://yourserverip:4326 (You can also use your hostname instead of ip)
 
 ## Startup/Shutdown scripts
 
-For linux you can start the rcon web admin with your server start. We provide a script soon.
+For linux you can start the rcon web admin with your server start. For example on ubuntu symlink `startscripts/runscript-linux.sh` to `/etc/rc2.d/S01Rconwebadmin` for automatic boot with server start.
+
+    Linux : startscripts/start-linux.sh (start/stop/restart/status)
 
 ## Widget developers
 Goto https://github.com/brainfoolong/rcon-web-admin/tree/master/public/widgets for more information.
