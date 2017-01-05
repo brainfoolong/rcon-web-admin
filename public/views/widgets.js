@@ -25,13 +25,34 @@ View.register("widgets", function (messageData) {
             container.append(widgetEl);
         }
     }
-    container.on("click", ".update", function () {
-
-    });
     container.on("click", ".delete", function () {
+        var e = $(this).closest(".widget-row");
+        var id = e.attr("data-id");
+        Modal.confirm(t("widgets.delete.confirm"), function (success) {
+            if(success){
+                Socket.send("view", {
+                    "view": "widgets",
+                    "action": "delete",
+                    "widget" : id
+                }, function (data) {
+                    note(t("widgets.delete.done"), "success");
+                    e.remove();
+                });
+            }
+        });
+    });
+    container.on("click", ".update", function () {
+        var e = $(this).closest(".widget-row");
+        var id = e.attr("data-id");
         Modal.confirm(t("sure"), function (success) {
             if(success){
-
+                Socket.send("view", {
+                    "view": "widgets",
+                    "action": "update",
+                    "widget" : id
+                }, function (data) {
+                    note(t("widgets.update.done"), "success");
+                });
             }
         });
     });

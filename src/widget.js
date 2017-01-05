@@ -206,7 +206,11 @@ Widget.widgets = {};
  * @type {Array}
  */
 Widget.defaultWidgets = [
-    "brainfoolong/rwa-autobot"
+    "brainfoolong/rwa-autobot",
+    "brainfoolong/rwa-console",
+    "brainfoolong/rwa-restart",
+    "brainfoolong/rwa-rustboard",
+    "brainfoolong/rwa-shutdown"
 ];
 
 /**
@@ -296,11 +300,13 @@ Widget.get = function (id) {
     if (typeof Widget.widgets[id] == "undefined") {
         Widget.widgets[id] = null;
         var dir = __dirname + "/../public/widgets/" + id;
-        var widget = require(dir + "/backend");
-        if (widget) {
-            widget.id = id;
-            widget.manifest = require(dir + "/manifest.json");
-            Widget.widgets[id] = widget;
+        if (fs.existsSync(dir + "/backend.js")) {
+            var widget = require(dir + "/backend");
+            if (widget) {
+                widget.id = id;
+                widget.manifest = require(dir + "/manifest.json");
+                Widget.widgets[id] = widget;
+            }
         }
     }
     return Widget.widgets[id];

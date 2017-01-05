@@ -99,7 +99,7 @@ View.register("index", function (messageData) {
                             widget.container.addClass("widget-" + widget.id);
                             widget.container.find(".widget-title")
                                 .attr("data-collapsable-target", "widget.content." + widget.id)
-                                .append($('<span>').text(widget.t("title")));
+                                .append($('<span>').text(widget.t("name")));
                             widget.container.find(".widget-content")
                                 .attr("data-collapsable-id", "widget.content." + widget.id);
 
@@ -329,7 +329,7 @@ View.register("index", function (messageData) {
             ) {
                 continue;
             }
-            addWidget.append($('<option></option>').attr("value", i).text(widget.t("title")));
+            addWidget.append($('<option></option>').attr("value", i).text(widget.t("name")));
         }
     }
 });

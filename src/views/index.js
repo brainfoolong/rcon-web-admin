@@ -95,12 +95,14 @@ var View = function (user, messageData, callback) {
                     break;
                 case "remove":
                     widget = Widget.get(messageData.widget);
-                    wdb.get("list").remove({
-                        "id": messageData.widget,
-                        "user": user.userData.id
-                    }).value();
-                    delete widget.storageCache[currentServer.id];
-                    delete widget.optionsCache[currentServer.id];
+                    if(widget) {
+                        wdb.get("list").remove({
+                            "id": messageData.widget,
+                            "user": user.userData.id
+                        }).value();
+                        delete widget.storageCache[currentServer.id];
+                        delete widget.optionsCache[currentServer.id];
+                    }
                     deeperCallback({});
                     break;
                 case "layout":
