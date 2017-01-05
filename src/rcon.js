@@ -117,6 +117,10 @@ Rcon.prototype.connect = function (callback) {
         this.disconnect();
     }.bind(this));
 
+    this.socket.on("timeout", function () {
+        this.disconnect();
+    }.bind(this));
+
     this.socket.on("end", function () {
         this.disconnect();
     }.bind(this));
