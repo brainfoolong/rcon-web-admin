@@ -258,7 +258,6 @@ Rcon.prototype._data = function () {
             this.sendBlocked = false;
             this.processQueue();
         }
-        response.body = response.body.toString();
         // just pipe each raw response to the event listener
         this.emit("message", response);
 
@@ -292,7 +291,7 @@ Rcon.prototype._pack = function (id, type, body) {
  * @property {number} id Response id
  * @property {number} size Response size
  * @property {number} type Response type
- * @property {string} body Response body
+ * @property {Buffer} body Response body
  * @property {boolean} log Indicates if this should be logged to disk
  * @property {Date} timestamp The timestamp
  * @property {WebSocketUser|null} user The user that have made the request for this response

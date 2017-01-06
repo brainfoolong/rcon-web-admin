@@ -85,7 +85,7 @@ function RconServer(id, serverData) {
         if (rconMessage.log !== true || rconMessage.body.length == 0) return;
         var rconMessageJson = {
             "type": rconMessage.type,
-            "body": rconMessage.body,
+            "body": rconMessage.body.toString(),
             "user": rconMessage.user ? rconMessage.user.userData.username : null,
             "server": rconMessage.server.id,
             "timestamp": rconMessage.timestamp.toString()
@@ -117,7 +117,7 @@ function RconServer(id, serverData) {
             "timestamp": new Date(),
             "user": user || null,
             "server": this,
-            "body": message
+            "body": new Buffer(message, "utf8")
         });
     };
 
