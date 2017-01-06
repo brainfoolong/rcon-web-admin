@@ -86,7 +86,6 @@ function RconServer(id, serverData) {
         var rconMessageJson = {
             "type": rconMessage.type,
             "body": rconMessage.body,
-            "bodyBase64": rconMessage.bodyBase64,
             "user": rconMessage.user ? rconMessage.user.userData.username : null,
             "server": rconMessage.server.id,
             "timestamp": rconMessage.timestamp.toString()

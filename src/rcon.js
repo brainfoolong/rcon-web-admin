@@ -258,8 +258,9 @@ Rcon.prototype._data = function () {
             this.sendBlocked = false;
             this.processQueue();
         }
-        response.bodyBase64 = response.body.toString("base64");
-        response.body = response.body.toString();
+        // do buffer to base64 and than manually with our own decode function to utf8
+        // node buffer does it in the wrong way
+        response.body = this.decodeBase64(response.body.toString("base64"));
         // just pipe each raw response to the event listener
         this.emit("message", response);
 
@@ -285,6 +286,22 @@ Rcon.prototype._pack = function (id, type, body) {
     buf[buf.length - 2] = 0;
     buf[buf.length - 1] = 0;
     return buf;
+};
+
+/**
+ * Base 64 decode
+ * @param {string} s
+ * @returns {string}
+ */
+Rcon.prototype.decodeBase64 = function(s) {
+    var e={},i,b=0,c,x,l=0,a,r='',w=String.fromCharCode,L=s.length;
+    var A="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    for(i=0;i<64;i++){e[A.charAt(i)]=i;}
+    for(x=0;x<L;x++){
+        c=e[s.charAt(x)];b=(b<<6)+c;l+=6;
+        while(l>=8){((a=(b>>>(l-=8))&0xff)||(x<(L-2)))&&(r+=w(a));}
+    }
+    return r;
 };
 
 /**
