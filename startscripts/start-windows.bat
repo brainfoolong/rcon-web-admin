@@ -6,5 +6,5 @@ if errorlevel 1 (
     exit /B
 ) else (
     echo Starting node server... Kill with CTRL+C or close window
-    node %~dp0\..\src\main.js
+    node %~dp0\..\src\main.js start
 )

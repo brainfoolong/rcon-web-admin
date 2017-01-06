@@ -31,7 +31,7 @@ steamapi.request = function (type, ids, callback) {
         }
     }
     if (missingIds.length) {
-        request.get("https://0x.at/steamapi/api.php?action=" + type + "&ids=" + missingIds.join(","), function (result) {
+        request.get("https://0x.at/steamapi/api.php?action=" + type + "&ids=" + missingIds.join(","), false, function (result) {
             if (result !== null) {
                 var data = JSON.parse(result);
                 for (var i = 0; i < data.players.length; i++) {

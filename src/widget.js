@@ -2,7 +2,9 @@
 
 var fs = require("fs");
 var db = require(__dirname + "/db");
-var exec = require('child_process').exec;
+var request = require(__dirname + "/request");
+var fstools = require(__dirname + "/fstools");
+var unzip = require("unzip");
 
 /**
  * A widget
@@ -224,17 +226,41 @@ Widget.install = function (repository, callback) {
     dir = dir.replace(/\\/g, "/");
     var id = repository.split("/")[1];
     var repoDir = dir + "/" + id;
-    var cb = function () {
-        delete Widget.widgets[id];
-        Widget.get(id);
-        if (callback) callback(true);
-    };
     if (fs.existsSync(repoDir)) {
-        exec("cd " + repoDir + " && git pull", cb);
-    } else {
-        var cmd = "cd " + dir + " && git clone https://github.com/" + repository + ".git";
-        exec(cmd, cb);
+        // delete existing folder
+        fstools.deleteRecursive(repoDir);
+
     }
+    fs.mkdir(repoDir, 0o777, function (err) {
+        if (err) {
+            console.error("Cannot create widget directory", err);
+            callback(false);
+            return;
+        }
+        request.get("https://codeload.github.com/" + repository + "/zip/master", true, function (contents) {
+            if (!contents.length) {
+                console.error("Cannot load widget repository zip file");
+                callback(false);
+                return;
+            }
+            fs.writeFile(repoDir + "/master.zip", contents, {"mode": 0o777}, function () {
+                fs.createReadStream(repoDir + "/master.zip").pipe(unzip.Parse()).on('entry', function (entry) {
+                    var fileName = entry.path.split("/").slice(1).join("/");
+                    if (!fileName.length) return;
+                    var path = repoDir + "/" + fileName;
+                    if (entry.type == "Directory") {
+                        fs.mkdirSync(path, 0o777);
+                        entry.autodrain();
+                    } else {
+                        entry.pipe(fs.createWriteStream(path));
+                    }
+                }).on("close", function () {
+                    fs.unlinkSync(repoDir + "/master.zip");
+                    callback(true);
+                });
+            });
+        });
+    });
 };
 
 /**
@@ -245,20 +271,7 @@ Widget.install = function (repository, callback) {
 Widget.delete = function (id, callback) {
     var widget = Widget.get(id);
     if (widget) {
-        var deleteFolderRecursive = function (path) {
-            if (fs.existsSync(path)) {
-                fs.readdirSync(path).forEach(function (file) {
-                    var curPath = path + "/" + file;
-                    if (fs.lstatSync(curPath).isDirectory()) {
-                        deleteFolderRecursive(curPath);
-                    } else {
-                        fs.unlinkSync(curPath);
-                    }
-                });
-                fs.rmdirSync(path);
-            }
-        };
-        deleteFolderRecursive(__dirname + "/../public/widgets/" + id);
+        fstools.deleteRecursive(__dirname + "/../public/widgets/" + id);
         // delete all entries with this widget in the server widgets
         var RconServer = require(__dirname + "/rconserver");
         for (var serverIndex in RconServer.instances) {

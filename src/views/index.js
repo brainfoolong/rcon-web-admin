@@ -24,13 +24,19 @@ var View = function (user, messageData, callback) {
         sendMessageData.widgets = widgets;
         sendMessageData.myServers = myServers;
         if (currentServer) {
-            sendMessageData.myWidgets = wdb.get("list").filter({
+            var myWidgets = wdb.get("list").filter({
                 "user": user.userData.id
             }).cloneDeep().value();
             sendMessageData.gridrows = wdb.get("gridrows").value();
-            if (sendMessageData.myWidgets) {
-                for (var i in sendMessageData.myWidgets) {
-                    sendMessageData.myWidgets[i].manifest = sendMessageData.widgets[sendMessageData.myWidgets[i].id];
+            sendMessageData.myWidgets = [];
+            if (myWidgets) {
+                for (var i = 0; i < myWidgets.length; i++) {
+                    var widgetData = myWidgets[i];
+                    var widget = Widget.get(widgetData.id);
+                    if(widget){
+                        widgetData.manifest = sendMessageData.widgets[widget.id];
+                        sendMessageData.myWidgets.push(widgetData);
+                    }
                 }
             }
             sendMessageData.server = messageData.server;

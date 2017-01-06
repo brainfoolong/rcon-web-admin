@@ -12,6 +12,7 @@
   "dependencies": {
     "express": "^4.14.0",
     "lowdb": "^0.14.0",
+    "unzip": "^0.1.11",
     "ws": "^1.1.1"
   }
 }

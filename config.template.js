@@ -14,13 +14,7 @@ var config = {
      * The given number is the one for the webinterface
      * Notice that both given number and the number+1 will be required
      */
-    "port" : 4310,
-
-    /**
-     * Is automatic widget update enabled on server start
-     * If you disable this before first server start you will have no widgets installed
-     */
-    "autoWidgetUpdate" : true
+    "port" : 4310
 };
 
 module.exports = config;

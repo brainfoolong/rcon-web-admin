@@ -8,8 +8,7 @@ var fs = require("fs");
  */
 var config = {
     "host" : null,
-    "port" : 4326,
-    "autoWidgetUpdate" : true
+    "port" : 4326
 };
 
 // load config.js if exist
