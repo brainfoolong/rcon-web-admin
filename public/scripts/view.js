@@ -138,7 +138,7 @@ View.load = function (view, messageData, callback) {
                 View.views[viewData.view](viewData, firstLoad);
                 if (callback) callback(viewData);
                 // replace language keys
-                lang.replaceInHtml();
+                lang.replaceInHtml(c);
                 // init selectpicker
                 $('.selectpicker').selectpicker();
                 collapsable(c);

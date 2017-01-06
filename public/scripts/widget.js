@@ -22,6 +22,8 @@ function Widget(id) {
     this.content = null;
     /** @type {object} */
     this.data = null;
+    /** @type {jQuery|null} */
+    this.templateEl = null;
 
     /**
      * On widget init
@@ -60,6 +62,19 @@ function Widget(id) {
         var msgId = "widget.onRconMessage." + self.id + "." + id;
         Socket.onMessage(msgId, socketCallback);
         this.socketMessageHandlers.push(msgId);
+    };
+
+    /**
+     * Load the html template file and return the jquery object for it
+     * @param {string=} selector Optional selector to select a given element
+     * @returns {jQuery}
+     */
+    this.template = function (selector) {
+        var el = null;
+        if (selector) el = this.templateEl.find(selector).clone();
+        else el = this.templateEl.clone();
+        lang.replaceInHtml(el, self);
+        return el;
     };
 
     /**
@@ -264,9 +279,9 @@ function Widget(id) {
 
 /**
  * The register callback
- * @type {WidgetRegisterCallback|null}
+ * @type {object<string, WidgetRegisterCallback>}
  */
-Widget.registerCallback = null;
+Widget.registerCallback = {};
 
 /**
  * All widgets
@@ -291,10 +306,11 @@ Widget.getByElement = function (el) {
 
 /**
  * Register a callback
+ * @param {string} id
  * @param {WidgetRegisterCallback} callback
  */
-Widget.register = function (callback) {
-    Widget.registerCallback = callback;
+Widget.register = function (id, callback) {
+    Widget.registerCallback[id] = callback;
 };
 
 /**

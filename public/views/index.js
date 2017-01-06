@@ -22,7 +22,6 @@ View.register("index", function (messageData) {
             if (!pingDataCheck(data)) return;
             // set max attribute for layout position
             $(".widget-layout .option").filter("[data-id='position']").find("input").attr("max", data.myWidgets.length - 1);
-            var allWidgets = c.find(".widget");
             // sort widgets by the position
             data.myWidgets.sort(function (a, b) {
                 if (a.position > b.position) {
@@ -33,141 +32,149 @@ View.register("index", function (messageData) {
                     return 0;
                 }
             });
-
-            // after all widgets have been loaded, align it all correctly
-            var widgetLoadedCallback = function () {
-                widgetLoadedCallback.count++;
-                if (widgetLoadedCallback.count >= data.myWidgets.length) {
-                    // for each type we must begin a new row
-                    // for large type we have only one column per row
-                    // for medium we have two columns per row
-                    // for small we have three columns per row
-                    var count = 1;
-                    var lastSize = null;
-                    var container = null;
-                    for (var j = 0; j < data.myWidgets.length; j++) {
-                        var widget = data.myWidgets[j];
-                        var max = 1;
-                        if (widget.size == "medium") max = 2;
-                        if (widget.size == "small") max = 3;
-                        if (lastSize !== widget.size || count >= max) {
-                            count = 1;
-                            container = $('.templates .grid-row.' + widget.size).clone();
-                            rowContainer.append(container);
-                        }
-                        // append the widget to the grid
-                        container.find(".grid-column").eq(count - 1).append($("#widget-" + widget.id));
-                        lastSize = widget.size;
-                        count++;
-                    }
-                    // delete old containers
-                    rowContainer.find(".grid-row").each(function () {
-                        if (!$(this).find(".widget").length) {
-                            $(this).remove();
-                        }
-                    });
-                    collapsable(c);
+            var allWidgets = rowContainer.find(".widget");
+            for (var i = 0; i < data.myWidgets.length; i++) {
+                var widgetData = data.myWidgets[i];
+                // if widget is no added than load it
+                var widgetEl = allWidgets.filter("#widget-" + widgetData.id);
+                if (!widgetEl.length) {
+                    loadWidget(widgetData);
+                } else {
+                    allWidgets = allWidgets.not(widgetEl);
                 }
-            };
-            widgetLoadedCallback.count = 0;
-            for (var i in data.myWidgets) {
-                (function () {
-                    var widgetData = data.myWidgets[i];
-                    allWidgets = allWidgets.not("#widget-" + widgetData.id);
-                    if (typeof Widget.widgets[widgetData.id] != "undefined") {
-                        var widget = Widget.widgets[widgetData.id];
-                        widget.data = widgetData;
-                        widgetLoadedCallback();
-                    } else {
-                        // a fix to catch non existing script file errors
-                        var loadTo = setTimeout(function () {
-                            widgetLoadedCallback();
-                        }, 1000);
-                        $.getScript("widgets/" + widgetData.id + "/frontend.js", function () {
-                            clearTimeout(loadTo);
-                            var widget = new Widget(widgetData.id);
-                            Widget.widgets[widgetData.id] = widget;
-                            widget.id = widgetData.id;
-                            widget.server = messageData.server;
-                            widget.serverData = messageData.myServers[messageData.server];
-                            widget.data = widgetData;
-                            if (!widgetData.id.match(/^[a-z]/) || widgetData.id.match(/[^a-z0-9-_]/)) {
-                                Modal.alert(t("index.widget.error.id"));
-                            }
-                            widget.container = c.find(".templates .widget").clone();
-                            widget.container.attr("data-id", widget.id).attr("id", "widget-" + widget.id);
-                            widget.container.addClass("widget-" + widget.id);
-                            widget.container.find(".widget-title")
-                                .attr("data-collapsable-target", "widget.content." + widget.id)
-                                .append($('<span>').text(widget.t("name")));
-                            widget.container.find(".widget-content")
-                                .attr("data-collapsable-id", "widget.content." + widget.id);
-
-                            $.get("widgets/" + widgetData.id + "/README.md", function (data) {
-                                var container = widget.container.find(".widget-readme");
-                                container.html(new showdown.Converter().makeHtml(data));
-                                container.prepend('<div class="github-info">' +
-                                    '<a href="https://github.com/' + widget.data.manifest.repository + '" ' +
-                                    'target="_blank">Version ' + widget.data.manifest.version + ' on Github</a></div>')
-                            });
-                            // copy to hidden widgets form, set position later
-                            $(".widgets-unsorted").append(widget.container);
-                            widget.content = widget.container.find(".widget-content");
-
-                            // fill layout option values
-                            var values = {"size": widget.data.size, "position": widget.data.position};
-                            $.each(values, function (valueKey, valueValue) {
-                                var input = widget.container.find(".widget-layout .option")
-                                    .filter("[data-id='" + valueKey + "']").find(":input");
-                                // limit to select only compatible sizes
-                                if (valueKey == "size") {
-                                    $.each(widget.data.manifest.compatibleSizes, function (sizeKey, sizeValue) {
-                                        input.append($('<option>').attr("value", sizeValue)
-                                            .html(t("index.widget.size.value." + sizeValue)));
-                                    });
-                                }
-                                // set default value
-                                input.val(valueValue);
-                                // instantiate selectpicker
-                                if (input.is("select")) input.selectpicker();
-                            });
-
-                            var options = widget.data.manifest.options;
-                            // create options html
-                            var optionsEl = widget.container.find(".widget-options .options");
-                            for (var optionIndex in options) {
-                                if (options.hasOwnProperty(optionIndex)) {
-                                    var optionRow = options[optionIndex];
-                                    optionsEl.append(
-                                        option.createHtmlFromData(
-                                            optionIndex,
-                                            widget.t("option." + optionIndex + ".title"),
-                                            widget.t("option." + optionIndex + ".info"),
-                                            widget.options.get(optionIndex),
-                                            optionRow
-                                        )
-                                    );
-                                }
-                            }
-
-                            widgetLoadedCallback();
-                            $("head").append('<link type="text/css" href="widgets/' + widgetData.id + '/style.css" ' +
-                                'rel="stylesheet" media="all" id="css-' + widgetData.id + '">');
-                            Widget.registerCallback(widget);
-                            Widget.registerCallback = null;
-                            widget.onInit();
-                            widget.bindSocketListener();
-                        });
-                    }
-                })();
             }
             // remove all widgets that are not in mywidgets list anymore
             allWidgets.each(function () {
-                var widget = Widget.widgets[$(this).attr("id")];
+                var widget = Widget.getByElement(this);
                 if (widget) {
                     widget.remove();
                 }
             });
+            sortWidgetElements();
+            collapsable(c);
+        });
+    };
+
+    /**
+     * Load a widget
+     * @param {object} widgetData
+     */
+    var loadWidget = function (widgetData) {
+        var widget = new Widget(widgetData.id);
+        Widget.widgets[widgetData.id] = widget;
+        widget.id = widgetData.id;
+        widget.server = messageData.server;
+        widget.serverData = messageData.myServers[messageData.server];
+        widget.data = widgetData;
+        if (!widgetData.id.match(/^[a-z]/) || widgetData.id.match(/[^a-z0-9-_]/)) {
+            Modal.alert(t("index.widget.error.id"));
+        }
+        widget.container = c.find(".templates .widget").clone();
+        widget.container
+            .attr("data-id", widget.id)
+            .attr("data-size", widgetData.size)
+            .attr("id", "widget-" + widget.id)
+            .addClass("widget-" + widget.id);
+        widget.container.find(".widget-title")
+            .attr("data-collapsable-target", "widget.content." + widget.id)
+            .append($('<span>').text(widget.t("name")));
+        widget.container.find(".widget-content")
+            .attr("data-collapsable-id", "widget.content." + widget.id);
+
+        // copy to hidden widgets form, set position later
+        $(".widgets-unsorted").append(widget.container);
+        widget.content = widget.container.find(".widget-content");
+
+        // fill layout option values
+        var values = {"size": widget.data.size, "position": widget.data.position};
+        $.each(values, function (valueKey, valueValue) {
+            var input = widget.container.find(".widget-layout .option")
+                .filter("[data-id='" + valueKey + "']").find(":input");
+            // limit to select only compatible sizes
+            if (valueKey == "size") {
+                $.each(widget.data.manifest.compatibleSizes, function (sizeKey, sizeValue) {
+                    input.append($('<option>').attr("value", sizeValue)
+                        .html(t("index.widget.size.value." + sizeValue)));
+                });
+            }
+            // set default value
+            input.val(valueValue);
+            // instantiate selectpicker
+            if (input.is("select")) input.selectpicker();
+        });
+
+        var options = widget.data.manifest.options;
+        // create options html
+        var optionsEl = widget.container.find(".widget-options .options");
+        for (var optionIndex in options) {
+            if (options.hasOwnProperty(optionIndex)) {
+                var optionRow = options[optionIndex];
+                optionsEl.append(
+                    option.createHtmlFromData(
+                        optionIndex,
+                        widget.t("option." + optionIndex + ".title"),
+                        widget.t("option." + optionIndex + ".info"),
+                        widget.options.get(optionIndex),
+                        optionRow
+                    )
+                );
+            }
+        }
+        $("head").append('<link type="text/css" href="widgets/' + widgetData.id + '/style.css" ' +
+            'rel="stylesheet" media="all" id="css-' + widgetData.id + '">');
+
+        // load readme
+        $.get("widgets/" + widgetData.id + "/README.md", function (data) {
+            var container = widget.container.find(".widget-readme");
+            container.html(new showdown.Converter().makeHtml(data));
+            container.prepend('<div class="github-info">' +
+                '<a href="https://github.com/' + widget.data.manifest.repository + '" ' +
+                'target="_blank">Version ' + widget.data.manifest.version + ' on Github</a></div>')
+        });
+
+        // load template and frontend javascript
+        $.get("widgets/" + widgetData.id + "/template.html", function (templateData) {
+            widget.templateEl = $('<div>').append(templateData);
+            $.getScript("widgets/" + widgetData.id + "/frontend.js", function () {
+                if (Widget.registerCallback[widget.id]) Widget.registerCallback[widget.id](widget);
+                widget.onInit();
+                widget.bindSocketListener();
+            });
+        });
+    };
+
+    /**
+     * Sort the widget elements from unsorted container
+     */
+    var sortWidgetElements = function () {
+        // for each type we must begin a new row
+        // for large type we have only one column per row
+        // for medium we have two columns per row
+        // for small we have three columns per row
+        var count = 1;
+        var lastSize = null;
+        var container = null;
+        var widgets = $(".widgets-unsorted").children();
+        widgets.each(function () {
+            var size = $(this).attr("data-size");
+            var max = 1;
+            if (size == "medium") max = 2;
+            if (size == "small") max = 3;
+            if (lastSize !== size || count >= max) {
+                count = 1;
+                container = $('.templates .grid-row.' + size).clone();
+                rowContainer.append(container);
+            }
+            // append the widget to the grid
+            container.find(".grid-column").eq(count - 1).append(this);
+            lastSize = size;
+            count++;
+        });
+        // delete old containers
+        rowContainer.find(".grid-row").each(function () {
+            if (!$(this).find(".widget").length) {
+                $(this).remove();
+            }
         });
     };
 
@@ -296,17 +303,12 @@ View.register("index", function (messageData) {
         Interval.create("index.server.ping", function () {
             var hashData = View.getViewDataByHash();
             // destroy interval if we are not in the right context anymore
-            if (View.current != "index" || !hashData || !hashData.server) {
+            if (View.current != "index" || !hashData || !hashData.messageData.server) {
                 Interval.destroy("index.server.ping");
                 Socket.offMessage("index.disconnect");
                 return;
             }
-            Socket.send("view", {
-                "view": "index",
-                "action": "widget",
-                "type": "ping",
-                "server": messageData.server
-            }, pingDataCheck);
+            loadAllWidgets();
         }, 30000);
         // bind disconnect check
         Socket.onMessage("index.disconnect", function (messageData) {

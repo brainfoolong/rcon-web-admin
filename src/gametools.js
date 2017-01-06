@@ -104,14 +104,20 @@ gametools.rust.serverstatus = function (server, forceUpdate, callback) {
 
                 // get bans from server
                 server.cmd("bans", null, false, function (messageData) {
-                    // fix for 64bit integer
-                    messageData = messageData.replace(/(\"steamid\"\s*:\s*)([0-9]+)/g, function (all) {
-                        return all.replace(/[0-9]+/, "\"$&\"")
-                    });
-                    var bans = JSON.parse(messageData);
-                    newStatus.players.bannedCount = bans.length;
-                    for (var i = 0; i < bans.length; i++) {
-                        newStatus.players.banned[bans[i].steamid] = bans[i];
+                    if (messageData) {
+                        // fix for 64bit integer
+                        messageData = messageData.replace(/(\"steamid\"\s*:\s*)([0-9]+)/g, function (all) {
+                            return all.replace(/[0-9]+/, "\"$&\"")
+                        });
+                        try {
+                            var bans = JSON.parse(messageData);
+                            newStatus.players.bannedCount = bans.length;
+                            for (var i = 0; i < bans.length; i++) {
+                                newStatus.players.banned[bans[i].steamid] = bans[i];
+                            }
+                        } catch (e) {
+
+                        }
                     }
                     newStatus.timestamp = new Date();
                     gametools.rust._serverstatus[server.id] = newStatus;

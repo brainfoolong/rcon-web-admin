@@ -105,6 +105,23 @@ function collapsable(container) {
 }
 
 /**
+ * Start downloading a file with given contents
+ * @param {string} data
+ * @param {string} fileName
+ */
+function downloadFile(data, fileName) {
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style.display = "none";
+    var blob = new Blob([data], {type: "octet/stream"});
+    var url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+/**
  * The escape html mapping
  * @type {{}}
  */
@@ -187,6 +204,7 @@ $(function () {
         }
     });
     collapsable(body);
+    lang.replaceInHtml(body);
     // socket stuff
     Socket.connectAndLoadView();
 });

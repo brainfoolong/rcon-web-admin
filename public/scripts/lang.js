@@ -36,19 +36,22 @@ lang.get = function (key, params) {
 
 /**
  * Replace all placeholders in html with proper translation values
+ * @param {jQuery} el The element to replace values in
+ * @param {Widget=} widget If given than use the t() function of the widget
  */
-lang.replaceInHtml = function () {
-    var el = $("body").find("[data-translate]");
-    el.each(function () {
-        $(this).html(lang.get($(this).attr("data-translate")));
+lang.replaceInHtml = function (el, widget) {
+    var get = widget ? widget.t : lang.get;
+    var elements = el.find("[data-translate]");
+    elements.each(function () {
+        $(this).html(get($(this).attr("data-translate")));
     });
-    el.removeAttr("data-translate-property");
-    el = $("body").find("[data-translate-property]");
-    el.each(function () {
+    elements.removeAttr("data-translate");
+    elements = el.find("[data-translate-property]");
+    elements.each(function () {
         var s = $(this).attr("data-translate-property").split(",");
-        $(this).attr(s[0], lang.get(s[1]));
+        $(this).attr(s[0], get(s[1]));
     });
-    el.removeAttr("data-translate-property");
+    elements.removeAttr("data-translate-property");
 };
 
 /**

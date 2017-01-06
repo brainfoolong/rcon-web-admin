@@ -349,9 +349,14 @@ h1 {
 
 h2 {
     font-size: 24px;
-    color: white;
     border-left: 2px solid #6cfeae;
+    color:#6cfeae;
     padding-left: 20px;
+}
+
+h2.collapsable-trigger{
+    border-left:0;
+    padding-left: 0;
 }
 
 .title {
@@ -468,7 +473,6 @@ body.is-not-admin [data-role='admin'] {
     position: relative;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
-    border: 1px solid rgba(0, 0, 0, 0.6);
 }
 
 .widget[data-area='options'],
@@ -565,6 +569,7 @@ body.is-not-admin [data-role='admin'] {
 
 .collapsable-trigger.collapsed::before {
     top:-6px;
+    left:-3px;
     transform: rotate(-90deg);
 }
 
