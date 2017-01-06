@@ -1,6 +1,8 @@
 "use strict";
 
 var Widget = require(__dirname + "/../widget");
+var os = require("os");
+var exec = require('child_process').exec;
 
 /**
  * The view
@@ -19,23 +21,14 @@ function View(user, messageData, callback) {
     switch (messageData.action) {
         case "update":
             widget = Widget.get(messageData.widget);
-            if (widget) {
-                Widget.install(messageData.widget, function () {
-                    callback({});
-                });
+            if (os.platform() != "linux" || !widget) {
+                callback({"message": "widgets.update.error.platform", "type" : "danger"});
                 return;
             }
-            callback({});
-            break;
-        case "delete":
-            widget = Widget.get(messageData.widget);
-            if (widget) {
-                Widget.delete(widget.id, function () {
-                    callback({});
-                });
-                return;
-            }
-            callback({});
+            var dir = __dirname + "/../..";
+            exec("cd " + dir + " && sh startscripts/start-linux.sh stop && node src/main.js install-widget " + widget.manifest.repository + " && startscripts/start-linux.sh start", null, function () {
+                callback({"message": "widgets.update.progress", "type": "info"});
+            });
             break;
         default:
             var widgets = {};

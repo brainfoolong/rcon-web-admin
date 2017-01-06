@@ -60,87 +60,91 @@ View.register("index", function (messageData) {
      * @param {object} widgetData
      */
     var loadWidget = function (widgetData) {
-        var widget = new Widget(widgetData.id);
-        Widget.widgets[widgetData.id] = widget;
-        widget.id = widgetData.id;
-        widget.server = messageData.server;
-        widget.serverData = messageData.myServers[messageData.server];
-        widget.data = widgetData;
-        if (!widgetData.id.match(/^[a-z]/) || widgetData.id.match(/[^a-z0-9-_]/)) {
-            Modal.alert(t("index.widget.error.id"));
-        }
-        widget.container = c.find(".templates .widget").clone();
-        widget.container
-            .attr("data-id", widget.id)
-            .attr("data-size", widgetData.size)
-            .attr("id", "widget-" + widget.id)
-            .addClass("widget-" + widget.id);
-        widget.container.find(".widget-title")
-            .attr("data-collapsable-target", "widget.content." + widget.id)
-            .append($('<span>').text(widget.t("name")));
-        widget.container.find(".widget-content")
-            .attr("data-collapsable-id", "widget.content." + widget.id);
-
-        // copy to hidden widgets form, set position later
-        $(".widgets-unsorted").append(widget.container);
-        widget.content = widget.container.find(".widget-content");
-
-        // fill layout option values
-        var values = {"size": widget.data.size, "position": widget.data.position};
-        $.each(values, function (valueKey, valueValue) {
-            var input = widget.container.find(".widget-layout .option")
-                .filter("[data-id='" + valueKey + "']").find(":input");
-            // limit to select only compatible sizes
-            if (valueKey == "size") {
-                $.each(widget.data.manifest.compatibleSizes, function (sizeKey, sizeValue) {
-                    input.append($('<option>').attr("value", sizeValue)
-                        .html(t("index.widget.size.value." + sizeValue)));
-                });
+        try {
+            var widget = new Widget(widgetData.id);
+            Widget.widgets[widgetData.id] = widget;
+            widget.id = widgetData.id;
+            widget.server = messageData.server;
+            widget.serverData = messageData.myServers[messageData.server];
+            widget.data = widgetData;
+            if (!widgetData.id.match(/^[a-z]/) || widgetData.id.match(/[^a-z0-9-_]/)) {
+                Modal.alert(t("index.widget.error.id"));
             }
-            // set default value
-            input.val(valueValue);
-            // instantiate selectpicker
-            if (input.is("select")) input.selectpicker();
-        });
+            widget.container = c.find(".templates .widget").clone();
+            widget.container
+                .attr("data-id", widget.id)
+                .attr("data-size", widgetData.size)
+                .attr("id", "widget-" + widget.id)
+                .addClass("widget-" + widget.id);
+            widget.container.find(".widget-title")
+                .attr("data-collapsable-target", "widget.content." + widget.id)
+                .append($('<span>').text(widget.t("name")));
+            widget.container.find(".widget-content")
+                .attr("data-collapsable-id", "widget.content." + widget.id);
 
-        var options = widget.data.manifest.options;
-        // create options html
-        var optionsEl = widget.container.find(".widget-options .options");
-        for (var optionIndex in options) {
-            if (options.hasOwnProperty(optionIndex)) {
-                var optionRow = options[optionIndex];
-                optionsEl.append(
-                    option.createHtmlFromData(
-                        optionIndex,
-                        widget.t("option." + optionIndex + ".title"),
-                        widget.t("option." + optionIndex + ".info"),
-                        widget.options.get(optionIndex),
-                        optionRow
-                    )
-                );
-            }
-        }
-        $("head").append('<link type="text/css" href="widgets/' + widgetData.id + '/style.css" ' +
-            'rel="stylesheet" media="all" id="css-' + widgetData.id + '">');
+            // copy to hidden widgets form, set position later
+            $(".widgets-unsorted").append(widget.container);
+            widget.content = widget.container.find(".widget-content");
 
-        // load readme
-        $.get("widgets/" + widgetData.id + "/README.md", function (data) {
-            var container = widget.container.find(".widget-readme");
-            container.html(new showdown.Converter().makeHtml(data));
-            container.prepend('<div class="github-info">' +
-                '<a href="https://github.com/' + widget.data.manifest.repository + '" ' +
-                'target="_blank">Version ' + widget.data.manifest.version + ' on Github</a></div>')
-        });
-
-        // load template and frontend javascript
-        $.get("widgets/" + widgetData.id + "/template.html", function (templateData) {
-            widget.templateEl = $('<div>').append(templateData);
-            $.getScript("widgets/" + widgetData.id + "/frontend.js", function () {
-                if (Widget.registerCallback[widget.id]) Widget.registerCallback[widget.id](widget);
-                widget.onInit();
-                widget.bindSocketListener();
+            // fill layout option values
+            var values = {"size": widget.data.size, "position": widget.data.position};
+            $.each(values, function (valueKey, valueValue) {
+                var input = widget.container.find(".widget-layout .option")
+                    .filter("[data-id='" + valueKey + "']").find(":input");
+                // limit to select only compatible sizes
+                if (valueKey == "size") {
+                    $.each(widget.data.manifest.compatibleSizes, function (sizeKey, sizeValue) {
+                        input.append($('<option>').attr("value", sizeValue)
+                            .html(t("index.widget.size.value." + sizeValue)));
+                    });
+                }
+                // set default value
+                input.val(valueValue);
+                // instantiate selectpicker
+                if (input.is("select")) input.selectpicker();
             });
-        });
+
+            var options = widget.data.manifest.options;
+            // create options html
+            var optionsEl = widget.container.find(".widget-options .options");
+            for (var optionIndex in options) {
+                if (options.hasOwnProperty(optionIndex)) {
+                    var optionRow = options[optionIndex];
+                    optionsEl.append(
+                        option.createHtmlFromData(
+                            optionIndex,
+                            widget.t("option." + optionIndex + ".title"),
+                            widget.t("option." + optionIndex + ".info"),
+                            widget.options.get(optionIndex),
+                            optionRow
+                        )
+                    );
+                }
+            }
+            $("head").append('<link type="text/css" href="widgets/' + widgetData.id + '/style.css" ' +
+                'rel="stylesheet" media="all" id="css-' + widgetData.id + '">');
+
+            // load readme
+            $.get("widgets/" + widgetData.id + "/README.md", function (data) {
+                var container = widget.container.find(".widget-readme");
+                container.html(new showdown.Converter().makeHtml(data));
+                container.prepend('<div class="github-info">' +
+                    '<a href="https://github.com/' + widget.data.manifest.repository + '" ' +
+                    'target="_blank">Version ' + widget.data.manifest.version + ' on Github</a></div>')
+            });
+
+            // load template and frontend javascript
+            $.get("widgets/" + widgetData.id + "/template.html", function (templateData) {
+                widget.templateEl = $('<div>').append(templateData);
+                $.getScript("widgets/" + widgetData.id + "/frontend.js", function () {
+                    if (Widget.registerCallback[widget.id]) Widget.registerCallback[widget.id](widget);
+                    widget.onInit();
+                    widget.bindSocketListener();
+                });
+            });
+        } catch (e) {
+            console.error("Load widget error", e);
+        }
     };
 
     /**

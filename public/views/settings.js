@@ -44,15 +44,16 @@ View.register("settings", function (messageData) {
 
     var btn = $(".btn.update");
     btn.on("click", function () {
+        var e = $(this);
         Modal.confirm(t("settings.confirm"), function (success) {
             if (success) {
-                spinner($(".settings"));
+                e.remove();
+                note(t("widgets.update.progress"), "info", 3000);
                 Socket.send("view", {
                     "view": "settings",
                     "action": "update"
-                }, function () {
-                    $(".settings").find(".spinner").remove();
-                    note(t("settings.update.done"), "success");
+                }, function (data) {
+                    note(data.message, data.type, 10000);
                 });
             }
         });

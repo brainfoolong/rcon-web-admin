@@ -229,7 +229,6 @@ Widget.install = function (repository, callback) {
     if (fs.existsSync(repoDir)) {
         // delete existing folder
         fstools.deleteRecursive(repoDir);
-
     }
     fs.mkdir(repoDir, 0o777, function (err) {
         if (err) {

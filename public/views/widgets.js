@@ -25,41 +25,20 @@ View.register("widgets", function (messageData) {
             container.append(widgetEl);
         }
     }
-    container.on("click", ".delete", function () {
-        var e = $(this).closest(".widget-row");
-        var btn = $(this);
-        var id = e.attr("data-id");
-        Modal.confirm(t("widgets.delete.confirm"), function (success) {
-            if (success) {
-                btn.remove();
-                note(t("widgets.delete.progress"), "info");
-                Socket.send("view", {
-                    "view": "widgets",
-                    "action": "delete",
-                    "widget": id
-                }, function (data) {
-                    btn.remove();
-                    note(t("widgets.delete.done"), "success");
-                    View.load("widgets");
-                });
-            }
-        });
-    });
     container.on("click", ".update", function () {
         var e = $(this).closest(".widget-row");
         var btn = $(this);
         var id = e.attr("data-id");
-        Modal.confirm(t("sure"), function (success) {
+        Modal.confirm(t("widgets.update.confirm"), function (success) {
             if (success) {
                 btn.remove();
-                note(t("widgets.update.progress"), "info");
+                note(t("widgets.update.progress"), "info", 3000);
                 Socket.send("view", {
                     "view": "widgets",
                     "action": "update",
                     "widget": id
                 }, function (data) {
-                    note(t("widgets.update.done"), "success");
-                    View.load("widgets");
+                    note(data.message, data.type, 10000);
                 });
             }
         });

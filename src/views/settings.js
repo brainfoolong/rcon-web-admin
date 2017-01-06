@@ -1,5 +1,6 @@
 "use strict";
 
+var os = require("os");
 var exec = require('child_process').exec;
 var fs = require("fs");
 
@@ -18,8 +19,13 @@ function View(user, messageData, callback) {
     }
     var logdir = __dirname + "/../../logs";
     if (messageData.action == "update") {
-        exec("cd " + __dirname + "/../.. && git pull", null, function () {
-            callback();
+        if (os.platform() != "linux") {
+            callback({"message": "settings.update.error.platform", "type" : "danger"});
+            return;
+        }
+        var dir = __dirname + "/../..";
+        exec("cd " + dir + " && sh startscripts/start-linux.sh stop && node src/main.js update-core && startscripts/start-linux.sh start", null, function () {
+            callback({"message": "widgets.update.progress", "type": "info"});
         });
         return;
     }
