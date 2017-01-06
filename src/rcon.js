@@ -258,6 +258,7 @@ Rcon.prototype._data = function () {
             this.sendBlocked = false;
             this.processQueue();
         }
+        response.bodyBase64 = response.body.toString("base64");
         response.body = response.body.toString();
         // just pipe each raw response to the event listener
         this.emit("message", response);
