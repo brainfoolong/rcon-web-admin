@@ -14,7 +14,7 @@ var config = {
      * The given number is the one for the webinterface
      * Notice that both given number and the number+1 will be required
      */
-    "port" : 4310
+    "port" : 4326
 };
 
 module.exports = config;

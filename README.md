@@ -1,4 +1,4 @@
-# RCON Web Admin
+# RCON Web Admin | Alpha
 
 <img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/dashboard.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/autobot.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/server-management.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/ucc.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/widgets.jpg" width="19%">
 
@@ -32,11 +32,18 @@ On linux you may execute this to git the newest verions of required packages.
     sudo apt-get install nodejs npm git
     sudo npm update npm -g
 
-Installation FAQ see bellow.
+Installation FAQ see bellow, especially for raspberry pi installations.
 
 ## Installation
+**Warning**: Do not install this application in an accessable webserver directory, if you do this, the database files will be accessable from the web. It is recommended to install it directly in your home directory.
 
-    git clone https://github.com/brainfoolong/rcon-web-admin.git
+For windows download https://github.com/brainfoolong/rcon-web-admin/archive/master.zip and unpack it to a directory and start from line `npm update`. For linux run all bellow.
+
+Never run this application as root via `sudo`, it is not required.
+    
+    wget https://codeload.github.com/brainfoolong/rcon-web-admin/zip/master -O rcon-web-admin.zip
+    unzip rcon-web-admin.zip
+    mv rcon-web-admin-master rcon-web-admin
     cd rcon-web-admin
     npm update
     node src/main.js install-core-widgets
@@ -57,11 +64,12 @@ To modify the :4326 port or allowed hosts, have a look in the `config.template.j
 
 ## Startup/Shutdown scripts
 
-For linux you can start the rcon web admin with your server start. For example on ubuntu symlink `startscripts/runscript-linux.sh` to `/etc/rc2.d/S01Rconwebadmin` for automatic boot with server start.
-
-    Linux : startscripts/start-linux.sh (start/stop/restart/status)
+For linux you can start the rcon web admin with your server start. For example on ubuntu you can simple add a `crontab -e` line. Do this with the user you want to start the script, not `sudo`.
+    
+    @reboot /path/to/startscripts/start-linux.sh start
 
 ## Widget developers
+
 Goto https://github.com/brainfoolong/rcon-web-admin/tree/master/public/widgets for more information.
 
 ## Installation FAQ
@@ -70,11 +78,11 @@ Linux: If you've installed it and `node` as not available but `nodejs` is, than 
 
     sudo ln -s `which nodejs` /usr/bin/node
     
-RaspberryPi: You may not be able to run the server or `npm update` that is required bellow, or the node modules do not download. This will be because of a very old npm/nodejs version (for old raspberry pi for example). So you have to update nodejs and npm to a new version. **Warning**: This will delete old nodejs and npm installation. Make some backups before you do this.
+RaspberryPi: You may not be able to run the server or `npm update`, or the node modules do not download. This will be because of a very old npm/nodejs version (for old raspberry pi for example). So you have to update nodejs and npm to a new version. **Warning**: This will delete old nodejs and npm installation. Make some backups before you do this.
 
     sudo apt-get purge nodejs npm
-    ## Pi2 -> wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv7l.tar.xz -O node.tar.xz
-    ## Pi A/A+, B/B+ und Zero (ARMv6) -> wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv6l.tar.xz -O node.tar.xz
+    ## Pi2 | wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv7l.tar.xz -O node.tar.xz
+    ## Pi A/A+, B/B+ und Zero (ARMv6) | wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv6l.tar.xz -O node.tar.xz
     tar -xvf node.tar.xz
     cd node-v6.9.3-linux-armv*
     sudo cp -R * /usr/local/
