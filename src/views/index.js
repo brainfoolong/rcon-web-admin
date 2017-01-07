@@ -73,7 +73,6 @@ var View = function (user, messageData, callback) {
             }
         }
     })();
-
     // widget actions
     if (messageData.action == "widget") {
         var widgetEntry = null;

@@ -204,18 +204,6 @@ function Widget(id) {
 Widget.widgets = {};
 
 /**
- * The default widget repositories, that will be installed on first installation
- * @type {Array}
- */
-Widget.defaultWidgets = [
-    "brainfoolong/rwa-autobot",
-    "brainfoolong/rwa-console",
-    "brainfoolong/rwa-restart",
-    "brainfoolong/rwa-rustboard",
-    "brainfoolong/rwa-shutdown"
-];
-
-/**
  * Install a widget from a git repository
  * If already exist try to update
  * @param {string} repository
@@ -395,9 +383,38 @@ Widget.updateAllActive = function () {
     }
 };
 
+
+/**
+ * Fetch latest versions for all installed widgets
+ * Stored it into widget.manifest._latestVersion
+ */
+Widget.fetchLatestVersions = function () {
+    var widgets = Widget.getAllWidgetIds();
+    for (var i = 0; i < widgets.length; i++) {
+        (function (widget) {
+            if (widget) {
+                request.get("https://raw.githubusercontent.com/" + widget.manifest.repository + "/master/manifest.json", false, function (content) {
+                    if (content) {
+                        var manifest = JSON.parse(content);
+                        if (manifest && manifest.version) {
+                            widget.manifest._latestVersion = manifest.version;
+                        }
+                    }
+                });
+            }
+        })(Widget.get(widgets[i]));
+    }
+};
+
 // each 30 seconds call the updates for each active widget
 setInterval(Widget.updateAllActive, 30000);
 // and call 5 second after server startup
 setTimeout(Widget.updateAllActive, 5000);
+
+// fetch latest version each hour
+setInterval(Widget.updateAllActive, 1000 * 60 * 60);
+// and call 5 second after server startup
+setTimeout(Widget.fetchLatestVersions, 5000);
+
 
 module.exports = Widget;

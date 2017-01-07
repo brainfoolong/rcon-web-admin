@@ -454,13 +454,6 @@ h2.collapsable-trigger{
     opacity: 1;
 }
 
-.top-logo a.update {
-    display: inline-block;
-    border-radius: 5px;
-    padding: 5px;
-    background: #62c462;
-}
-
 body.is-not-logged-in [data-role='login'] {
     display: none;
 }

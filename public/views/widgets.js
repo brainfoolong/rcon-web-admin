@@ -7,6 +7,7 @@ View.register("widgets", function (messageData) {
             var widgetRow = messageData.widgets[widgetIndex];
             var widgetEl = widgetTpl.clone().removeClass("hidden");
             var widget = new Widget(widgetIndex);
+            var newVersion = widgetRow._latestVersion && widgetRow._latestVersion != widgetRow.version;
             widget.data = {
                 "manifest": widgetRow
             };
@@ -15,13 +16,7 @@ View.register("widgets", function (messageData) {
             widgetEl.find("a.github").attr("href", "https://github.com/" + widgetRow.repository);
             widgetEl.find("small").text(widget.t("description"));
             widgetEl.find(".games .text").text(widgetRow.compatibleGames == "all" ? "All" : widgetRow.compatibleGames.join(", "));
-            for (var i = 0; i < messageData.defaultWidgets.length; i++) {
-                var repository = messageData.defaultWidgets[i];
-                if (repository.match(new RegExp("/" + widgetIndex, "i"))) {
-                    container.find(".actions .delete").remove();
-                    break;
-                }
-            }
+            widgetEl.find(".update").text(t(newVersion ? "widgets.update.available" : "widgets.update.anyway", {"version": widgetRow._latestVersion}));
             container.append(widgetEl);
         }
     }

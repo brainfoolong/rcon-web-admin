@@ -137,7 +137,10 @@ function WebSocketUser(socket) {
                         self.userData = null;
                         break;
                     case "init":
-                        sendCallback(require(__dirname + "/../package"));
+                        sendCallback({
+                            "package" : require(__dirname + "/../package"),
+                            "latestVersion" : require(__dirname + "/core").latestVersion
+                        });
                         break;
                     default:
                         sendCallback();

@@ -64,8 +64,12 @@ Socket.connect = function (callback) {
             Socket.con = con;
             // send init ping to backend
             Socket.send("init", null, function (messageData) {
-                if (messageData.version) {
-                    $(".app-version").text(messageData.version);
+                if (messageData.package.version) {
+                    $(".app-version").text(messageData.package.version);
+                    console.log(messageData);
+                    if (messageData.latestVersion && messageData.latestVersion != messageData.package.version) {
+                        $(".top-logo .update").removeClass("hidden");
+                    }
                 }
                 if (callback) callback(messageData);
                 Socket.sendQueue();

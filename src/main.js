@@ -17,6 +17,7 @@ if (mode == "start") {
     require(__dirname + "/websocketmgr");
     require(__dirname + "/steamapi");
     require(__dirname + "/config");
+    require(__dirname + "/core");
     return;
 }
 

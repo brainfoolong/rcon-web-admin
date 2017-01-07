@@ -43,8 +43,7 @@ function View(user, messageData, callback) {
                 }
             })();
             callback({
-                "widgets": widgets,
-                "defaultWidgets": Widget.defaultWidgets
+                "widgets": widgets
             });
     }
 }

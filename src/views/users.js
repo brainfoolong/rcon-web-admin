@@ -60,7 +60,11 @@ function View(user, messageData, callback) {
         db.get("users").set(id, userData).value();
         messageData.id = null;
         deeperCallback({
-            "sessionUserData": {"username": userData.username, "loginHash": userData.loginHash},
+            "sessionUserData": {
+                "username": userData.username,
+                "loginHash": userData.loginHash,
+                "admin": userData.admin
+            },
             "login": !user.userData || user.userData.id == id,
             "initial": usersCount == 0,
             "note": ["saved", "success"],
