@@ -58,12 +58,17 @@ function RconServer(id, serverData) {
     /**
      * Send a command
      * @param {string} cmd
-     * @param {WebSocketUser|null} user
-     * @param {boolean} log If true than log this message to the server log file
-     * @param {function} callback
+     * @param {WebSocketUser=} user
+     * @param {boolean=} log If false than do not log this message to the server log file, otherwise log
+     * @param {function=} callback
      */
     this.cmd = function (cmd, user, log, callback) {
         if (this.connected) {
+            if (!user) user = null;
+            if (log !== false) log = true;
+            if (!callback) callback = function () {
+
+            };
             this.con.send(cmd, user, log, function (result) {
                 try {
                     callback(result);

@@ -74,9 +74,14 @@ function Widget(id) {
     /**
      * Get the storage object for given server
      * @param {RconServer} server
-     * @return {{}}
+     * @return {object|null}
      */
     this.storage.getObject = function (server) {
+        var RconServer = require(__dirname + "/rconserver");
+        if (server instanceof RconServer === false) {
+            console.error("Widget.storage methods require a RconServer instance as first parameter");
+            return null;
+        }
         if (typeof self.storageCache[server.id] == "undefined") {
             self.storageCache[server.id] = {};
             var entry = self.getDbEntry(server);
@@ -96,6 +101,7 @@ function Widget(id) {
      */
     this.storage.set = function (server, key, value, lifetime) {
         var data = this.getObject(server);
+        if (!data) return null;
         data[key] = value;
         data[key + ".lifetime"] = lifetime ? (new Date().getTime() / 1000) + lifetime : -1;
         var entry = self.getDbEntry(server);
@@ -112,7 +118,7 @@ function Widget(id) {
      */
     this.storage.get = function (server, key) {
         var data = this.getObject(server)[key];
-        if (typeof data == "undefined") return null;
+        if (!data) return null;
         var lifetime = this.getObject(server)[key + ".lifetime"];
         if (lifetime > -1) {
             // if lifetime has ended than return null
@@ -130,9 +136,14 @@ function Widget(id) {
     /**
      * Get the options object for given server
      * @param {RconServer} server
-     * @return {{}}
+     * @return {object|null}
      */
     this.options.getObject = function (server) {
+        var RconServer = require(__dirname + "/rconserver");
+        if (server instanceof RconServer === false) {
+            console.error("Widget.options methods require a RconServer instance as first parameter");
+            return null;
+        }
         if (typeof self.optionsCache[server.id] == "undefined") {
             self.optionsCache[server.id] = null;
             var entry = self.getDbEntry(server);
@@ -150,11 +161,12 @@ function Widget(id) {
      * @param {*} value
      */
     this.options.set = function (server, key, value) {
+        var data = this.getObject(server);
+        if (!data) return null;
         var option = self.manifest.options[key];
         if (option) {
             if (option.type == "switch") value = value === "1" || value === true;
             if (option.type == "number") value = parseFloat(value);
-            var data = this.getObject(server);
             data[key] = value;
             var entry = self.getDbEntry(server);
             if (entry) {
@@ -167,10 +179,18 @@ function Widget(id) {
      * Get value of an option
      * @param {RconServer} server
      * @param {string} key
-     * @returns {*|null} Null if not found
+     * @returns {*} Return the manifest default value if no saved value has been found
      */
     this.options.get = function (server, key) {
-        return this.getObject(server)[key] || null;
+        var data = this.getObject(server);
+        var value = data && data[key] !== null && typeof data[key] != "undefined" ? data[key] : null;
+        if (value === null) {
+            var option = self.manifest.options[key];
+            if (option) {
+                value = option.default;
+            }
+        }
+        return value;
     };
 
     /**
@@ -312,7 +332,7 @@ Widget.delete = function (id, callback) {
  * @return {string[]}
  */
 Widget.getAllWidgetIds = function () {
-    if(Widget.widgetIds === null){
+    if (Widget.widgetIds === null) {
         Widget.widgetIds = [];
         var dir = __dirname + "/../public/widgets";
         var files = fs.readdirSync(dir);
