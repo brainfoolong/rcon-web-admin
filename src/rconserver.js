@@ -66,7 +66,7 @@ function RconServer(id, serverData) {
         if (this.connected) {
             this.con.send(cmd, user, log, function (result) {
                 try {
-                    callback(result.toString());
+                    callback(result);
                 } catch (e) {
                     console.error(new Date(), "RconServer [" + serverName + "]: Command error", e, e.stack);
                 }

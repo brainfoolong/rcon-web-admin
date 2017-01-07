@@ -253,7 +253,7 @@ Rcon.prototype._data = function () {
         if (response.type == Rcon.SERVERDATA_RESPONSE_VALUE && response.body.length === 0) {
             var cb = this.callbacks.shift();
             if (cb) {
-                if (cb.callback) cb.callback(this.bodyBuffer);
+                if (cb.callback) cb.callback(base64.decode(this.bodyBuffer.toString("base64")));
                 this.bodyBuffer = new Buffer(0);
             }
             this.sendBlocked = false;
