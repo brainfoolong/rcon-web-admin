@@ -66,7 +66,7 @@ if (mode == "update-core") {
                     entry.pipe(fs.createWriteStream(path));
                 }
             }).on("close", function () {
-                process.stdout.write("Rcon web admin successfully updated");
+                process.stdout.write("Rcon web admin successfully updated\n");
                 fs.unlinkSync(dir + "/master.zip");
                 process.exit(0);
             });
