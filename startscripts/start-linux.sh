@@ -26,7 +26,7 @@ case "$1" in
 			echo "!"
 		fi
 		echo "Starting the RCON web admin server"
-		node ../src/main.js start > ../logs/rwa.output.log 2> ../logs/rwa.error.log &
+		node ../src/main.js start > ../logs/output.log 2> ../logs/error.log &
 		PID=$!
 		ps -p ${PID} > /dev/null 2>&1
 		if [ "$?" -ne "0" ]; then
