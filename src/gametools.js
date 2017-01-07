@@ -26,9 +26,9 @@ gametools.rust._serverstatus = {};
  * @param {function} callback
  */
 gametools.rust.serverstatus = function (server, forceUpdate, callback) {
-    // cached for 10 seconds if not forced
+    // cached for x seconds if not forced
     // to prevent many widgets calling this and spam the server
-    if (!forceUpdate && gametools.rust._serverstatus[server.id] && new Date(gametools.rust._serverstatus[server.id].timestamp).getTime() / 1000 > new Date() / 1000 - 10) {
+    if (!forceUpdate && gametools.rust._serverstatus[server.id] && new Date(gametools.rust._serverstatus[server.id].timestamp).getTime() / 1000 > new Date() / 1000 - 29) {
         return callback(gametools.rust._serverstatus[server.id]);
     }
     gametools.rust._serverstatus[server.id] = null;

@@ -66,7 +66,6 @@ Socket.connect = function (callback) {
             Socket.send("init", null, function (messageData) {
                 if (messageData.package.version) {
                     $(".app-version").text(messageData.package.version);
-                    console.log(messageData);
                     if (messageData.latestVersion && messageData.latestVersion != messageData.package.version) {
                         $(".top-logo .update").removeClass("hidden");
                     }

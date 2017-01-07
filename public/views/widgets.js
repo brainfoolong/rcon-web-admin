@@ -16,7 +16,7 @@ View.register("widgets", function (messageData) {
             widgetEl.find("a.github").attr("href", "https://github.com/" + widgetRow.repository);
             widgetEl.find("small").text(widget.t("description"));
             widgetEl.find(".games .text").text(widgetRow.compatibleGames == "all" ? "All" : widgetRow.compatibleGames.join(", "));
-            widgetEl.find(".update").text(t(newVersion ? "widgets.update.available" : "widgets.update.anyway", {"version": widgetRow._latestVersion}));
+            widgetEl.find(".update").text(t(newVersion ? "widgets.update.available" : "widgets.update.anyway", {"version": widgetRow._latestVersion})).removeClass("hidden");
             container.append(widgetEl);
         }
     }
