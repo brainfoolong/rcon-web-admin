@@ -24,9 +24,7 @@ var View = function (user, messageData, callback) {
         sendMessageData.widgets = widgets;
         sendMessageData.myServers = myServers;
         if (currentServer) {
-            var myWidgets = wdb.get("list").filter({
-                "user": user.userData.id
-            }).cloneDeep().value();
+            var myWidgets = wdb.get("list").cloneDeep().value();
             sendMessageData.gridrows = wdb.get("gridrows").value();
             sendMessageData.myWidgets = [];
             if (myWidgets) {
