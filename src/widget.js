@@ -52,6 +52,20 @@ function Widget(id) {
     };
 
     /**
+     * Send a message to all connected frontend widgets
+     * @param {RconServer} server
+     * @param {*} message
+     */
+    this.sendMessageToFrontend = function (server, message) {
+        var WebSocketUser = require(__dirname + "/websocketuser");
+        for (var i = 0; i < WebSocketUser.instances.length; i++) {
+            var user = WebSocketUser.instances[i];
+            if (!user || !user.server) continue;
+            user.send("widgetBackendMessage", {"server": user.server.id, "widget": self.id, "message": message});
+        }
+    };
+
+    /**
      * The widget storage
      * @type {{}}
      */
@@ -195,6 +209,14 @@ function Widget(id) {
     this.onServerMessage = function (server, message) {
         // override this function in the child widget
     };
+
+    /**
+     * Fired when widget is added to a server dashboard
+     * @param {RconServer} server
+     */
+    this.onWidgetAdded = function (server) {
+        // override this function in the child widget
+    };
 }
 
 /**
@@ -202,6 +224,12 @@ function Widget(id) {
  * @type {{string: Widget}}
  */
 Widget.widgets = {};
+
+/**
+ * All existing widget ids
+ * @type {Array|null}
+ */
+Widget.widgetIds = null;
 
 /**
  * Install a widget from a git repository
@@ -284,15 +312,17 @@ Widget.delete = function (id, callback) {
  * @return {string[]}
  */
 Widget.getAllWidgetIds = function () {
-    var dir = __dirname + "/../public/widgets";
-    var files = fs.readdirSync(dir);
-    var f = [];
-    for (var i = 0; i < files.length; i++) {
-        var file = files[i];
-        if (file.match(/^(\.|README.md)/i)) continue;
-        f.push(file);
+    if(Widget.widgetIds === null){
+        Widget.widgetIds = [];
+        var dir = __dirname + "/../public/widgets";
+        var files = fs.readdirSync(dir);
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            if (file.match(/^(\.|README.md)/i)) continue;
+            Widget.widgetIds.push(file);
+        }
     }
-    return f;
+    return Widget.widgetIds;
 };
 
 /**

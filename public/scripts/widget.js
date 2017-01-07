@@ -33,6 +33,14 @@ function Widget(id) {
     };
 
     /**
+     * Fired when the backend send a message to all connected frontend users
+     * @param {object} messageData
+     */
+    this.onBackendMessage = function (messageData) {
+        // override this function in the child widget
+    };
+
+    /**
      * Fired after the backend widget have done it's onUpdate cycle
      */
     this.onBackendUpdate = function () {
@@ -271,8 +279,11 @@ function Widget(id) {
             if (data.action == "widgetUpdateDone" && self.server == data.messageData.server) {
                 self.onBackendUpdate();
             }
+            if (data.action == "widgetBackendMessage" && self.server == data.messageData.server && self.id == data.messageData.widget) {
+                self.onBackendMessage(data.messageData.message);
+            }
         };
-        Socket.onMessage("widget.widgetUpdateDone", socketCallback);
+        Socket.onMessage("widget.listener." + self.id, socketCallback);
         self.socketMessageHandlers.push("widget.widgetUpdateDone");
     };
 }

@@ -239,11 +239,11 @@ Rcon.prototype._data = function () {
             "log": true
         };
 
-        // console.log("response", response.id, response.type, response.body.length);
+        // console.log("response", response.id, response.type, response.body.length, this.callbacks.length);
 
         // SERVERDATA_RESPONSE_VALUE is the response to SERVERDATA_EXECCOMMAND
         // so we collect buffer information everytime we have such a request
-        if (response.id >= 0 && response.type == Rcon.SERVERDATA_RESPONSE_VALUE) {
+        if (response.id > 0 && response.type == Rcon.SERVERDATA_RESPONSE_VALUE) {
             this.bodyBuffer = Buffer.concat([this.bodyBuffer, response.body]);
         }
 

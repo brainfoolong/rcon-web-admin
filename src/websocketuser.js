@@ -25,7 +25,7 @@ function WebSocketUser(socket) {
      * The current active server
      * Updated with each incoming websocket request
      * This means this is only possibly set if user is viewing the dashboard
-     * @type {null}
+     * @type {RconServer|null}
      */
     this.server = null;
 

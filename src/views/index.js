@@ -94,6 +94,10 @@ var View = function (user, messageData, callback) {
                                 "options": {},
                                 "storage": {}
                             }).value();
+                            Widget.callMethodForAllWidgetsIfActive(
+                                "onWidgetAdded",
+                                currentServer
+                            );
                         }
                     }
                     deeperCallback({"widget": widgetId});

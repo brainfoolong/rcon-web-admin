@@ -91,11 +91,8 @@ if (mode == "install-widget") {
 // install core widgets
 if (mode == "install-core-widgets") {
     var coreWidgets = [
-        "brainfoolong/rwa-autobot",
         "brainfoolong/rwa-console",
-        "brainfoolong/rwa-restart",
-        "brainfoolong/rwa-rustboard",
-        "brainfoolong/rwa-shutdown"
+        "brainfoolong/rwa-rustboard"
     ];
     var cbCount = 0;
     for (var i = 0; i < coreWidgets.length; i++) {
