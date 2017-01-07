@@ -32,7 +32,7 @@ View.register("widgets", function (messageData) {
         Modal.confirm(t("widgets.update.confirm"), function (success) {
             if (success) {
                 btn.remove();
-                note(t("widgets.update.progress"), "info", 3000);
+                note(t("widgets.update.progress"), "info", 6000);
                 Socket.send("view", {
                     "view": "widgets",
                     "action": "update",

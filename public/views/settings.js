@@ -48,7 +48,7 @@ View.register("settings", function (messageData) {
         Modal.confirm(t("settings.confirm"), function (success) {
             if (success) {
                 e.remove();
-                note(t("widgets.update.progress"), "info", 3000);
+                note(t("widgets.update.progress"), "info", 6000);
                 Socket.send("view", {
                     "view": "settings",
                     "action": "update"
