@@ -79,7 +79,7 @@ function Widget(id) {
     this.storage.getObject = function (server) {
         var RconServer = require(__dirname + "/rconserver");
         if (server instanceof RconServer === false) {
-            console.error("Widget.storage methods require a RconServer instance as first parameter");
+            console.trace("Widget.storage methods require a RconServer instance as first parameter");
             return null;
         }
         if (typeof self.storageCache[server.id] == "undefined") {
@@ -117,14 +117,14 @@ function Widget(id) {
      * @returns {*|null} Null if not found
      */
     this.storage.get = function (server, key) {
-        var data = this.getObject(server)[key];
-        if (!data) return null;
-        var lifetime = this.getObject(server)[key + ".lifetime"];
+        var data = this.getObject(server);
+        if (!data || typeof data[key] == "undefined" || data[key] === null) return null;
+        var lifetime = data[key + ".lifetime"];
         if (lifetime > -1) {
             // if lifetime has ended than return null
             if (lifetime < new Date().getTime() / 1000) return null;
         }
-        return data;
+        return data[key];
     };
 
     /**
@@ -141,7 +141,7 @@ function Widget(id) {
     this.options.getObject = function (server) {
         var RconServer = require(__dirname + "/rconserver");
         if (server instanceof RconServer === false) {
-            console.error("Widget.options methods require a RconServer instance as first parameter");
+            console.trace("Widget.options methods require a RconServer instance as first parameter");
             return null;
         }
         if (typeof self.optionsCache[server.id] == "undefined") {

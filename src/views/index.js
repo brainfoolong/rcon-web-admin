@@ -33,7 +33,7 @@ var View = function (user, messageData, callback) {
                 for (var i = 0; i < myWidgets.length; i++) {
                     var widgetData = myWidgets[i];
                     var widget = Widget.get(widgetData.id);
-                    if(widget){
+                    if (widget) {
                         widgetData.manifest = sendMessageData.widgets[widget.id];
                         sendMessageData.myWidgets.push(widgetData);
                     }
@@ -76,11 +76,12 @@ var View = function (user, messageData, callback) {
     // widget actions
     if (messageData.action == "widget") {
         var widgetEntry = null;
+        var widget = null;
         if (user.userData !== null && currentServer) {
             switch (messageData.type) {
                 case "add":
                     var list = wdb.get("list");
-                    var widget = Widget.get(messageData.widget);
+                    widget = Widget.get(messageData.widget);
                     if (widget) {
                         var widgetId = widget.id;
                         if (list.find({"id": widget.id}).size().value()) {
@@ -88,7 +89,6 @@ var View = function (user, messageData, callback) {
                         } else {
                             list.push({
                                 "id": widgetId,
-                                "user": user.userData.id,
                                 "position": list.size().value(),
                                 "size": widget.manifest.compatibleSizes[0],
                                 "options": {},
@@ -104,10 +104,9 @@ var View = function (user, messageData, callback) {
                     break;
                 case "remove":
                     widget = Widget.get(messageData.widget);
-                    if(widget) {
+                    if (widget) {
                         wdb.get("list").remove({
-                            "id": messageData.widget,
-                            "user": user.userData.id
+                            "id": messageData.widget
                         }).value();
                         delete widget.storageCache[currentServer.id];
                         delete widget.optionsCache[currentServer.id];
@@ -116,10 +115,9 @@ var View = function (user, messageData, callback) {
                     break;
                 case "layout":
                     widgetEntry = wdb.get("list").find({
-                        "id": messageData.widget,
-                        "user": user.userData.id
+                        "id": messageData.widget
                     });
-                    if (widgetEntry.size()) {
+                    if (widgetEntry.size().value()) {
                         for (var messageDataIndex in messageData.values) {
                             if (messageData.values.hasOwnProperty(messageDataIndex)) {
                                 widgetEntry.set(messageDataIndex, messageData.values[messageDataIndex]).value();
@@ -129,27 +127,16 @@ var View = function (user, messageData, callback) {
                     deeperCallback({});
                     break;
                 case "storage":
-                    widgetEntry = wdb.get("list").find({
-                        "id": messageData.widget,
-                        "user": user.userData.id
-                    });
-                    if (widgetEntry.size()) {
-                        var storage = widgetEntry.get("storage").value();
-                        storage[messageData.key] = messageData.value;
-                        storage[messageData.key + ".lifetime"] = messageData.lifetime;
-                        widgetEntry.set("storage", storage).value();
+                    widget = Widget.get(messageData.widget);
+                    if (widget) {
+                        widget.storage.set(currentServer, messageData.key, messageData.value, messageData.lifetime);
                     }
                     deeperCallback({});
                     break;
                 case "option":
-                    widgetEntry = wdb.get("list").find({
-                        "id": messageData.widget,
-                        "user": user.userData.id
-                    });
-                    if (widgetEntry.size()) {
-                        var options = widgetEntry.get("options").value();
-                        options[messageData.option] = messageData.value;
-                        widgetEntry.set("options", options).value();
+                    widget = Widget.get(messageData.widget);
+                    if (widget) {
+                        widget.options.set(currentServer, messageData.option, messageData.value);
                     }
                     deeperCallback({});
                     break;

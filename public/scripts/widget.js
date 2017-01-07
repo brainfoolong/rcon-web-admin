@@ -155,7 +155,7 @@ function Widget(id) {
 
     /**
      * The widget storage
-     * @type {{}}
+     * @type {object}
      */
     this.storage = {};
 
@@ -199,7 +199,7 @@ function Widget(id) {
 
     /**
      * The widget options
-     * @type {{}}
+     * @type {object}
      */
     this.options = {};
 
