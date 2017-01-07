@@ -225,8 +225,8 @@ Rcon.prototype.disconnect = function () {
  * @private
  */
 Rcon.prototype._data = function () {
+    var serverName = this.server.serverData.host + ":" + this.server.serverData.rcon_port;
     while (this.dataBuffer.length >= 12) {
-
         var size = this.dataBuffer.readInt32LE(0);
         if (this.dataBuffer.length < 4 + size) break;
         var response = {
@@ -239,6 +239,8 @@ Rcon.prototype._data = function () {
             "log": true
         };
 
+        // console.log("response", response.id, response.type, response.body.length);
+
         // SERVERDATA_RESPONSE_VALUE is the response to SERVERDATA_EXECCOMMAND
         // so we collect buffer information everytime we have such a request
         if (response.id >= 0 && response.type == Rcon.SERVERDATA_RESPONSE_VALUE) {
@@ -248,12 +250,15 @@ Rcon.prototype._data = function () {
         // auth response is special handled, just callback if success auth or not
         if (response.type == Rcon.SERVERDATA_AUTH_RESPONSE) {
             if (this.authCallback) this.authCallback(response.id !== -1);
-        }
-        // if we receive an empty package than the SERVERDATA_EXECCOMMAND is finally done
-        if (response.type == Rcon.SERVERDATA_RESPONSE_VALUE && response.body.length === 0) {
+        } else if (response.type == Rcon.SERVERDATA_RESPONSE_VALUE && response.body.length === 0) {
+            // if we receive an empty package than the SERVERDATA_EXECCOMMAND is finally done
             var cb = this.callbacks.shift();
             if (cb) {
-                if (cb.callback) cb.callback(base64.decode(this.bodyBuffer.toString("base64")));
+                try {
+                    if (cb.callback) cb.callback(base64.decode(this.bodyBuffer.toString("base64")));
+                } catch (e) {
+                    console.error(new Date(), "RconServer [" + serverName + "]: send callback error", e, e.stack);
+                }
                 this.bodyBuffer = new Buffer(0);
             }
             this.sendBlocked = false;

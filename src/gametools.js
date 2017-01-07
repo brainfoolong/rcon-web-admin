@@ -39,17 +39,17 @@ gametools.rust.serverstatus = function (server, forceUpdate, callback) {
             callback(null);
             return;
         }
-        var hostname = statusDataLines[0].split(":", 2);
-        var version = statusDataLines[1].split(":", 2);
-        var map = statusDataLines[2].split(":", 2);
-        var players = statusDataLines[3].split(":", 2);
+        var hostname = statusDataLines[0].split(":").slice(1);
+        var version = statusDataLines[1].split(":").slice(1);
+        var map = statusDataLines[2].split(":").slice(1);
+        var players = statusDataLines[3].split(":").slice(1);
 
         var newStatus = {
             "server": {
-                "hostname": hostname[1] ? hostname[1].trim() : "",
-                "players": players[1] ? players[1].trim() : "",
-                "version": version[1] ? version[1].trim() : "",
-                "map": map[1] ? map[1].trim() : ""
+                "hostname": hostname ? hostname.join(":").trim() : "",
+                "players": players ? players.join(":").trim() : "",
+                "version": version ? version.join(":").trim() : "",
+                "map": map ? map.join(":").trim() : ""
             },
             "players": {
                 "onlineCount": 0,
