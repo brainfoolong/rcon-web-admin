@@ -258,7 +258,7 @@ View.register("index", function (messageData) {
     }).on("click.index", ".widget .widget-icons .icon", function (ev) {
         ev.stopPropagation();
         showArea(Widget.getByElement(this), $(this).attr("data-id"));
-    }).on("input.index change.index", ".widget-options .option :input", function () {
+    }).on("input.index change.index keyup.index", ".widget-options .option :input", function (ev) {
         var e = $(this);
         clearTimeout(e.data("optionTimeout"));
         e.data("optionTimeout", setTimeout(function () {
@@ -267,7 +267,7 @@ View.register("index", function (messageData) {
             var id = o.attr("data-id");
             widget.options.set(id, option.htmlValueToDb(o.attr("data-type"), e.val()));
             note("saved", "success");
-        }, 600));
+        }, ev.type == "keyup" && ev.keyCode == 13 ? 0 : 600));
     }).on("click.index", ".widget-layout .save-layout", function () {
         var widget = Widget.getByElement(this);
         note("index.widget.layout.save", "success");
