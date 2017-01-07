@@ -17,6 +17,9 @@ Socket.queue = [];
 /** @type {{}} */
 Socket.onMessageEvents = {};
 
+/** @type {number|null} */
+Socket.port = null;
+
 /**
  * Bind a callback to be triggered everytime a message is received
  * @param {string} id The handler id
@@ -51,13 +54,13 @@ Socket.sendQueue = function () {
  * @param {function=} callback If connection is established
  */
 Socket.connect = function (callback) {
-    // load the required port number
-    $.get("wsport", function (port) {
-        var con = new WebSocket('ws://' + window.location.hostname + ':' + port);
+    var cb = function () {
+        var con = new WebSocket('ws://' + window.location.hostname + ':' + Socket.port);
         /**
          * On open connection
          */
         con.onopen = function () {
+            Interval.destroy("socket.reconnect");
             Socket.con = con;
             // send init ping to backend
             Socket.send("init", null, function (messageData) {
@@ -116,11 +119,20 @@ Socket.connect = function (callback) {
             // try reconnect
             note("socket.disconnect", "danger");
             spinner("#content");
-            setTimeout(function () {
+            Interval.create("socket.reconnect", function () {
                 Socket.connectAndLoadView();
             }, 5000);
         };
-    });
+    };
+    if (Socket.port) {
+        cb();
+    } else {
+        // load the required port number
+        $.get("wsport", function (port) {
+            Socket.port = parseInt(port);
+            cb();
+        });
+    }
 };
 
 /**
