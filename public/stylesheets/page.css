@@ -350,12 +350,12 @@ h1 {
 h2 {
     font-size: 24px;
     border-left: 2px solid #6cfeae;
-    color:#6cfeae;
+    color: #6cfeae;
     padding-left: 20px;
 }
 
-h2.collapsable-trigger{
-    border-left:0;
+h2.collapsable-trigger {
+    border-left: 0;
     padding-left: 0;
 }
 
@@ -468,19 +468,23 @@ body.is-not-admin [data-role='admin'] {
     border-radius: 5px;
 }
 
-.widget[data-area='options'],
-.widget[data-area='layout'],
-.widget[data-area='readme'] {
-    background: rgba(255, 255, 255, 0.1) !important;
+.widget .widget-icons .icon[data-id="content"] {
+    display: none;
+}
+
+.widget[data-area='options'] .widget-icons .icon[data-id="content"],
+.widget[data-area='layout'] .widget-icons .icon[data-id="content"],
+.widget[data-area='readme'] .widget-icons .icon[data-id="content"] {
+    display: inline;
 }
 
 .widget .widget-padding {
     padding: 10px;
 }
 
-.widget .widget-content h2{
+.widget .widget-content h2 {
     font-size: 16px;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     padding-bottom: 5px;
     margin-bottom: 8px;
 }
@@ -498,7 +502,7 @@ body.is-not-admin [data-role='admin'] {
     margin-right: 10px;
 }
 
-.widget .widget-readme .github-info{
+.widget .widget-readme .github-info {
     text-align: right;
     font-size: 80%;
 }
@@ -509,7 +513,7 @@ body.is-not-admin [data-role='admin'] {
     top: 10px;
     height: 24px;
     font-size: 24px;
-    color:white;
+    color: white;
 }
 
 .widget .widget-icons .icon {
@@ -561,11 +565,11 @@ body.is-not-admin [data-role='admin'] {
 }
 
 .collapsable-trigger.collapsed::before {
-    top:-6px;
-    left:-3px;
+    top: -6px;
+    left: -3px;
     transform: rotate(-90deg);
 }
 
-.collapsable-target.collapsed{
+.collapsable-target.collapsed {
     display: none;
 }

@@ -188,13 +188,8 @@ View.register("index", function (messageData) {
      * @param {string} area
      */
     var showArea = function (widget, area) {
-        var lastArea = widget.container.data("area");
-        if (lastArea === area) {
-            area = "content";
-        }
         widget.container.find(".widget-content, .widget-options, .widget-layout, .widget-readme").addClass("hidden");
         widget.container.find(".widget-" + area).removeClass("hidden");
-        widget.container.data("area", area);
         widget.container.attr("data-area", area);
     };
 

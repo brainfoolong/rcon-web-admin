@@ -105,6 +105,19 @@ function collapsable(container) {
 }
 
 /**
+ * Initialize all textarea autoheights
+ * @param {jQuery} container
+ */
+function textareaAutoheight(container) {
+    container.find('textarea.autoheight').not(".autoheight-activated").each(function () {
+        this.setAttribute('style', 'height:' + (Math.max(20, this.scrollHeight)) + 'px;overflow-y:hidden;');
+    }).addClass("autoheight-activated").on('input focus', function () {
+        this.style.height = 'auto';
+        this.style.height = (Math.max(20, this.scrollHeight)) + 'px';
+    }).triggerHandler("input");
+}
+
+/**
  * Start downloading a file with given contents
  * @param {string} data
  * @param {string} fileName

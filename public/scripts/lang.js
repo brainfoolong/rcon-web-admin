@@ -116,6 +116,7 @@ lang.values.en = {
     "index.tooltip.options": "Options",
     "index.tooltip.layout": "Layout",
     "index.tooltip.readme": "Readme",
+    "index.tooltip.content": "Widget",
     "index.tooltip.newversion" : "A new version is available",
     "index.widget.error.id": "Widget.id must begin with an a-z character and should only contain: a-z, 0-9, -, _",
     "index.widget.add.error": "Widget not added, it does already exist",

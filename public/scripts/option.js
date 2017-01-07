@@ -48,6 +48,16 @@ option.createHtmlFromData = function (id, label, info, value, data) {
             input.attr("step", data.step);
         }
     }
+    if (data.type == "textarea") {
+        formEl.append('<textarea class="form-control autoheight">');
+        input = formEl.find("textarea");
+        if (typeof data.default != "undefined") {
+            input.attr("placeholder", data.default);
+        }
+        if (typeof data.rows == "number") {
+            input.attr("rows", data.rows);
+        }
+    }
     if (data.type == "select") {
         formEl.append('<select></select>');
         input = formEl.find("select");
@@ -70,6 +80,19 @@ option.createHtmlFromData = function (id, label, info, value, data) {
 };
 
 /**
+ * Get input value for given option element
+ * @param {jQuery} el
+ * @returns {*}
+ */
+option.getValueOfElement = function (el) {
+    el = $(el).closest(".option");
+    if(el.find("select").length){
+        return el.find("select").val();
+    }
+    return el.find(":input").val();
+};
+
+/**
  * Convert given html value to db value
  * @param {string} type
  * @param {string} value
@@ -77,7 +100,7 @@ option.createHtmlFromData = function (id, label, info, value, data) {
  */
 option.htmlValueToDb = function (type, value) {
     if (type == "switch") return value == "1";
-    if (type == "text") return !value.length ? null : value;
+    if (type == "text" || type == "textarea") return !value.length ? null : value;
     if (type == "number") return !value.length ? null : parseFloat(value);
     return value;
 };
@@ -90,6 +113,6 @@ option.htmlValueToDb = function (type, value) {
  */
 option.dbValueToHtml = function (type, value) {
     if (type == "switch") return value ? "1" : "0";
-    if ((type == "text" || type == "number") && value === null) return "";
+    if ((type == "text" || type == "number" || type == "textarea") && value === null) return "";
     return value;
 };
