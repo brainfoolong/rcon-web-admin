@@ -1,12 +1,12 @@
 # RCON Web Admin | Alpha
 
-<img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/dashboard.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/autobot.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/server-management.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/ucc.jpg" width="19%"><img src="https://brainfoolong.github.io/rcon-web-admin/images/screenshots/widgets.jpg" width="19%">
-
 RCON Web Admin as a powerful web interface to control your RCON server, e.g: for Rust game servers, but not limited to. Every RCON server will work.
 
-The most powerful feature is that this web admin can run on a server, raspberry pi or another device that is online 24/7. It does all jobs for you, even if you are not connected to the interface. You can install this almost everywhere.
+The most powerful feature is that this web admin can run on a server, raspberry pi or another device that is online 24/7. It does all jobs for you, even if you are not connected to the interface. You can install it almost everywhere.
 
 So imagine you've set-up rcon web admin so that it check users for high ping, VAC status or chat filter. The RCON web admin does it 24/7 for you, no need to have a tool opened all the time.
+
+**Notice:** Currently this all is in alpha state and as with all software it need more tests to be stable. If you're interested, please help me with tests and your time. Also almost all things are currently tested for rust game servers. But the system is built to support every rcon server, like counterstrike, minecraft, etc...
 
 `if(youLikeThisRepository === true && spendMeSomeRedBullOrCoffee === true) echo I would really appriciate that` https://www.paypal.me/brainfoolong
 
@@ -20,9 +20,7 @@ So imagine you've set-up rcon web admin so that it check users for high ping, VA
 * So many more... Give it a try
 
 ## Widgets 
-The widgets are so powerful, they deserve an extra header here. All dashboard things are written in widgets. From the simplest to the most powerful tool, widgets are the way to go. There are some core widgets, most noticable `autobot`. That can do so many jobs for you. As mentioned above, setup scripts that kick high pings automatically, that kick vac banned people, that say hello to new users, the periodically send chat messages, that ...
-
-Core widgets are automatically kept up2date with their github repositories, or you can trigger updates easily in the interface.
+The widgets are powerful, they deserve an extra header here. All dashboard things are written in widgets. From the simplest to the most powerful tool, widgets are the way to go. They are some sort of "High level" programs inside the rcon web admin. You don't have to dig much into the code to write widgets. It's basically HTML and JS.
 
 ## Requirements
 It is required to have `npm` and `node` properly installed.

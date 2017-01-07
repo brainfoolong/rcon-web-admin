@@ -2,9 +2,6 @@
 
 Widgets are designed to have the best high level api so you can easily extend and use features of rcon web admin. There are already some core widgets from which you can start learning.
 
-## Consider autobot
-Maybe you have an idea of "If this than that". Consider using the `autobot` widget. It have also a really high level script interface.
-
 ## A new widget
 Creating a new widget is straight forward. Just copy one of the existing widgets. Rename the copied folder. Modify the `manifest.json` to your needs. `id` must be the folder name. Restart the server and you should see the widget in the dashboard.
 
