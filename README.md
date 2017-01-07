@@ -8,6 +8,8 @@ The most powerful feature is that this web admin can run on a server, raspberry 
 
 So imagine you've set-up rcon web admin so that it check users for high ping, VAC status or chat filter. The RCON web admin does it 24/7 for you, no need to have a tool opened all the time.
 
+`if(youLikeThisRepository === true && spendMeSomeRedBullOrCoffee === true) echo I would really appriciate that` https://www.paypal.me/brainfoolong
+
 ## Features
 
 * Full administration via your browser, it's just a website
