@@ -23,13 +23,12 @@ The widgets are so powerful, they deserve an extra header here. All dashboard th
 Core widgets are automatically kept up2date with their github repositories, or you can trigger updates easily in the interface.
 
 ## Requirements
-It is required to have `npm`, `node` and `git` properly installed.
+It is required to have `npm` and `node` properly installed.
 * https://nodejs.org
-* https://git-scm.com/downloads
 
-On linux you may execute this to git the newest verions of required packages.
+On linux you may execute this to get the newest versions of the required packages.
 
-    sudo apt-get install nodejs npm git
+    sudo apt-get install nodejs npm
     sudo npm update npm -g
 
 Installation FAQ see bellow, especially for raspberry pi installations.
@@ -37,15 +36,15 @@ Installation FAQ see bellow, especially for raspberry pi installations.
 ## Installation
 **Warning**: Do not install this application in an accessable webserver directory, if you do this, the database files will be accessable from the web. It is recommended to install it directly in your home directory.
 
-For windows download https://github.com/brainfoolong/rcon-web-admin/archive/master.zip and unpack it to a directory and start from line `npm update`. For linux run all bellow.
+For windows download https://github.com/brainfoolong/rcon-web-admin/archive/master.zip and unpack it to a directory and start from line `npm install`. For linux run all bellow.
 
-Never run this application as root via `sudo`, it is not required.
+**Note**: Never run this application as root via `sudo`, it is not required.
     
     wget https://codeload.github.com/brainfoolong/rcon-web-admin/zip/master -O rcon-web-admin.zip
     unzip rcon-web-admin.zip
     mv rcon-web-admin-master rcon-web-admin
     cd rcon-web-admin
-    npm update
+    npm install
     node src/main.js install-core-widgets
     chmod 0755 -R startscripts *
     
@@ -60,11 +59,11 @@ Never run this application as root via `sudo`, it is not required.
     startscripts/start-windows.bat
     
 Then goto: http://yourserverip:4326 (You can also use your hostname instead of ip).
-To modify the :4326 port or allowed hosts, have a look in the `config.template.js` file in the root folder.
+To modify the :326 port or allowed hosts, have a look in the `config.template.js` file in the root folder.
 
-## Startup/Shutdown scripts
+## Boot scripts
 
-For linux you can start the rcon web admin with your server start. For example on ubuntu you can simple add a `crontab -e` line. Do this with the user you want to start the script, not `sudo`.
+On linux you can start the rcon web admin with your server start. For example on ubuntu you can simply add a `crontab -e` line. Do this with the user you want to start the script with, not `sudo`.
     
     @reboot /path/to/startscripts/start-linux.sh start
 
@@ -78,7 +77,7 @@ Linux: If you've installed it and `node` as not available but `nodejs` is, than 
 
     sudo ln -s `which nodejs` /usr/bin/node
     
-RaspberryPi: You may not be able to run the server or `npm update`, or the node modules do not download. This will be because of a very old npm/nodejs version (for old raspberry pi for example). So you have to update nodejs and npm to a new version. **Warning**: This will delete old nodejs and npm installation. Make some backups before you do this.
+RaspberryPi: You may not be able to run the server or `npm install`, or the node modules do not download. This will be because of a very old npm/nodejs version (for old raspberry pi for example). So you have to update nodejs and npm to a new version. **Warning**: This will delete old nodejs and npm installation. Make some backups before you do this.
 
     sudo apt-get purge nodejs npm
     ## Pi2 | wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv7l.tar.xz -O node.tar.xz
