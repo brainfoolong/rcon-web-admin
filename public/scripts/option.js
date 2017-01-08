@@ -10,7 +10,7 @@ var option = {};
  * @param {string} id
  * @param {string|null} label
  * @param {string|null} info
- * @param {string} value
+ * @param {*} value
  * @param {*} data
  * @returns {jQuery}
  */
