@@ -91,6 +91,7 @@ if (mode == "install-widget") {
 // install core widgets
 if (mode == "install-core-widgets") {
     var coreWidgets = [
+        "brainfoolong/rwa-autobot",
         "brainfoolong/rwa-console",
         "brainfoolong/rwa-rustboard"
     ];
