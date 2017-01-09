@@ -16,17 +16,28 @@ var fstools = require(__dirname + "/../fstools");
 var View = function (user, messageData, callback) {
     // access denied for everyone except admin
     if (!user.userData || !user.userData.admin) {
-        callback({redirect: "index", "note": {"message" : "access.denied", "type" : "danger"}});
+        callback({redirect: "index", "note": {"message": "access.denied", "type": "danger"}});
         return;
     }
 
     var deeperCallback = function (sendMessageData) {
+        // just pipe to frontend
+        var users = [];
+        var usersObject = db.get("users").value();
+        for (var userIndex in usersObject) {
+            if (usersObject.hasOwnProperty(userIndex)) {
+                var userRow = usersObject[userIndex];
+                users.push(userRow.username);
+            }
+        }
         sendMessageData.servers = db.get("servers").cloneDeep().value();
         if (messageData.id) {
             sendMessageData.editData = sendMessageData.servers[messageData.id];
         }
+        sendMessageData.users = users;
         callback(sendMessageData);
     };
+
     var servers = null;
     var server = null;
     // on delete
@@ -43,7 +54,7 @@ var View = function (user, messageData, callback) {
                 fstools.deleteRecursive(dir);
             }
             deeperCallback({
-                "note": {"message" : "deleted", "type" : "success"},
+                "note": {"message": "deleted", "type": "success"},
                 "redirect": "servers"
             });
         }
@@ -60,7 +71,7 @@ var View = function (user, messageData, callback) {
         serverData.name = formData.name;
         serverData.host = formData.host;
         serverData.port = parseInt(formData.port);
-        serverData.users = formData.users.replace(/\s/ig, "");
+        serverData.users = formData.users;
         serverData.rcon_port = parseInt(formData.rcon_port);
         serverData.rcon_password = formData.rcon_password;
         db.get("servers").set(id, serverData).value();
@@ -80,12 +91,11 @@ var View = function (user, messageData, callback) {
         }
         messageData.id = null;
         deeperCallback({
-            "note": {"message" : "saved", "type" : "success"},
+            "note": {"message": "saved", "type": "success"},
             "redirect": "servers"
         });
         return;
     }
-    // just pipe to frontend
     deeperCallback({});
 };
 

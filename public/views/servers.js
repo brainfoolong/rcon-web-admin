@@ -1,5 +1,11 @@
 "use strict";
 View.register("servers", function (messageData) {
+    // set users
+    var select = $("select[name='users']");
+    messageData.users.sort();
+    for (var i = 0; i < messageData.users.length; i++) {
+        select.append($('<option>').attr("value", messageData.users[i]).text(messageData.users[i]));
+    }
     if (messageData.editData) {
         $(".btn.save").removeClass("btn-info").addClass("btn-success").attr("data-translate", "save.edited");
         $(".btn.cancel").removeClass("hidden");

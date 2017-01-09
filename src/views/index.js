@@ -47,16 +47,20 @@ var View = function (user, messageData, callback) {
     (function () {
         for (var i in servers) {
             var server = servers[i];
-            var users = server.users.split(",");
+            var found = user.userData.admin;
+            var users = server.users;
             if (users) {
-                for (var id in users) {
-                    if (users[id] == user.userData.username || user.userData.admin) {
-                        myServers[i] = {
-                            "id": server.id,
-                            "name": server.name,
-                            "game": server.game
-                        }
+                for (var j = 0; j < users.length; j++) {
+                    if (users[j] == user.userData.username) {
+                        found = true;
                     }
+                }
+            }
+            if (found) {
+                myServers[i] = {
+                    "id": server.id,
+                    "name": server.name,
+                    "game": server.game
                 }
             }
         }

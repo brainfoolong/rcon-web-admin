@@ -212,10 +212,11 @@ function WebSocketUser(socket) {
         if (self.userData && self.userData.admin) {
             return server;
         }
-        var users = server.serverData.users.split(",");
+        var users = server.serverData.users;
         if (users) {
-            for (var id in users) {
-                if (users[id] == self.userData.username) {
+            for (var j = 0; j < users.length; j++) {
+                var user = users[j];
+                if (user == self.userData.username) {
                     return server;
                 }
             }

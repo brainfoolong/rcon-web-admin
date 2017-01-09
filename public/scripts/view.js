@@ -173,17 +173,10 @@ $(document).on("click", ".page-link", function (ev) {
     var name = f.attr("name");
     if (f[0].checkValidity()) {
         var data = {};
-        var formData = f.serializeArray();
-        for (var i in formData) {
-            if (typeof data[formData[i].name] != "undefined") {
-                if (typeof data[formData[i].name] != "object") {
-                    data[formData[i].name] = [data[formData[i].name]];
-                }
-                data[formData[i].name].push(formData[i].value);
-                continue;
-            }
-            data[formData[i].name] = formData[i].value;
-        }
+        f.find(":input").filter("[name]").each(function () {
+            if ($(this).closest(".dropdown-toggle, .dropdown-menu").length) return true;
+            data[$(this).attr("name")] = $(this).val();
+        });
         var view = f.attr("data-view");
         var messageData = {
             "form": name,

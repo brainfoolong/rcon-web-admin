@@ -44,11 +44,11 @@ function View(user, messageData, callback) {
             }
         }
         if (!hasAdmin) {
-            deeperCallback({"note": {"message" : "users.missing.admin", "type" : "danger"}});
+            deeperCallback({"note": {"message": "users.missing.admin", "type": "danger"}});
             return;
         }
         if ((!messageData.id && !formData.password1) || (formData.password1 != formData.password2)) {
-            deeperCallback({"note": {"message" : "users.error.pwmatch", "type" : "danger"}});
+            deeperCallback({"note": {"message": "users.error.pwmatch", "type": "danger"}});
             return;
         }
         var userData = users[id] || {};
@@ -67,10 +67,10 @@ function View(user, messageData, callback) {
         var sessionUserData = userData;
         delete sessionUserData["password"];
         deeperCallback({
-            "sessionUserData": sessionUserData,
+            "sessionUserData": !user || !user.userData || user.userData.id == userData.id ? sessionUserData : user.userData,
             "login": !user.userData || user.userData.id == id,
             "initial": usersCount == 0,
-            "note": {"message" : "saved", "type" : "success"},
+            "note": {"message": "saved", "type": "success"},
             "redirect": "users"
         });
         return;

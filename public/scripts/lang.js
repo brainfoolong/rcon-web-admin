@@ -97,7 +97,7 @@ lang.values.en = {
     "cronjobs for scheduled tasks. Don't panic, it's not readable without server access." +
     "The one that means 'rcon.password' in console",
     "servers.users.title": "Assigned users",
-    "servers.users.info": "Usernames separated with comma, only the given user's will see this server",
+    "servers.users.info": "Only the given user's will see this server",
     "delete.confirm": "Are you sure? This cannot be undone!",
     "login.remember": "Remember me",
     "login.title": "Welcome",
