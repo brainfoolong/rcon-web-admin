@@ -69,18 +69,21 @@ function populateForm(form, data) {
     if (!form || !form.length) return;
     $.each(data, function (key, value) {
         var ctrl = $('[name=' + key + ']', form);
-        switch (ctrl.prop("type")) {
-            case "select":
-                $(this).val(value).selectpicker("refresh");
-                break;
-            case "radio":
-            case "checkbox":
-                ctrl.each(function () {
-                    if ($(this).attr('value') == value) $(this).attr("checked", value);
-                });
-                break;
-            default:
-                ctrl.val(value);
+        if (ctrl.is("select.selectpicker")) {
+            if (value === true) value = "yes";
+            if (value === false) value = "no";
+            ctrl.val(value);
+        } else {
+            switch (ctrl.prop("type")) {
+                case "radio":
+                case "checkbox":
+                    ctrl.each(function () {
+                        if ($(this).attr('value') == value) $(this).attr("checked", value);
+                    });
+                    break;
+                default:
+                    ctrl.val(value);
+            }
         }
     });
 }

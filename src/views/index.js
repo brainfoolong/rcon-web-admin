@@ -78,6 +78,10 @@ var View = function (user, messageData, callback) {
         if (user.userData !== null && currentServer) {
             switch (messageData.type) {
                 case "add":
+                    if (user.userData.restrictwidgets && user.userData.restrictwidgets.indexOf(messageData.widget) > -1) {
+                        deeperCallback({"note": {"message": "server.widget.restricted", "type": "danger"}});
+                        return;
+                    }
                     var list = wdb.get("list");
                     widget = Widget.get(messageData.widget);
                     if (widget) {
@@ -101,6 +105,10 @@ var View = function (user, messageData, callback) {
                     deeperCallback({"widget": widgetId});
                     break;
                 case "remove":
+                    if (user.userData.readonlyoptions || user.userData.restrictwidgets && user.userData.restrictwidgets.indexOf(messageData.widget) > -1) {
+                        deeperCallback({"note": {"message": "server.widget.restricted", "type": "danger"}});
+                        return;
+                    }
                     widget = Widget.get(messageData.widget);
                     if (widget) {
                         wdb.get("list").remove({
@@ -132,6 +140,10 @@ var View = function (user, messageData, callback) {
                     deeperCallback({});
                     break;
                 case "option":
+                    if (user.userData.readonlyoptions) {
+                        deeperCallback({"note": {"message": "server.options.restricted", "type": "danger"}});
+                        return;
+                    }
                     widget = Widget.get(messageData.widget);
                     if (widget) {
                         widget.options.set(currentServer, messageData.option, messageData.value);

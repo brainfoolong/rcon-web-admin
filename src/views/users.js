@@ -2,6 +2,7 @@
 
 var db = require(__dirname + "/../db");
 var hash = require(__dirname + "/../hash");
+var Widget = require(__dirname + "/../widget");
 
 /**
  * The view
@@ -15,6 +16,7 @@ function View(user, messageData, callback) {
     var usersCount = db.get("users").size().value();
     var deeperCallback = function (sendMessageData) {
         sendMessageData.users = db.get("users").cloneDeep().value();
+        sendMessageData.widgets = Widget.getAllWidgetIds();
         if (messageData.id) {
             sendMessageData.editData = db.get("users").get(messageData.id).cloneDeep().value();
             sendMessageData.editData.admin = sendMessageData.editData.admin ? "yes" : "no";
@@ -42,11 +44,11 @@ function View(user, messageData, callback) {
             }
         }
         if (!hasAdmin) {
-            deeperCallback({"note": ["users.missing.admin", "danger"]});
+            deeperCallback({"note": {"message" : "users.missing.admin", "type" : "danger"}});
             return;
         }
         if ((!messageData.id && !formData.password1) || (formData.password1 != formData.password2)) {
-            deeperCallback({"note": ["users.error.pwmatch", "danger"]});
+            deeperCallback({"note": {"message" : "users.error.pwmatch", "type" : "danger"}});
             return;
         }
         var userData = users[id] || {};
@@ -55,19 +57,20 @@ function View(user, messageData, callback) {
         }
         userData.id = id;
         userData.username = formData.username;
+        userData.restrictcommands = formData.restrictcommands;
+        userData.restrictwidgets = formData.restrictwidgets;
+        userData.readonlyoptions = formData.readonlyoptions == "yes";
         userData.admin = formData.admin == "yes";
         userData.loginHash = hash.random(64);
         db.get("users").set(id, userData).value();
         messageData.id = null;
+        var sessionUserData = userData;
+        delete sessionUserData["password"];
         deeperCallback({
-            "sessionUserData": {
-                "username": userData.username,
-                "loginHash": userData.loginHash,
-                "admin": userData.admin
-            },
+            "sessionUserData": sessionUserData,
             "login": !user.userData || user.userData.id == id,
             "initial": usersCount == 0,
-            "note": ["saved", "success"],
+            "note": {"message" : "saved", "type" : "success"},
             "redirect": "users"
         });
         return;

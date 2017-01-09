@@ -14,7 +14,7 @@ var exec = require('child_process').exec;
 function View(user, messageData, callback) {
     // access denied for everyone except admin
     if (!user.userData || !user.userData.admin) {
-        callback({redirect: "index", "note": ["access.denied", "danger"]});
+        callback({redirect: "index", "note": {"message": "access.denied", "type": "danger"}});
         return;
     }
     var widget = null;
@@ -22,7 +22,7 @@ function View(user, messageData, callback) {
         case "update":
             widget = Widget.get(messageData.widget);
             if (os.platform() != "linux" || !widget) {
-                callback({"message": "widgets.update.error.platform", "type" : "danger"});
+                callback({"message": "widgets.update.error.platform", "type": "danger"});
                 return;
             }
             var dir = __dirname + "/../..";

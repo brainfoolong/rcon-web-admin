@@ -14,7 +14,7 @@ var fs = require("fs");
 function View(user, messageData, callback) {
     // access denied for everyone except admin
     if (!user.userData || !user.userData.admin) {
-        callback({redirect: "index", "note": ["access.denied", "danger"]});
+        callback({redirect: "index", "note": {"message" : "login.failed", "type" : "danger"}});
         return;
     }
     var logdir = __dirname + "/../../logs";

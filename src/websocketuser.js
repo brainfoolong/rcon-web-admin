@@ -65,11 +65,8 @@ function WebSocketUser(socket) {
             var sendCallback = function (sendMessageData) {
                 if (!sendMessageData) sendMessageData = {};
                 if (!sendMessageData.sessionUserData && self.userData !== null) {
-                    sendMessageData.sessionUserData = {
-                        "username": self.userData.username,
-                        "loginHash": self.userData.loginHash,
-                        "admin": self.userData.admin
-                    };
+                    sendMessageData.sessionUserData = self.userData;
+                    delete sendMessageData.sessionUserData["password"];
                 }
                 self.send(frontendData.action, sendMessageData, frontendData.callbackId);
             };
@@ -123,6 +120,21 @@ function WebSocketUser(socket) {
                         break;
                     case "cmd":
                         if (self.server && self.server.connected) {
+                            if (self.userData.restrictcommands) {
+                                var commands = self.userData.restrictcommands.split(",");
+                                var found = false;
+                                for (var i = 0; i < commands.length; i++) {
+                                    var command = commands[i].trim();
+                                    if (command && messageData.cmd.match(new RegExp(command, "ig"))) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (found) {
+                                    sendCallback({"note": {"message": "server.cmd.restricted", "type": "danger"}});
+                                    return;
+                                }
+                            }
                             self.server.injectServerMessage("> " + messageData.cmd, self);
                             self.server.cmd(messageData.cmd, self, true, function (serverMessage) {
                                 sendCallback({"message": serverMessage});
@@ -138,8 +150,8 @@ function WebSocketUser(socket) {
                         break;
                     case "init":
                         sendCallback({
-                            "package" : require(__dirname + "/../package"),
-                            "latestVersion" : require(__dirname + "/core").latestVersion
+                            "package": require(__dirname + "/../package"),
+                            "latestVersion": require(__dirname + "/core").latestVersion
                         });
                         break;
                     default:

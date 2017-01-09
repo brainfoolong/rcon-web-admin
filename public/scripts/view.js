@@ -109,9 +109,6 @@ View.load = function (view, messageData, callback) {
     c.html('');
     spinner(c);
     Socket.send("view", messageData, function (viewData) {
-        if (viewData.note) {
-            note(viewData.note[0], viewData.note[1]);
-        }
         var loadCallback = function (firstLoad) {
             var hash = viewData.view;
             // only change the hash if no form data has been sent back or if redirect is given
@@ -178,6 +175,13 @@ $(document).on("click", ".page-link", function (ev) {
         var data = {};
         var formData = f.serializeArray();
         for (var i in formData) {
+            if (typeof data[formData[i].name] != "undefined") {
+                if (typeof data[formData[i].name] != "object") {
+                    data[formData[i].name] = [data[formData[i].name]];
+                }
+                data[formData[i].name].push(formData[i].value);
+                continue;
+            }
             data[formData[i].name] = formData[i].value;
         }
         var view = f.attr("data-view");

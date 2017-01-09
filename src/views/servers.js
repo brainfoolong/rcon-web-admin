@@ -16,7 +16,7 @@ var fstools = require(__dirname + "/../fstools");
 var View = function (user, messageData, callback) {
     // access denied for everyone except admin
     if (!user.userData || !user.userData.admin) {
-        callback({redirect: "index", "note": ["access.denied", "danger"]});
+        callback({redirect: "index", "note": {"message" : "access.denied", "type" : "danger"}});
         return;
     }
 
@@ -43,7 +43,7 @@ var View = function (user, messageData, callback) {
                 fstools.deleteRecursive(dir);
             }
             deeperCallback({
-                "note": ["deleted", "success"],
+                "note": {"message" : "deleted", "type" : "success"},
                 "redirect": "servers"
             });
         }
@@ -80,7 +80,7 @@ var View = function (user, messageData, callback) {
         }
         messageData.id = null;
         deeperCallback({
-            "note": ["saved", "success"],
+            "note": {"message" : "saved", "type" : "success"},
             "redirect": "servers"
         });
         return;

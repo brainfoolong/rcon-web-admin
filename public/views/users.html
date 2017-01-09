@@ -28,6 +28,34 @@
         </select>
     </div>
 
+    <div class="title spacer">
+        <strong data-translate="users.restrictcommands.title"></strong>
+        <small data-translate="users.restrictcommands.info"></small>
+    </div>
+    <div class="spacer">
+        <input type="text" name="restrictcommands" class="form-control">
+    </div>
+
+    <div class="title spacer">
+        <strong data-translate="users.restrictwidgets.title"></strong>
+        <small data-translate="users.restrictwidgets.info"></small>
+    </div>
+    <div class="spacer">
+        <select name="restrictwidgets" class="selectpicker" multiple>
+        </select>
+    </div>
+
+    <div class="title spacer">
+        <strong data-translate="users.readonlyoptions.title"></strong>
+        <small data-translate="users.readonlyoptions.info"></small>
+    </div>
+    <div class="spacer">
+        <select name="readonlyoptions" class="selectpicker">
+            <option value="no" data-translate="no"></option>
+            <option value="yes" data-translate="yes"></option>
+        </select>
+    </div>
+
     <span data-name="save" data-translate="save" class="btn btn-default btn-info submit-form save"></span>
     <span data-name="delete" data-translate="delete" class="btn btn-danger btn-info submit-form hidden"></span>
     <a href="#users" class="btn page-link cancel hidden" data-translate="cancel"></a>

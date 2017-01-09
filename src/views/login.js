@@ -23,12 +23,12 @@ var View = function (user, messageData, callback) {
                 callback({
                     "sessionUserData": {"username": userData.username, "loginHash": userData.loginHash},
                     "login": formData.remember == "yes" ? "local" : "session",
-                    "note": ["login.success", "success"]
+                    "note": {"message" : "login.success", "type" : "success"}
                 });
                 return;
             }
         }
-        callback({"note": ["login.failed", "danger"], "redirect": "login"});
+        callback({"note": {"message" : "login.failed", "type" : "danger"}, "redirect": "login"});
         return;
     }
     callback({});

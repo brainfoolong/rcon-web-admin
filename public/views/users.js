@@ -10,11 +10,18 @@ View.register("users", function (messageData) {
             }
         }
     }
+    // set widgets
+    var select = $("select[name='restrictwidgets']");
+    for (var i = 0; i < messageData.widgets.length; i++) {
+        select.append($('<option>').attr("value", messageData.widgets[i]).text(messageData.widgets[i]));
+    }
+
     if (messageData.editData) {
         $(".btn.save").removeClass("btn-info").addClass("btn-success").attr("data-translate", "save.edited");
         $(".btn.cancel").removeClass("hidden");
         populateForm($("form").filter("[name='users']"), messageData.editData);
     }
+
     // write to table
     var tbody = $("table.data-table tbody");
     for (var i in messageData.users) {

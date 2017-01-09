@@ -5,6 +5,7 @@ View.register("index", function (messageData) {
     var pickServer = c.find(".pick-server");
     var addWidget = c.find(".add-widget");
     var rowContainer = c.find(".grid-row-container");
+    var sessionUserData = messageData.sessionUserData;
 
     /**
      * load all new widgets and remove deprecated ones
@@ -20,6 +21,7 @@ View.register("index", function (messageData) {
             "server": messageData.server
         }, function (data) {
             if (!pingDataCheck(data)) return;
+            sessionUserData = data.sessionUserData;
             // set max attribute for layout position
             $(".widget-layout .option").filter("[data-id='position']").find("input").attr("max", data.myWidgets.length - 1);
             // sort widgets by the position
@@ -35,6 +37,10 @@ View.register("index", function (messageData) {
             var allWidgets = rowContainer.find(".widget");
             for (var i = 0; i < data.myWidgets.length; i++) {
                 var widgetData = data.myWidgets[i];
+                // ignore widget from the list if restricted
+                if (sessionUserData.restrictwidgets && sessionUserData.restrictwidgets.indexOf(widgetData.id) > -1) {
+                    continue;
+                }
                 // if widget is no added than load it
                 var widgetEl = allWidgets.filter("#widget-" + widgetData.id);
                 if (!widgetEl.length) {
@@ -220,12 +226,13 @@ View.register("index", function (messageData) {
         }
     }).on("change.index", ".add-widget", function () {
         if (messageData.server && $(this).val().length) {
+            var widgetId = $(this).val();
             Socket.send("view", {
                 "view": "index",
                 "action": "widget",
                 "type": "add",
                 "server": messageData.server,
-                "widget": $(this).val()
+                "widget": widgetId
             }, function (responseData) {
                 if (!responseData.widget) {
                     note(t("index.widget.add.error"), "danger");
@@ -234,19 +241,28 @@ View.register("index", function (messageData) {
                 loadAllWidgets();
             });
             $(this).val('').selectpicker("refresh");
+
         }
     }).on("click.index", ".widget-delete", function () {
-        if (messageData.server && confirm(t("sure"))) {
-            var widget = Widget.getByElement(this);
-            if (widget) {
-                Socket.send("view", {
-                    "view": "index",
-                    "action": "widget",
-                    "type": "remove",
-                    "server": messageData.server,
-                    "widget": widget.id
-                }, function () {
-                    widget.remove();
+        if (sessionUserData.readonlyoptions) {
+            note("server.options.restricted", "danger");
+        } else {
+            if (messageData.server) {
+                Modal.confirm(t("sure"), function (success) {
+                    if (success) {
+                        var widget = Widget.getByElement(this);
+                        if (widget) {
+                            Socket.send("view", {
+                                "view": "index",
+                                "action": "widget",
+                                "type": "remove",
+                                "server": messageData.server,
+                                "widget": widget.id
+                            }, function () {
+                                widget.remove();
+                            });
+                        }
+                    }
                 });
             }
         }
@@ -257,11 +273,15 @@ View.register("index", function (messageData) {
         var e = $(this);
         clearTimeout(e.data("optionTimeout"));
         e.data("optionTimeout", setTimeout(function () {
-            var widget = Widget.getByElement(e);
-            var o = e.closest(".option");
-            var id = o.attr("data-id");
-            widget.options.set(id, option.htmlValueToDb(o.attr("data-type"), e.val()));
-            note("saved", "success");
+            if (sessionUserData.readonlyoptions) {
+                note("server.options.restricted", "danger");
+            } else {
+                var widget = Widget.getByElement(e);
+                var o = e.closest(".option");
+                var id = o.attr("data-id");
+                widget.options.set(id, option.htmlValueToDb(o.attr("data-type"), e.val()));
+                note("saved", "success");
+            }
         }, ev.type == "keyup" && ev.keyCode == 13 ? 0 : 600));
     }).on("click.index", ".widget-layout .save-layout", function () {
         var widget = Widget.getByElement(this);
