@@ -19,6 +19,11 @@ So imagine you've set-up rcon web admin so that it check users for high ping, VA
 * Run on every device that can install node.js
 * So many more... Give it a try
 
+## Supported/tested games
+
+* Rust
+* Counter-Strike: Go
+
 ## Widgets 
 The widgets are powerful, they deserve an extra header here. All dashboard things are written in widgets. From the simplest to the most powerful tool, widgets are the way to go. They are some sort of "High level" programs inside the rcon web admin. You don't have to dig much into the code to write widgets. It's basically HTML and JS.
 
