@@ -7,8 +7,8 @@ var fs = require("fs");
  * Override with local config.js file in root
  */
 var config = {
-    "host" : null,
-    "port" : 4326
+    "host": null,
+    "port": 4326
 };
 
 // load config.js if exist
