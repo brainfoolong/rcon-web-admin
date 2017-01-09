@@ -194,7 +194,8 @@ Rcon.prototype.send = function (cmd, user, log, callback, type) {
     self.socket.write(self._pack(this.packetId, type, cmd), null, function () {
         self.packetId = self.nextPacketId();
         // write an extra empty request to be able to find multipart message boundings
-        if (type != Rcon.SERVERDATA_AUTH) {
+        // minecraft dont have multipart packages so we need no end
+        if (type != Rcon.SERVERDATA_AUTH && self.server.serverData.game != "minecraft") {
             self.socket.write(self._pack(self.packetId, Rcon.SERVERDATA_RESPONSE_VALUE, new Buffer(0)));
             self.packetId = self.nextPacketId();
         }
@@ -250,8 +251,10 @@ Rcon.prototype._data = function () {
         // auth response is special handled, just callback if success auth or not
         if (response.type == Rcon.SERVERDATA_AUTH_RESPONSE) {
             if (this.authCallback) this.authCallback(response.id !== -1);
-        } else if (response.type == Rcon.SERVERDATA_RESPONSE_VALUE && response.body.length === 0) {
+            this.sendBlocked = false;
+        } else if ((response.type == Rcon.SERVERDATA_RESPONSE_VALUE && response.body.length === 0) || this.server.serverData.game == "minecraft") {
             // if we receive an empty package than the SERVERDATA_EXECCOMMAND is finally done
+            // or in case of minecraft that don't support multipart packages
             var cb = this.callbacks.shift();
             if (cb) {
                 try {
