@@ -61,7 +61,7 @@ Modal.prompt = function (message, placeholder, callback) {
     var i = e.find(".modal-body input");
     i.val('');
     i.off("keyup").on("keyup", function (ev) {
-        if(ev.keyCode == 13){
+        if (ev.keyCode == 13) {
             if (callback) callback(i.val());
             callback = null;
             e.modal("hide");

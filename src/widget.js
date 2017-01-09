@@ -4,7 +4,6 @@ var fs = require("fs");
 var db = require(__dirname + "/db");
 var request = require(__dirname + "/request");
 var fstools = require(__dirname + "/fstools");
-var unzip = require("unzip");
 
 /**
  * A widget
@@ -258,6 +257,7 @@ Widget.widgetIds = null;
  * @param {function=} callback
  */
 Widget.install = function (repository, callback) {
+    var unzip = require("unzip");
     var dir = fs.realpathSync(__dirname + "/../public/widgets");
     dir = dir.replace(/\\/g, "/");
     var id = repository.split("/")[1];

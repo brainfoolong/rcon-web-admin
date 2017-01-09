@@ -14,13 +14,13 @@ var fs = require("fs");
 function View(user, messageData, callback) {
     // access denied for everyone except admin
     if (!user.userData || !user.userData.admin) {
-        callback({redirect: "index", "note": {"message" : "login.failed", "type" : "danger"}});
+        callback({redirect: "index", "note": {"message": "login.failed", "type": "danger"}});
         return;
     }
     var logdir = __dirname + "/../../logs";
     if (messageData.action == "update") {
         if (os.platform() != "linux") {
-            callback({"message": "settings.update.error.platform", "type" : "danger"});
+            callback({"message": "settings.update.error.platform", "type": "danger"});
             return;
         }
         var dir = __dirname + "/../..";
@@ -58,7 +58,7 @@ function View(user, messageData, callback) {
                     fs.unlink(logdir + "/" + filesArr[j].file);
                     delete filesArr[i];
                 }
-                if (callback) callback({"files" : filesArr});
+                if (callback) callback({"files": filesArr});
             });
         });
         return;
@@ -67,15 +67,15 @@ function View(user, messageData, callback) {
         var file = logdir + "/" + messageData.file.replace(/\/\\/g, "");
         fs.stat(file, function (err) {
             if (err) {
-                callback({"content" : ""});
+                callback({"content": ""});
                 return;
             }
             fs.readFile(file, "utf8", function (err, data) {
-                if(data.length > 1024 * 1024){
+                if (data.length > 1024 * 1024) {
                     data = data.substr(-(1024 * 1024 * 0.8));
                     fs.writeFile(file, data);
                 }
-                callback({"content" : data});
+                callback({"content": data});
             });
         });
         return;

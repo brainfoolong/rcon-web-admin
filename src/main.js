@@ -61,7 +61,7 @@ if (mode == "update-core") {
                 if (!fileName.length) return;
                 var path = dir + "/" + fileName;
                 if (entry.type == "Directory") {
-                    if(!fs.existsSync(path)) fs.mkdirSync(path, 0o777);
+                    if (!fs.existsSync(path)) fs.mkdirSync(path, 0o777);
                     entry.autodrain();
                 } else {
                     entry.pipe(fs.createWriteStream(path));

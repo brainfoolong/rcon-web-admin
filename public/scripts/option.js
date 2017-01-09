@@ -86,7 +86,7 @@ option.createHtmlFromData = function (id, label, info, value, data) {
  */
 option.getValueOfElement = function (el) {
     el = $(el).closest(".option");
-    if(el.find("select").length){
+    if (el.find("select").length) {
         return el.find("select").val();
     }
     return el.find(":input").val();
