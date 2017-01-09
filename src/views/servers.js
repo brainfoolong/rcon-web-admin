@@ -70,7 +70,6 @@ var View = function (user, messageData, callback) {
         serverData.game = formData.game;
         serverData.name = formData.name;
         serverData.host = formData.host;
-        serverData.port = parseInt(formData.port);
         serverData.users = formData.users;
         serverData.rcon_port = parseInt(formData.rcon_port);
         serverData.rcon_password = formData.rcon_password;
