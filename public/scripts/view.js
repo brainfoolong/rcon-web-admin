@@ -167,7 +167,7 @@ $(document).on("click", ".page-link", function (ev) {
         View.changeHash(hash);
     }
     View.load(hash, messageData);
-}).on("click", ".submit-form", function () {
+}).on("click submit-form", ".submit-form", function () {
     // onclick form submit btn
     var f = $(this).closest("form");
     var name = f.attr("name");

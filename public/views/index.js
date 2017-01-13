@@ -248,9 +248,9 @@ View.register("index", function (messageData) {
             note("server.options.restricted", "danger");
         } else {
             if (messageData.server) {
+                var widget = Widget.getByElement(this);
                 Modal.confirm(t("sure"), function (success) {
                     if (success) {
-                        var widget = Widget.getByElement(this);
                         if (widget) {
                             Socket.send("view", {
                                 "view": "index",

@@ -11,10 +11,11 @@ View.register("servers", function (messageData) {
         $(".btn.cancel").removeClass("hidden");
         populateForm($("form").filter("[name='servers']"), messageData.editData);
         $(".btn.delete").removeClass("hidden").on("click", function (ev) {
+            var btn = $(this);
             ev.stopPropagation();
             Modal.confirm(t("sure"), function (success) {
                 if (success) {
-
+                    btn.trigger("submit-form");
                 }
             });
         });
