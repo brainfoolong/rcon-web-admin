@@ -23,9 +23,9 @@ steamapi.request = function (type, ids, callback) {
     var missingIds = [];
     for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
-        var banData = steamapi.getDataForId(type, id);
-        if (banData) {
-            res[id] = banData;
+        var steamData = steamapi.getDataForId(type, id);
+        if (steamData) {
+            res[id] = steamData;
         } else {
             missingIds.push(id);
         }
@@ -33,11 +33,25 @@ steamapi.request = function (type, ids, callback) {
     if (missingIds.length) {
         request.get("https://0x.at/steamapi/api.php?action=" + type + "&ids=" + missingIds.join(","), false, function (result) {
             if (result !== null) {
+                var steamData = null;
                 var data = JSON.parse(result);
-                for (var i = 0; i < data.players.length; i++) {
-                    var banData = data.players[i];
-                    steamapi.saveDataForId(type, banData.SteamId, banData);
-                    res[banData.SteamId] = banData;
+                if (type == "bans") {
+                    for (var i = 0; i < data.players.length; i++) {
+                        steamData = data.players[i];
+                        steamapi.saveDataForId(type, steamData.SteamId, steamData);
+                        res[steamData.SteamId] = steamData;
+                    }
+                }
+                if (type == "summaries") {
+                    if(data.response){
+                        for (var playerIndex in data.response.players) {
+                            if (data.response.players.hasOwnProperty(playerIndex)) {
+                                steamData = data.response.players[playerIndex];
+                                steamapi.saveDataForId(type, steamData.steamid, steamData);
+                                res[steamData.steamid] = steamData;
+                            }
+                        }
+                    }
                 }
             }
             callback(res);
