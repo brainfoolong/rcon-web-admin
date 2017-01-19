@@ -64,8 +64,9 @@ See FAQ bellow.
 
     startscripts/start-windows.bat
     
-Then goto: http://yourserverip:4326 (You can also use your hostname instead of ip).
-To modify the :326 port or allowed hosts, have a look in the `config.template.js` file in the root folder.
+## Open in browser
+Goto: http://yourserverip:4326 (You can also use your hostname instead of ip).
+To modify the :4326 port or allowed hosts, have a look in the `config.template.js` file in the root folder.
 
 ## Boot scripts
 
