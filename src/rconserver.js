@@ -137,18 +137,22 @@ function RconServer(id, serverData) {
             console.error(new Date(), "RconServer [" + serverName + "]: Connection failed");
             return;
         }
-        // authenticate
-        self.injectServerMessage("Rcon authentication by rcon web admin...");
-        self.con.send(self.serverData.rcon_password, null, true, function (success) {
-            self.injectServerMessage("Rcon authentication " + (success ? "successfull" : "invalid"));
-            if (!success) {
-                console.error(new Date(), "Invalid rcon password for server " + self.serverData.name + ":" + self.serverData.rcon_port);
-                return;
-            }
+        if (self.serverData.web) {
             self.connected = true;
             Widget.callMethodForAllWidgetsIfActive("onServerConnected", self);
-        }, Rcon.SERVERDATA_AUTH);
-
+        } else {
+            // authenticate
+            self.injectServerMessage("Rcon authentication by rcon web admin...");
+            self.con.send(self.serverData.rcon_password, null, true, function (success) {
+                self.injectServerMessage("Rcon authentication " + (success ? "successfull" : "invalid"));
+                if (!success) {
+                    console.error(new Date(), "Invalid rcon password for server " + self.serverData.name + ":" + self.serverData.rcon_port);
+                    return;
+                }
+                self.connected = true;
+                Widget.callMethodForAllWidgetsIfActive("onServerConnected", self);
+            }, Rcon.SERVERDATA_AUTH);
+        }
         // catch errors
         self.con.on("error", function (err) {
             console.trace("RconServer [" + serverName + "]", err);
@@ -160,6 +164,12 @@ function RconServer(id, serverData) {
             self.onServerMessage(rconMessage);
         });
     });
+
+    // on disconnect remove server from instances
+    this.con.on("disconnect", function () {
+        self.removeInstance();
+    });
+
 }
 
 /**
@@ -175,7 +185,7 @@ RconServer.connectAll = function () {
     var servers = db.get("servers").value();
     if (servers) {
         for (var i in servers) {
-            RconServer.get(servers[i].id);
+            RconServer.get(servers[i].id, true);
         }
     }
 };
@@ -184,12 +194,14 @@ RconServer.connectAll = function () {
  * Get the server instance for given id
  * Connect to server if not yet connected
  * @param {string} id
+ * @param {boolean} connect If false or not set than return null if no connection exist
  * @return {RconServer|null}
  */
-RconServer.get = function (id) {
+RconServer.get = function (id, connect) {
     if (RconServer.instances[id]) {
         return RconServer.instances[id];
     }
+    if (!connect) return null;
     var serverData = db.get("servers").get(id).cloneDeep().value();
     if (serverData) {
         RconServer.instances[id] = new RconServer(id, serverData);

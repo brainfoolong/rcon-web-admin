@@ -96,6 +96,8 @@ lang.values.en = {
     "servers.rcon_password.info": "Will be stored as cleartext in database. Required to run background " +
     "cronjobs for scheduled tasks. Don't panic, it's not readable without server access." +
     "The one that means 'rcon.password' in console",
+    "servers.webrcon.title" : "Web Rcon",
+    "servers.webrcon.info" : "Especially Rust provide a Web Rcon interface. This must be yes if server is started with rcon.web 1",
     "servers.users.title": "Assigned users",
     "servers.users.info": "Only the given user's will see this server",
     "delete.confirm": "Are you sure? This cannot be undone!",

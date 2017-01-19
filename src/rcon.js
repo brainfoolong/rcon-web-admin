@@ -3,6 +3,7 @@
 var net = require("net");
 var events = require("events");
 var base64 = require(__dirname + "/base64");
+var WebSocket = require("ws");
 
 /**
  * RCON socket connection
@@ -115,36 +116,81 @@ Rcon.prototype.nextPacketId = function () {
  */
 Rcon.prototype.connect = function (callback) {
     if (this.socket) return false;
+
     var self = this;
+    var serverName = this.server.serverData.host + ":" + this.server.serverData.rcon_port;
 
-    this.socket = new net.Socket();
-    // initial timeout is 10 seconds, if server is connected than unset this timeout
-    this.socket.setTimeout(10 * 1000);
-
-    this.socket.on("error", function (err) {
-        if (callback) callback(err);
-        this.disconnect();
-    }.bind(this));
-
-    this.socket.on("timeout", function () {
-        var serverName = self.server.serverData.host + ":" + self.server.serverData.rcon_port;
-        console.error(new Date(), "RconServer [" + serverName + "]: Connection timed out");
-        this.disconnect();
-    }.bind(this));
-
-    this.socket.on("end", function () {
-        this.disconnect();
-    }.bind(this));
-
-    this.socket.connect(this.port, this.host, function (err) {
-        this.socket.setTimeout(0);
-        this.socket.on("data", function (data) {
-            this.dataBuffer = Buffer.concat([this.dataBuffer, data]);
-            this._data();
+    if (this.server.serverData.web) {
+        // handling for web rcon
+        this.socket = new WebSocket("ws://" + this.server.serverData.host + ":" + (this.server.serverData.rcon_port) + "/" + this.server.serverData.rcon_password);
+        this.socket.on("error", function (err) {
+            if(!self.socket) return;
+            if (callback) callback(err);
+            this.disconnect();
         }.bind(this));
-        if (callback) callback(null);
-        this.emit("connect");
-    }.bind(this));
+        this.socket.on("open", function () {
+            if(!self.socket) return;
+            if (callback) callback(null);
+            this.emit("connect");
+        }.bind(this));
+        this.socket.on("close", function () {
+            if(!self.socket) return;
+            this.emit("disconnect");
+        }.bind(this));
+        this.socket.on("message", function (message) {
+            if (message) {
+                var json = JSON.parse(message);
+                var cb = self.callbacks[json.Identifier] || {};
+                self.callbacks[message.Identifier] = null;
+                var response = {
+                    "size": json.Message.length,
+                    "id": json.Identifier,
+                    "type": 0,
+                    "body": json.Message,
+                    "user": cb.user || null,
+                    "timestamp": new Date(),
+                    "log": cb.log || false
+                };
+                try {
+                    if (cb.callback) cb.callback(json.Message);
+                } catch (e) {
+                    console.error(new Date(), "RconServer [" + serverName + "]: send callback error", e, e.stack);
+                }
+                this.emit("message", response);
+            }
+        }.bind(this));
+        return true;
+    } else {
+        // handling for normal connections
+        this.socket = new net.Socket();
+        // initial timeout is 10 seconds, if server is connected than unset this timeout
+        this.socket.setTimeout(10 * 1000);
+
+        this.socket.on("error", function (err) {
+            if (callback) callback(err);
+            this.disconnect();
+        }.bind(this));
+
+        this.socket.on("timeout", function () {
+            var serverName = self.server.serverData.host + ":" + self.server.serverData.rcon_port;
+            console.error(new Date(), "RconServer [" + serverName + "]: Connection timed out");
+            this.disconnect();
+        }.bind(this));
+
+        this.socket.on("end", function () {
+            this.disconnect();
+        }.bind(this));
+
+        this.socket.connect(this.port, this.host, function (err) {
+            this.socket.setTimeout(0);
+            this.socket.on("data", function (data) {
+                this.dataBuffer = Buffer.concat([this.dataBuffer, data]);
+                this._data();
+            }.bind(this));
+            if (callback) callback(null);
+            this.emit("connect");
+        }.bind(this));
+    }
     return true;
 };
 
@@ -157,17 +203,6 @@ Rcon.prototype.connect = function (callback) {
  * @param {number=} type Message type
  */
 Rcon.prototype.send = function (cmd, user, log, callback, type) {
-    // it could happen that we send multiple requests at once without receiving data inbetween
-    // this will swallow the send request
-    // we fix this by queue send requests and processing them only after we received some data
-    if (this.sendBlocked) {
-        this.queue.push(Array.prototype.slice.call(arguments));
-        return;
-    }
-    this.sendBlocked = true;
-    if (typeof type !== 'number') {
-        type = Rcon.SERVERDATA_EXECCOMMAND;
-    }
     if (!this.socket) {
         process.nextTick(function () {
             var err = new Error("Not connected");
@@ -176,30 +211,56 @@ Rcon.prototype.send = function (cmd, user, log, callback, type) {
         });
         return;
     }
-    if (!Buffer.isBuffer(cmd)) {
-        cmd = new Buffer(cmd);
-    }
-    // for auth request we handle a special callback
-    if (type == Rcon.SERVERDATA_AUTH) {
-        this.authCallback = callback;
-    } else {
+    if (this.server.serverData.web) {
+        // handling for web rcon
+        this.socket.send(JSON.stringify({
+            "Identifier": this.callbacks.length,
+            "Message": cmd.toString(),
+            "Name": "Rcon Web Admin"
+        }));
         this.callbacks.push({
             "callback": callback,
             "user": user,
             "log": log
         });
-    }
-    // write request
-    var self = this;
-    self.socket.write(self._pack(this.packetId, type, cmd), null, function () {
-        self.packetId = self.nextPacketId();
-        // write an extra empty request to be able to find multipart message boundings
-        // minecraft dont have multipart packages so we need no end
-        if (type != Rcon.SERVERDATA_AUTH && self.server.serverData.game != "minecraft") {
-            self.socket.write(self._pack(self.packetId, Rcon.SERVERDATA_RESPONSE_VALUE, new Buffer(0)));
-            self.packetId = self.nextPacketId();
+    } else {
+        // handling for normal sockets
+        // it could happen that we send multiple requests at once without receiving data inbetween
+        // this will swallow the send request
+        // we fix this by queue send requests and processing them only after we received some data
+        if (this.sendBlocked) {
+            this.queue.push(Array.prototype.slice.call(arguments));
+            return;
         }
-    });
+        this.sendBlocked = true;
+        if (typeof type !== 'number') {
+            type = Rcon.SERVERDATA_EXECCOMMAND;
+        }
+        if (!Buffer.isBuffer(cmd)) {
+            cmd = new Buffer(cmd);
+        }
+        // for auth request we handle a special callback
+        if (type == Rcon.SERVERDATA_AUTH) {
+            this.authCallback = callback;
+        } else {
+            this.callbacks.push({
+                "callback": callback,
+                "user": user,
+                "log": log
+            });
+        }
+        // write request
+        var self = this;
+        self.socket.write(self._pack(this.packetId, type, cmd), null, function () {
+            self.packetId = self.nextPacketId();
+            // write an extra empty request to be able to find multipart message boundings
+            // minecraft dont have multipart packages so we need no end
+            if (type != Rcon.SERVERDATA_AUTH && self.server.serverData.game != "minecraft") {
+                self.socket.write(self._pack(self.packetId, Rcon.SERVERDATA_RESPONSE_VALUE, new Buffer(0)));
+                self.packetId = self.nextPacketId();
+            }
+        });
+    }
 };
 
 /**
@@ -208,16 +269,21 @@ Rcon.prototype.send = function (cmd, user, log, callback, type) {
  */
 Rcon.prototype.disconnect = function () {
     if (!this.socket) return false;
-    this.socket.removeAllListeners();
+
+    // handling for web rcon
+    if (!this.server.serverData.web) {
+        this.socket.removeAllListeners();
+        this.socket.end();
+    }
     // blind error handler, we don't care about those error's anymore
     // if we don't add this, it will result in uncatched error
     this.socket.on("error", function () {
 
     });
-    this.socket.end();
     this.socket = null;
     this.emit("disconnect");
     return true;
+
 };
 
 /**
