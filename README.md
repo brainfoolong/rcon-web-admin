@@ -17,6 +17,7 @@ So imagine you've set-up rcon web admin so that it check users for high ping, VA
 * Powerful widget system - Developers can add new features for the dashboard easily
 * Responsible - The frontend is designed for every device, desktop or smartphone.
 * Run on every device that can install node.js
+* rcon.web support (Even better as normal RCON sockets because of proper encoding)
 * So many more... Give it a try
 
 ## Supported/tested games
