@@ -28,24 +28,21 @@ So imagine you've set-up rcon web admin so that it check users for high ping, VA
 ## Widgets 
 The widgets are powerful, they deserve an extra header here. All dashboard things are written in widgets. From the simplest to the most powerful tool, widgets are the way to go. They are some sort of "High level" programs inside the rcon web admin. You don't have to dig much into the code to write widgets. It's basically HTML and JS.
 
-## Requirements
-It is required to have `npm` and `node` properly installed.
-* https://nodejs.org
+## Installation Windows
+* Download and install node.js (https://nodejs.org)
+* Download zip repository and unpack wherever you want
+* Open command line and goto unpacked folder (root of the application where the `package.json` is)
 
-On linux you may execute this to get the newest versions of the required packages.
+Run following commands
+
+    npm install
+    node src/main.js install-core-widgets
+    
+# Installation Linux
+Just run all of this commands in the shell. **Note**: Never run this application as root via `sudo`, it is not required. Also never install this application in a webserver directory than can be accessed from the web. The application create an own webserver with limited access to the public folder.
 
     sudo apt-get install nodejs npm
     sudo npm update npm -g
-
-Installation FAQ see bellow, especially for raspberry pi installations.
-
-## Installation
-**Warning**: Do not install this application in an accessable webserver directory, if you do this, the database files will be accessable from the web. It is recommended to install it directly in your home directory.
-
-For windows download https://github.com/brainfoolong/rcon-web-admin/archive/master.zip and unpack it to a directory and start from line `npm install`. For linux run all bellow.
-
-**Note**: Never run this application as root via `sudo`, it is not required.
-    
     wget https://codeload.github.com/brainfoolong/rcon-web-admin/zip/master -O rcon-web-admin.zip
     unzip rcon-web-admin.zip
     mv rcon-web-admin-master rcon-web-admin
@@ -54,13 +51,16 @@ For windows download https://github.com/brainfoolong/rcon-web-admin/archive/mast
     node src/main.js install-core-widgets
     chmod 0755 -R startscripts *
     
-## Start/Stop on linux
+# Installation Raspberry pi
+See FAQ bellow.
+    
+## Start/Stop on Linux
 
     sh startscripts/start-linux.sh start
     sh startscripts/start-linux.sh stop
     sh startscripts/start-linux.sh restart
     
-## Start/Stop on windows - Close cmd window to close
+## Start/Stop on Windows - Close cmd window to close
 
     startscripts/start-windows.bat
     
@@ -78,7 +78,7 @@ On linux you can start the rcon web admin with your server start. For example on
 Goto https://github.com/brainfoolong/rcon-web-admin/tree/master/public/widgets for more information.
 
 ## Installation FAQ
-    
+
 Linux: If you've installed it and `node` as not available but `nodejs` is, than create a symlink with 
 
     sudo ln -s `which nodejs` /usr/bin/node
