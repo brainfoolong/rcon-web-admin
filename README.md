@@ -38,7 +38,7 @@ Run following commands
     npm install
     node src/main.js install-core-widgets
     
-# Installation Linux
+## Installation Linux
 Just run all of this commands in the shell. **Note**: Never run this application as root via `sudo`, it is not required. Also never install this application in a webserver directory than can be accessed from the web. The application create an own webserver with limited access to the public folder.
 
     sudo apt-get install nodejs npm
@@ -51,7 +51,7 @@ Just run all of this commands in the shell. **Note**: Never run this application
     node src/main.js install-core-widgets
     chmod 0755 -R startscripts *
     
-# Installation Raspberry pi
+## Installation Raspberry pi
 See FAQ bellow.
     
 ## Start/Stop on Linux
