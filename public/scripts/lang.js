@@ -6,12 +6,6 @@
 var lang = {};
 
 /**
- * The current language
- * @type {string}
- */
-lang.language = "en";
-
-/**
  * Just get a translation value for given key
  * @param {string} key
  * @param {object=} params
@@ -78,8 +72,6 @@ lang.values.en = {
     "users.error.pwmatch": "Password did not match",
     "users.missing.admin": "At least one administrator must exist in user database",
     "settings.title": "Settings",
-    "settings.language.title": "Language",
-    "settings.language.desc": "Select the language for the web interface",
     "servers.title": "Server Management",
     "servers.name.title": "Name",
     "servers.name.info": "Set an individual name for this server, appear in lists",
@@ -88,18 +80,16 @@ lang.values.en = {
     "servers.game.other": "Other",
     "servers.host.title": "Server Host",
     "servers.host.info": "IP or domain",
-    "servers.port.title": "Server Port",
-    "servers.port.info": "The one that means 'server.port' in console",
     "servers.rcon_port.title": "RCON Port",
-    "servers.rcon_port.info": "The one that means 'rcon.port' in console",
+    "servers.rcon_port.info": "The port to the RCON interface",
     "servers.rcon_password.title": "RCON Password",
     "servers.rcon_password.info": "Will be stored as cleartext in database. Required to run background " +
     "cronjobs for scheduled tasks. Don't panic, it's not readable without server access." +
     "The one that means 'rcon.password' in console",
-    "servers.active.title" : "Active",
-    "servers.active.info" : "If no than this server is not available in the dashboard and do not execute any backend jobs",
-    "servers.webrcon.title" : "Web Rcon",
-    "servers.webrcon.info" : "Especially Rust provide a Web Rcon interface. This must be yes if server is started with rcon.web 1. If available, this feature should be used because of a way better performance and stability.",
+    "servers.active.title": "Active",
+    "servers.active.info": "If no than this server is not available in the dashboard and do not execute any backend jobs",
+    "servers.webrcon.title": "Web Rcon",
+    "servers.webrcon.info": "Especially Rust provide a Web Rcon interface. This must be yes if server is started with rcon.web 1. If available, this feature should be used because of a way better performance and stability.",
     "servers.users.title": "Assigned users",
     "servers.users.info": "Only the given user's will see this server",
     "delete.confirm": "Are you sure? This cannot be undone!",
@@ -143,13 +133,12 @@ lang.values.en = {
     "settings.update": "Update Rcon Web Admin",
     "settings.update.done": "Update done. You have to restart the server manually right now.",
     "settings.update.btn": "Update now",
-    "settings.confirm": "Warning: Always make a backup before doing this, in case of any error. The server will shutdown, install the update, and restart automatically. Be aware that, in case of any errors, you might need to startup your server manually.",
     "settings.logs": "RCON Web Admin logfiles",
     "settings.logs.info": "If anything is going wrong you will probably find some useful debug information in this logs.",
     "settings.log.download": "Download logfiles",
     "settings.update.error.platform": "One click update is not supported on this platform. Please shutdown server and run 'node main.js update-core' manually on the command line.",
     "core.update": "Update available",
-    "widget.update" : "Widget update available",
+    "widget.update": "Widget update available",
     "server.cmd.restricted": "You are not allowed to execute this server command",
     "server.options.restricted": "You are not allowed to edit options",
     "server.widget.restricted": "You are not allowed to use this widget",
@@ -178,3 +167,133 @@ lang.values.en = {
     "access.denied": "Access denied",
     "socket.disconnect": "Connection to backend closed, automatically trying to reconnect in 5 seconds..."
 };
+
+// de values
+lang.values.de = {
+    "users.title": "Benutzerverwaltung",
+    "users.username.title": "Benutzername",
+    "users.username.info": "Nury A-Z, Nummern, - und _ allowed",
+    "users.password.title": "Passwort",
+    "users.password.info": "Wiederholen falls es geändert wird, leerlassen wenn keine Änderung erwünscht. Wird als Hash gespeichert.",
+    "users.admin.title": "Administrator",
+    "users.admin.info": "Admins können alles sehen und bearbeiten. Benutzer können nur ihre zugeordneten Server und Befehle sehen/ausführen",
+    "users.restrictcommands.title": "Beschränke Zugriff auf Serverbefehle",
+    "users.restrictcommands.info": "Komma separierte Liste von Serverbefehlen (Regex erlaubt) die der Nutzer nicht ausführen darf",
+    "users.restrictwidgets.title": "Deaktivierte Widgets",
+    "users.restrictwidgets.info": "Die hier angegebenen Widgets können vom Nutzer nicht gewählt oder gesehen werden",
+    "users.readonlyoptions.title": "Read-Only Widget Optionen",
+    "users.readonlyoptions.info": "Der Nutzer kann Widget zwar sehen aber keine Optionen im Optionen Tab editieren",
+    "users.error.pwmatch": "Passwörter stimmen nicht überein",
+    "users.missing.admin": "Mindestens ein Administrator muss existieren",
+    "settings.title": "Einstellungen",
+    "servers.title": "Server Management",
+    "servers.name.title": "Name",
+    "servers.name.info": "Benenne deinen Server, erscheint so in der Liste",
+    "servers.game.title": "Spiel",
+    "servers.game.info": "Wähle ein Spiel für deinen Server",
+    "servers.game.other": "Andere",
+    "servers.host.title": "Server Host",
+    "servers.host.info": "IP oder Domain",
+    "servers.rcon_port.title": "RCON Port",
+    "servers.rcon_port.info": "Der Port zum RCON Interface",
+    "servers.rcon_password.title": "RCON Passwort",
+    "servers.rcon_password.info": "Wird als Klartext gespeichert. Nötig um Hintergundjobs auszuführen und geplante Tasks (Autobot zb.) zu erledigen. Keine Panik, das Passwort ist im Interface nie wieder sichtbar.",
+    "servers.active.title": "Aktiv",
+    "servers.active.info": "Falls nein dann wird der Server nirgends mehr aufscheinen und Hintergrund Jobs werden auch nicht mehr ausgeführt.",
+    "servers.webrcon.title": "Web Rcon",
+    "servers.webrcon.info": "Speziell Rust bietet ein Web Rcon Option. Falls du das auf deinem Server aktiviert hast dann musst du hier die Option aktivieren. Wenn möglich, aktiviere das auf deinem Server, es ist stabiler und hat bessere Performance für das RCON Interface.",
+    "servers.users.title": "Zugeordnete Benutzer",
+    "servers.users.info": "Nur die gewählten Benutzer haben Zugriff auf diesen Server",
+    "delete.confirm": "Bist du sicher? Das kann nicht rückgängig gemacht werden!",
+    "login.remember": "Eingeloggt bleiben",
+    "login.title": "Willkommen",
+    "login.success": "Willkommen, Servus, Grias di",
+    "login.failed": "Login fehlgeschlagen",
+    "logout.title": "Tschüss, Pfiati",
+    "logout": "Ausloggen",
+    "index.pickserver": "Wähle einen Server",
+    "index.addwidget": "Widget hinzufügen",
+    "index.noserver": "Kein Server gewählt",
+    "index.nowidgets": "Keine Widgets hinzugefügt, Zeit wirds",
+    "index.serveroffline": "Der aktuell gewählte Server ist nicht mehr verfügbar, vielleicht ging er Offline?",
+    "index.widget.delete": "Widget löschen",
+    "index.widget.size.title": "Widget Größe",
+    "index.widget.size.info": "Die Größe im Layout.",
+    "index.widget.size.value.small": "Klein | 3 pro Reihe",
+    "index.widget.size.value.medium": "Mittel | 2 pro Reihe",
+    "index.widget.size.value.large": "Groß | 1 pro Reihe",
+    "index.widget.position.title": "Widget Position",
+    "index.widget.position.info": "Die Position im Layout. Sortierung ist aufsteigend.",
+    "index.widget.layout.save": "Du musst die Seite neu laden um die Änderungen zu sehen",
+    "index.tooltip.options": "Optionen",
+    "index.tooltip.layout": "Layout",
+    "index.tooltip.readme": "Readme",
+    "index.tooltip.content": "Widget",
+    "index.tooltip.newversion": "Neue Version ist verfügbar",
+    "index.widget.error.id": "Widget.id muss mit a-z beginnen und darf nur folgende Zeichen beinhalten: a-z, 0-9, -, _",
+    "index.widget.add.error": "Widget nicht hinzugefügt, es existiert bereits oder du hast keinen Zugriff darauf",
+    "server.disconnect": "Rcon server Verbindungsabbruch",
+    "widgets.title": "Widgets",
+    "widgets.installed": "Installierte Widgets",
+    "widgets.games": "Verfügbar für folgende Spiele",
+    "widgets.update.available": "Auf Version {version} aktualisieren",
+    "widgets.update.anyway": "Kein Update verfügbar - Trotzdem aktualisieren?",
+    "widgets.update.error.platform": "One-Click Update ist auf dieser Platform nicht verfübar. Stoppe den Server und führe 'node main.js update-all-widgets' aus.",
+    "widgets.update.done": "Widget update erfolgreich",
+    "widgets.update.confirm": "Warnung: Immer ein Backup machen bevor du das ausführst, für den Fall eines Fehlers. RCON Web Admin wird beendet, Updates werden installiert und RCON Web Admin wird automatisch neu gestartet. Sei dir darüber klar, dass im Fehlerfall du manuell den Node Server wieder starten musst.",
+    "widgets.update.progress": "Update wird ausgeführt. Du wirst gleich eine Disconnet Meldung sehen. Das Interface sollte automatisch neu laden wenn das Update fertig ist",
+    "settings.update": "Update Rcon Web Admin",
+    "settings.update.btn": "Jetzt aktualisieren",
+    "settings.logs": "RCON Web Admin Logdateien",
+    "settings.logs.info": "Falls irgendwas nicht so funktioniert wie erwartet dann findest du hier vielleicht hilfreiche Debug Meldungen.",
+    "settings.log.download": "Logs downloaden",
+    "settings.update.error.platform": "One-Click Update ist auf dieser Platform nicht verfübar. Stoppe den Server und führe 'node main.js update-core' aus.",
+    "core.update": "Update verfügbar",
+    "widget.update": "Widget Update verfügbar",
+    "server.cmd.restricted": "Du darfst diesen Serverbefehl nicht ausführen",
+    "server.options.restricted": "Du darfst die Optionen nicht bearbeiten",
+    "server.widget.restricted": "Du darfst dieses Widget nicht benutzen",
+    "dashboard": "Dashboard",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "save.edited": "Bearbeitung speichern",
+    "saved": "Gespeichert",
+    "delete": "Löschen",
+    "deleted": "Gelöscht",
+    "edit": "Bearbeiten",
+    "edited": "Bearbeited",
+    "submit": "Absenden",
+    "submitted": "Abgesendet",
+    "yes": "Ja",
+    "no": "Nein",
+    "on": "On",
+    "off": "Off",
+    "sure": "Bist du sicher?",
+    "modal.ok": "Ok",
+    "modal.accept": "Akzeptieren",
+    "modal.cancel": "Abbrechen",
+    "modal.title.alert": "Informationen",
+    "modal.title.confirm": "Bestätigung",
+    "modal.title.prompt": "Warten auf Eingabe",
+    "access.denied": "Zugriff verweigert",
+    "socket.disconnect": "Verbindung zum Backend geschlossen, erneuter Verbindungsversuch in 5 Sekunden..."
+};
+
+/**
+ * The current language, default to en
+ * @type {string}
+ */
+lang.language = "en";
+
+// check for a other supported language depending on the users defined languages
+if (navigator.languages) {
+    (function () {
+        for (var i = 0; i < navigator.languages.length; i++) {
+            var l = navigator.languages[i];
+            if (typeof lang.values[l] != "undefined") {
+                lang.language = l;
+                break;
+            }
+        }
+    })();
+}

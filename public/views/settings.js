@@ -45,7 +45,7 @@ View.register("settings", function (messageData) {
     var btn = $(".btn.update");
     btn.on("click", function () {
         var e = $(this);
-        Modal.confirm(t("settings.confirm"), function (success) {
+        Modal.confirm(t("widgets.update.confirm"), function (success) {
             if (success) {
                 e.remove();
                 note(t("widgets.update.progress"), "info", 6000);
