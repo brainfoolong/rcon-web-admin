@@ -1,6 +1,6 @@
 # RCON Web Admin | Alpha
 
-RCON Web Admin as a powerful web interface to control your RCON server, e.g: for Rust game servers, but not limited to. Every RCON server will work.
+RCON Web Admin as a powerful web interface to control your RCON server. Every RCON server will work.
 
 The most powerful feature is that this web admin can run on a server, raspberry pi or another device that is online 24/7. It does all jobs for you, even if you are not connected to the interface. You can install it almost everywhere.
 
@@ -17,6 +17,7 @@ So imagine you've set-up rcon web admin so that it check users for high ping, VA
 * Powerful widget system - Developers can add new features for the dashboard easily
 * Responsible - The frontend is designed for every device, desktop or smartphone.
 * Run on every device that can install node.js
+* Multilanguage
 * rcon.web support (Even better as normal RCON sockets because of proper encoding)
 * So many more... Give it a try
 
