@@ -266,7 +266,7 @@ Widget.install = function (repository, callback) {
         // delete existing folder
         fstools.deleteRecursive(repoDir);
     }
-    fs.mkdir(repoDir, '0777', function (err) {
+    fs.mkdir(repoDir, 777, function (err) {
         if (err) {
             console.error("Cannot create widget directory", err);
             callback(false);
@@ -278,13 +278,13 @@ Widget.install = function (repository, callback) {
                 callback(false);
                 return;
             }
-            fs.writeFile(repoDir + "/master.zip", contents, {"mode": '0777'}, function () {
+            fs.writeFile(repoDir + "/master.zip", contents, {"mode": 777}, function () {
                 fs.createReadStream(repoDir + "/master.zip").pipe(unzip.Parse()).on('entry', function (entry) {
                     var fileName = entry.path.split("/").slice(1).join("/");
                     if (!fileName.length) return;
                     var path = repoDir + "/" + fileName;
                     if (entry.type == "Directory") {
-                        fs.mkdirSync(path, '0777');
+                        fs.mkdirSync(path, 777);
                         entry.autodrain();
                     } else {
                         entry.pipe(fs.createWriteStream(path));
