@@ -134,6 +134,7 @@ View.register("index", function (messageData) {
             $.get("widgets/" + widgetData.id + "/README.md", function (data) {
                 var container = widget.container.find(".widget-readme");
                 container.html(new showdown.Converter().makeHtml(data));
+                container.find("img").remove();
                 container.prepend('<div class="github-info">' +
                     '<a href="https://github.com/' + widget.data.manifest.repository + '" ' +
                     'target="_blank">Version ' + widget.data.manifest.version + ' on Github</a></div>')

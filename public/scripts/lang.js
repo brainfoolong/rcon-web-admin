@@ -99,7 +99,7 @@ lang.values.en = {
     "servers.active.title" : "Active",
     "servers.active.info" : "If no than this server is not available in the dashboard and do not execute any backend jobs",
     "servers.webrcon.title" : "Web Rcon",
-    "servers.webrcon.info" : "Especially Rust provide a Web Rcon interface. This must be yes if server is started with rcon.web 1",
+    "servers.webrcon.info" : "Especially Rust provide a Web Rcon interface. This must be yes if server is started with rcon.web 1. If available, this feature should be used because of a way better performance and stability.",
     "servers.users.title": "Assigned users",
     "servers.users.info": "Only the given user's will see this server",
     "delete.confirm": "Are you sure? This cannot be undone!",
