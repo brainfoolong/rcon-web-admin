@@ -347,6 +347,9 @@ View.register("index", function (messageData) {
             var widget = new Widget("");
             widget.data = {};
             widget.data.manifest = messageData.widgets[i];
+            if (messageData.sessionUserData.admin && widget.data.manifest._latestVersion && widget.data.manifest._latestVersion != widget.data.manifest.version) {
+                $(".top-logo .widget-update").removeClass("hidden");
+            }
             // check if widget is compatible with this server
             if (
                 widget.data.manifest.compatibleGames !== "all"

@@ -17,6 +17,9 @@ View.register("widgets", function (messageData) {
             widgetEl.find("small").text(widget.t("description"));
             widgetEl.find(".games .text").text(widgetRow.compatibleGames == "all" ? "All" : widgetRow.compatibleGames.join(", "));
             widgetEl.find(".update").text(t(newVersion ? "widgets.update.available" : "widgets.update.anyway", {"version": widgetRow._latestVersion})).removeClass("hidden");
+            if (!newVersion) {
+                widgetEl.find(".update").addClass("btn-default").removeClass("btn-info");
+            }
             container.append(widgetEl);
         }
     }
