@@ -45,7 +45,7 @@ function Rcon(host, port, server) {
      * Callback store.
      * @type {[]}
      */
-    this.callbacks = [];
+    this.callbacks = [0];
 
     /**
      * RCON connection.
@@ -140,19 +140,19 @@ Rcon.prototype.connect = function (callback) {
         this.socket.on("message", function (message) {
             if (message) {
                 var json = JSON.parse(message);
-                var cb = self.callbacks[json.Identifier] || {};
+                var cb = self.callbacks[json.Identifier] || null;
                 self.callbacks[message.Identifier] = null;
                 var response = {
                     "size": json.Message.length,
                     "id": json.Identifier,
                     "type": 0,
                     "body": json.Message,
-                    "user": cb.user || null,
+                    "user": cb && cb.user  ? cb.user : null,
                     "timestamp": new Date(),
-                    "log": cb.log || false
+                    "log": cb ? cb.log : true
                 };
                 try {
-                    if (cb.callback) cb.callback(json.Message);
+                    if (cb && cb.callback) cb.callback(json.Message);
                 } catch (e) {
                     console.error(new Date(), "RconServer [" + serverName + "]: send callback error", e, e.stack);
                 }
