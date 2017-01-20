@@ -88,7 +88,7 @@ var View = function (user, messageData, callback) {
             }
         } else {
             // create server folder
-            fs.mkdirSync(__dirname + "/../../db/server_" + id, 0o777);
+            fs.mkdirSync(__dirname + "/../../db/server_" + id, '0777');
         }
         messageData.id = null;
         deeperCallback({
