@@ -14,18 +14,24 @@ So imagine you've set-up rcon web admin so that it check users for high ping, VA
 
 * Full administration via your browser, it's just a website
 * Unlimited users and servers, Admin roles can manage servers, users can use the dashboard
+* Ever more fine granulated user permissions to restrict access to specific server commands and interface features. If you want a user that only can use the 'say' command, you can do it.
 * Powerful widget system - Developers can add new features for the dashboard easily
 * Responsible - The frontend is designed for every device, desktop or smartphone.
-* Run on every device that can install node.js
-* Multilanguage
-* rcon.web support (Even better as normal RCON sockets because of proper encoding)
+* Run on every device that can install *node.js*
+* Multilanguage interface
+* rcon.web support (Even better as normal RCON sockets because of better stability)
+* Core widgets and their top features
+  * Console - Provide a console interface to directly use rcon web commands in the most low level form
+  * Autobot - For advanced users, a programmatic interface to write your own little code with high level features
+  * Rustboard - A dedicated widget for the game 'Rust', provides a lot usefull tools such as playerlist, banlist, chat, kick/ban/admins/mods, steam information incl. VAC ban checks, and a lot more
+  * Timed Commands - As the name say, you can easily schedule any server command you want to execute on a specific date or time.
 * So many more... Give it a try
 
 ## Supported/tested games
 
-* Rust
-* Counter-Strike: Go
-* Minecraft
+* Rust (Most tested at the moment)
+* Counter-Strike: Go (Basic tests with the console widget)
+* Minecraft (Basic tests with the console widget)
 
 ## Widgets 
 The widgets are powerful, they deserve an extra header here. All dashboard things are written in widgets. From the simplest to the most powerful tool, widgets are the way to go. They are some sort of "High level" programs inside the rcon web admin. You don't have to dig much into the code to write widgets. It's basically HTML and JS.
