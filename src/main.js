@@ -57,13 +57,13 @@ if (mode == "update-core") {
             return;
         }
         var dir = __dirname + "/..";
-        fs.writeFile(dir + "/master.zip", contents, {"mode": 777}, function () {
+        fs.writeFile(dir + "/master.zip", contents, {"mode": 0o777}, function () {
             fs.createReadStream(dir + "/master.zip").pipe(unzip.Parse()).on('entry', function (entry) {
                 var fileName = entry.path.split("/").slice(1).join("/");
                 if (!fileName.length) return;
                 var path = dir + "/" + fileName;
                 if (entry.type == "Directory") {
-                    if (!fs.existsSync(path)) fs.mkdirSync(path, 777);
+                    if (!fs.existsSync(path)) fs.mkdirSync(path, 0o777);
                     entry.autodrain();
                 } else {
                     entry.pipe(fs.createWriteStream(path));
