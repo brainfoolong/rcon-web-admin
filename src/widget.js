@@ -260,6 +260,9 @@ Widget.install = function (repository, callback) {
     var unzip = require("unzip");
     var dir = fs.realpathSync(__dirname + "/../public/widgets");
     dir = dir.replace(/\\/g, "/");
+    if (repository.match(/^https/)) {
+        repository = repository.match(/https:\/\/github\.com\/([^\/]+\/[^\/\?\#]+)/)[1];
+    }
     var id = repository.split("/")[1];
     var repoDir = dir + "/" + id;
     if (fs.existsSync(repoDir)) {

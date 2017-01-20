@@ -21,8 +21,8 @@ function View(user, messageData, callback) {
     var dir = __dirname + "/../..";
     switch (messageData.action) {
         case "install":
-            if (os.platform() != "linux" || !widget) {
-                callback({"message": "widgets.update.error.platform", "type": "danger"});
+            if (os.platform() != "linux") {
+                callback({"message": "widgets.install.error.platform", "type": "danger"});
                 return;
             }
             exec("cd " + dir + " && sh startscripts/start-linux.sh stop && node src/main.js install-widget " + messageData.widget + " && startscripts/start-linux.sh start", null, function () {
