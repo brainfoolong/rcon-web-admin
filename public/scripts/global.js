@@ -29,7 +29,7 @@ function t(key, params) {
 
 /**
  * Display a loading spinner in a given element
- * @param {string|jQuery} el
+ * @param {string|JQuery} el
  */
 function spinner(el) {
     el = $(el);
@@ -62,7 +62,7 @@ function note(message, type, delay) {
 
 /**
  * Populate form data properties
- * @param {jQuery} form
+ * @param {JQuery} form
  * @param {object} data
  */
 function populateForm(form, data) {
@@ -101,7 +101,7 @@ function escapeHtml(string) {
 
 /**
  * Initialize all collapsables in given container
- * @param {jQuery} container
+ * @param {JQuery} container
  */
 function collapsable(container) {
     container.find(".collapsable-trigger").not("activated").addClass("activated").trigger("collapsable-init");
@@ -109,7 +109,7 @@ function collapsable(container) {
 
 /**
  * Initialize all textarea autoheights
- * @param {jQuery} container
+ * @param {JQuery} container
  */
 function textareaAutoheight(container) {
     container.find('textarea.autoheight').not(".autoheight-activated").each(function () {

@@ -36,7 +36,7 @@ lang.get = function (key, params) {
 
 /**
  * Replace all placeholders in html with proper translation values
- * @param {jQuery} el The element to replace values in
+ * @param {JQuery} el The element to replace values in
  * @param {Widget=} widget If given than use the t() function of the widget
  */
 lang.replaceInHtml = function (el, widget) {

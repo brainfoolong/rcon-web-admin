@@ -77,6 +77,6 @@ function View(user, messageData, callback) {
     }
     // just pipe to frontend
     deeperCallback({});
-};
+}
 
 module.exports = View;

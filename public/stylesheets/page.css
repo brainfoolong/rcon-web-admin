@@ -85,7 +85,6 @@ html {
     background-color: #1c1c1c;
     -webkit-transition: width .2s ease-in;
     -moz-transition: width .2s ease-in;
-    -ms-transition: width .2s ease-in;
     transition: width .2s ease-in;
 
 }
@@ -132,7 +131,6 @@ html {
     width: 100%;
     -webkit-transition: width .2s ease-in;
     -moz-transition: width .2s ease-in;
-    -ms-transition: width .2s ease-in;
     transition: width .2s ease-in;
 
 }
@@ -165,9 +163,7 @@ html {
 }
 
 .sidebar-nav > .sidebar-brand div {
-    padding: 25px;
-    padding-left: 0;
-    padding-right: 0;
+    padding: 25px 0;
 }
 
 .sidebar-nav .dropdown-menu {
@@ -197,7 +193,6 @@ html {
     border: none;
     -webkit-transition: all .2s ease;
     -moz-transition: all .2s ease;
-    -ms-transition: all .2s ease;
     transition: all .2s ease;
 }
 

@@ -16,13 +16,13 @@ function Widget(id) {
     this.id = id;
     /** @type {string[]} */
     this.socketMessageHandlers = [];
-    /** @type {jQuery} */
+    /** @type {JQuery} */
     this.container = null;
-    /** @type {jQuery} */
+    /** @type {JQuery} */
     this.content = null;
     /** @type {object} */
     this.data = null;
-    /** @type {jQuery|null} */
+    /** @type {JQuery|null} */
     this.templateEl = null;
 
     /**
@@ -75,7 +75,7 @@ function Widget(id) {
     /**
      * Load the html template file and return the jquery object for it
      * @param {string=} selector Optional selector to select a given element
-     * @returns {jQuery}
+     * @returns {JQuery}
      */
     this.template = function (selector) {
         var el = null;
@@ -302,7 +302,7 @@ Widget.widgets = {};
 
 /**
  * Get widget by given html element
- * @param {string|jQuery} el
+ * @param {string|JQuery} el
  * @return {Widget|null}
  */
 Widget.getByElement = function (el) {

@@ -12,7 +12,7 @@ var option = {};
  * @param {string|null} info
  * @param {*} value
  * @param {*} data
- * @returns {jQuery}
+ * @returns {JQuery}
  */
 option.createHtmlFromData = function (id, label, info, value, data) {
     var el = $('<div class="option">');
@@ -81,7 +81,7 @@ option.createHtmlFromData = function (id, label, info, value, data) {
 
 /**
  * Get input value for given option element
- * @param {jQuery} el
+ * @param {JQuery} el
  * @returns {*}
  */
 option.getValueOfElement = function (el) {

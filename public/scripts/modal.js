@@ -7,7 +7,7 @@ var Modal = {};
 
 /**
  * Show alert box
- * @param {string} message
+ * @param {string|JQuery} message
  * @param {function=} callback
  */
 Modal.alert = function (message, callback) {
@@ -22,7 +22,7 @@ Modal.alert = function (message, callback) {
 
 /**
  * Show confirm box
- * @param {string} message
+ * @param {string|JQuery} message
  * @param {function=} callback
  */
 Modal.confirm = function (message, callback) {
@@ -48,7 +48,7 @@ Modal.confirm = function (message, callback) {
 
 /**
  * Show confirm box
- * @param {string} message
+ * @param {string|JQuery} message
  * @param {string} placeholder
  * @param {function=} callback
  */

@@ -195,7 +195,7 @@ RconServer.connectAll = function () {
  * Get the server instance for given id
  * Connect to server if not yet connected
  * @param {string} id
- * @param {boolean} connect If false or not set than return null if no connection exist
+ * @param {boolean=} connect If false or not set than return null if no connection exist
  * @return {RconServer|null}
  */
 RconServer.get = function (id, connect) {
