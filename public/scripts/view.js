@@ -139,6 +139,7 @@ View.load = function (view, messageData, callback) {
                 // init selectpicker
                 $('.selectpicker').selectpicker();
                 collapsable(c);
+                dismissable(c);
             });
         };
         if (typeof View.views[viewData.view] == "undefined") {

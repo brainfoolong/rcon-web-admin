@@ -108,6 +108,18 @@ function collapsable(container) {
 }
 
 /**
+ * Initialize all dismissable in given container
+ * @param {JQuery} container
+ */
+function dismissable(container) {
+    container.find(".dismissable").not("activated").addClass("activated").each(function () {
+        if (!$(this).find("button").length) {
+            $(this).prepend('<button type="button" class="close "><span>&times;</span></button>');
+        }
+    }).find("button.close").trigger("dismissable-init")
+}
+
+/**
  * Initialize all textarea autoheights
  * @param {JQuery} container
  */
@@ -218,8 +230,33 @@ $(function () {
                 target.toggleClass("collapsed", flag);
             }
         }
+    }).on("click dismissable-init", ".dismissable button", function (ev) {
+        var e = $(this);
+        var target = $(this).closest(".alert");
+        var targetId = target.attr("data-id");
+        if (!targetId) {
+            note("Dismissable data-id attribute missing", "danger");
+            return;
+        }
+        if (target.length) {
+            var o = Storage.get("dismissable") || {};
+            if (ev.type != "dismissable-init") {
+                target.remove();
+                o[targetId] = true;
+                Storage.set("dismissable", o);
+                note("dismissed.info", "info");
+            } else {
+                if (o[targetId] === true) {
+                    target.remove();
+                }
+            }
+        }
+    }).on("click", ".show-dismissable", function (ev) {
+        Storage.set("dismissable", null);
+        window.location.reload();
     });
     collapsable(body);
+    dismissable(body);
     lang.replaceInHtml(body);
     // socket stuff
     Socket.connectAndLoadView();

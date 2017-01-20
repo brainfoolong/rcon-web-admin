@@ -58,6 +58,7 @@ View.register("index", function (messageData) {
             });
             sortWidgetElements();
             collapsable(c);
+            dismissable(c);
         });
     };
 

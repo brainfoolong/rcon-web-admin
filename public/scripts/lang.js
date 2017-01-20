@@ -165,7 +165,9 @@ lang.values.en = {
     "modal.title.confirm": "Confirmation",
     "modal.title.prompt": "Prompt",
     "access.denied": "Access denied",
-    "socket.disconnect": "Connection to backend closed, automatically trying to reconnect in 5 seconds..."
+    "socket.disconnect": "Connection to backend closed, automatically trying to reconnect in 5 seconds...",
+    "show.dismissable" : "Show all dismissed messages again",
+    "dismissed.info" : "You can view the message again if you goto to sidebar navigation. On the bottom there is a button."
 };
 
 // de values
@@ -276,7 +278,9 @@ lang.values.de = {
     "modal.title.confirm": "Bestätigung",
     "modal.title.prompt": "Warten auf Eingabe",
     "access.denied": "Zugriff verweigert",
-    "socket.disconnect": "Verbindung zum Backend geschlossen, erneuter Verbindungsversuch in 5 Sekunden..."
+    "socket.disconnect": "Verbindung zum Backend geschlossen, erneuter Verbindungsversuch in 5 Sekunden...",
+    "show.dismissable" : "Ausgeblendete Nachrichten wieder anzeigen",
+    "dismissed.info" : "Du kannst diese Nachrichten wieder einblenden wenn du in der Sidebar Navigation ganz unten schaust. Da gibt es einen Button."
 };
 
 /**

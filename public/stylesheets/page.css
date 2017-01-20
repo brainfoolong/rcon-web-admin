@@ -8,8 +8,14 @@ html {
     height: 100%;
 }
 
-a, a:hover, a:active {
+a, a:hover, a:active,
+.navbar-inverse .btn-link:hover, .navbar-inverse .btn-link:focus {
     color: #35acdf;
+}
+
+.nav .show-dismissable {
+    white-space: normal;
+    opacity: 0.5
 }
 
 .nav .open > a,
