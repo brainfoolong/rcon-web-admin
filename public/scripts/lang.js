@@ -167,7 +167,11 @@ lang.values.en = {
     "access.denied": "Access denied",
     "socket.disconnect": "Connection to backend closed, automatically trying to reconnect in 5 seconds...",
     "show.dismissable" : "Show all dismissed messages again",
-    "dismissed.info" : "You can view the message again if you goto to sidebar navigation. On the bottom there is a button."
+    "dismissed.info" : "You can view the message again if you goto to sidebar navigation. On the bottom there is a button.",
+    "widgets.install" : "Install a new widget",
+    "widgets.install.info" : "You can install user made widgets easily. Just paste the full github repository URL, inclusive https://. If this repository is a valid RCON web admin widget than it will be installed. RCON web admin will restart during this process. Always make sure to have a backup of your RCON web admin in case you install a corrupt widget that destroy your installation. Generally it's recommended, in case of any error and unavailability of the interface, to just delete the widget folder in 'public/widgets/xxx' and restart the web admin.",
+    "widgets.install.btn" : "Install now",
+    "widgets.install.invalid" : "Invalid widget repository"
 };
 
 // de values
@@ -280,7 +284,11 @@ lang.values.de = {
     "access.denied": "Zugriff verweigert",
     "socket.disconnect": "Verbindung zum Backend geschlossen, erneuter Verbindungsversuch in 5 Sekunden...",
     "show.dismissable" : "Ausgeblendete Nachrichten wieder anzeigen",
-    "dismissed.info" : "Du kannst diese Nachrichten wieder einblenden wenn du in der Sidebar Navigation ganz unten schaust. Da gibt es einen Button."
+    "dismissed.info" : "Du kannst diese Nachrichten wieder einblenden wenn du in der Sidebar Navigation ganz unten schaust. Da gibt es einen Button.",
+    "widgets.install" : "Installiere ein neues Widget",
+    "widgets.install.info" : "Du kannst Widgets von der Community ganz einfach installieren. Füge dazu die Github Repository URL ein, inklusive https://. Falls das Repository ein gültiges Widget Repository ist wird es installiert. Dazu wird RCON Web Admin neu gestartet. Mache immer ein Backup im Falle eines Fehlers oder fehlerhaften Widgets. Generell ist empfohlen erst einmal, bei einem fehlerhaften Widget, den Widget Folder unter 'public/widgets/xxx' zu löschen und das Web Admin neu zu starten.",
+    "widgets.install.btn" : "Jetzt installieren",
+    "widgets.install.invalid" : "Kein korrektes Widget Repository"
 };
 
 /**

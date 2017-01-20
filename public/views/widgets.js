@@ -2,6 +2,7 @@
 View.register("widgets", function (messageData) {
     var widgetTpl = $(".widget-row");
     var container = $(".widgets-installed");
+
     for (var widgetIndex in messageData.widgets) {
         if (messageData.widgets.hasOwnProperty(widgetIndex)) {
             var widgetRow = messageData.widgets[widgetIndex];
@@ -40,5 +41,30 @@ View.register("widgets", function (messageData) {
                 });
             }
         });
+    })
+    $("#content").on("click", ".install", function () {
+        var repo = $("#content").find(".widget-url").val();
+        if (repo.length && repo.match(/https:\/\/github\.com\/(.*?)\/(.*)/)) {
+            var id = repo.match(/https:\/\/github\.com\/([^\/]+\/[^\/\?\#]+)/)[1];
+            $.getJSON("https://raw.githubusercontent.com/" + id + "/master/manifest.json", function (data) {
+                if (!data || !data.version || !data.compatibleGames || !data.repository) {
+                    note(t("widgets.install.invalid"), "danger");
+                    return;
+                }
+                Modal.confirm(t("sure"), function (success) {
+                    if (success) {
+                        Socket.send("view", {
+                            "view": "widgets",
+                            "action": "install",
+                            "widget": id
+                        }, function (data) {
+                            note(data.message, data.type, 10000);
+                        });
+                    }
+                });
+            });
+        } else {
+            note(t("widgets.install.invalid"), "danger");
+        }
     });
 });

@@ -18,14 +18,23 @@ function View(user, messageData, callback) {
         return;
     }
     var widget = null;
+    var dir = __dirname + "/../..";
     switch (messageData.action) {
+        case "install":
+            if (os.platform() != "linux" || !widget) {
+                callback({"message": "widgets.update.error.platform", "type": "danger"});
+                return;
+            }
+            exec("cd " + dir + " && sh startscripts/start-linux.sh stop && node src/main.js install-widget " + messageData.widget + " && startscripts/start-linux.sh start", null, function () {
+                callback({"message": "widgets.update.progress", "type": "info"});
+            });
+            break;
         case "update":
             widget = Widget.get(messageData.widget);
             if (os.platform() != "linux" || !widget) {
                 callback({"message": "widgets.update.error.platform", "type": "danger"});
                 return;
             }
-            var dir = __dirname + "/../..";
             exec("cd " + dir + " && sh startscripts/start-linux.sh stop && node src/main.js install-widget " + widget.manifest.repository + " && startscripts/start-linux.sh start", null, function () {
                 callback({"message": "widgets.update.progress", "type": "info"});
             });

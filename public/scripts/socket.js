@@ -119,11 +119,11 @@ Socket.connect = function (callback) {
          */
         con.onclose = function () {
             Socket.con = null;
-            // try reconnect
+            // reload page after 5 seconds
             note("socket.disconnect", "danger");
             spinner("#content");
-            Interval.create("socket.reconnect", function () {
-                Socket.connectAndLoadView();
+            setTimeout(function () {
+                window.location.reload();
             }, 5000);
         };
     };
