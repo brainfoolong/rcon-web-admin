@@ -231,7 +231,6 @@ $(function () {
             }
         }
     }).on("click dismissable-init", ".dismissable button", function (ev) {
-        var e = $(this);
         var target = $(this).closest(".alert");
         var targetId = target.attr("data-id");
         if (!targetId) {
@@ -241,13 +240,13 @@ $(function () {
         if (target.length) {
             var o = Storage.get("dismissable") || {};
             if (ev.type != "dismissable-init") {
-                target.remove();
+                target.removeClass("visible");
                 o[targetId] = true;
                 Storage.set("dismissable", o);
                 note("dismissed.info", "info");
             } else {
-                if (o[targetId] === true) {
-                    target.remove();
+                if (o[targetId] !== true) {
+                    target.addClass("visible");
                 }
             }
         }
