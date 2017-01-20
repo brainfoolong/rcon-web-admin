@@ -19,6 +19,7 @@ So imagine you've set-up rcon web admin so that it check users for high ping, VA
 * Responsible - The frontend is designed for every device, desktop or smartphone.
 * Run on every device that can install *node.js*
 * Multilanguage interface
+* One-Click update for the core and all installed widgets
 * rcon.web support (Even better as normal RCON sockets because of better stability)
 * Core widgets and their top features
   * Console - Provide a console interface to directly use rcon web commands in the most low level form
