@@ -20,6 +20,7 @@ If you've developed a widget and you think it's good for a core widget than you 
 * https://github.com/brainfoolong/rwa-autobot
 * https://github.com/brainfoolong/rwa-console
 * https://github.com/brainfoolong/rwa-rustboard
+* https://github.com/brainfoolong/rwa-timedcommands
 
 
 ## Tips
