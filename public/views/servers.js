@@ -28,6 +28,7 @@ View.register("servers", function (messageData) {
             '<td>' + server.game.toUpperCase() + '</td>' +
             '<td>' + server.name + '</td>' +
             '<td>' + server.rcon_port + '</td>' +
+            '<td>' + (server.active === false ? t("no") : t("yes")) + '</td>' +
             '<td><a href="#servers" data-message="' + View.getAttributeMessage({id: server.id}) + '" data-translate="edit" ' +
             'class="btn btn-info btn-sm page-link"></a></td>' +
             '</tr>');

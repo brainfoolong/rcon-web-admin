@@ -72,6 +72,7 @@ var View = function (user, messageData, callback) {
         serverData.host = formData.host;
         serverData.users = formData.users;
         serverData.web = formData.web == "yes";
+        serverData.active = formData.active == "yes";
         serverData.rcon_port = parseInt(formData.rcon_port);
         serverData.rcon_password = formData.rcon_password;
         db.get("servers").set(id, serverData).value();

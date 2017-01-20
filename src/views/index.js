@@ -47,6 +47,7 @@ var View = function (user, messageData, callback) {
     (function () {
         for (var i in servers) {
             var server = servers[i];
+            if (server.active === false) continue;
             var found = user.userData.admin;
             var users = server.users;
             if (users) {

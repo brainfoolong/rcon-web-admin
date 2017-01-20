@@ -96,6 +96,8 @@ lang.values.en = {
     "servers.rcon_password.info": "Will be stored as cleartext in database. Required to run background " +
     "cronjobs for scheduled tasks. Don't panic, it's not readable without server access." +
     "The one that means 'rcon.password' in console",
+    "servers.active.title" : "Active",
+    "servers.active.info" : "If no than this server is not available in the dashboard and do not execute any backend jobs",
     "servers.webrcon.title" : "Web Rcon",
     "servers.webrcon.info" : "Especially Rust provide a Web Rcon interface. This must be yes if server is started with rcon.web 1",
     "servers.users.title": "Assigned users",
@@ -147,6 +149,7 @@ lang.values.en = {
     "settings.log.download": "Download logfiles",
     "settings.update.error.platform": "One click update is not supported on this platform. Please shutdown server and run 'node main.js update-core' manually on the command line.",
     "core.update": "Update available",
+    "widget.update" : "Widget update available",
     "server.cmd.restricted": "You are not allowed to execute this server command",
     "server.options.restricted": "You are not allowed to edit options",
     "server.widget.restricted": "You are not allowed to use this widget",

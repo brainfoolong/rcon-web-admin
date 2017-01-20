@@ -185,6 +185,7 @@ RconServer.connectAll = function () {
     var servers = db.get("servers").value();
     if (servers) {
         for (var i in servers) {
+            if (servers[i].active === false) continue;
             RconServer.get(servers[i].id, true);
         }
     }
