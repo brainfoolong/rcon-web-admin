@@ -172,7 +172,7 @@ lang.values.en = {
 lang.values.de = {
     "users.title": "Benutzerverwaltung",
     "users.username.title": "Benutzername",
-    "users.username.info": "Nury A-Z, Nummern, - und _ allowed",
+    "users.username.info": "Nur A-Z, Nummern, - und _ erlaubt",
     "users.password.title": "Passwort",
     "users.password.info": "Wiederholen falls es geändert wird, leerlassen wenn keine Änderung erwünscht. Wird als Hash gespeichert.",
     "users.admin.title": "Administrator",
@@ -182,7 +182,7 @@ lang.values.de = {
     "users.restrictwidgets.title": "Deaktivierte Widgets",
     "users.restrictwidgets.info": "Die hier angegebenen Widgets können vom Nutzer nicht gewählt oder gesehen werden",
     "users.readonlyoptions.title": "Read-Only Widget Optionen",
-    "users.readonlyoptions.info": "Der Nutzer kann Widget zwar sehen aber keine Optionen im Optionen Tab editieren",
+    "users.readonlyoptions.info": "Der Nutzer kann Widgets zwar sehen aber keine Optionen im Optionen Tab editieren",
     "users.error.pwmatch": "Passwörter stimmen nicht überein",
     "users.missing.admin": "Mindestens ein Administrator muss existieren",
     "settings.title": "Einstellungen",

@@ -8,6 +8,10 @@ html {
     height: 100%;
 }
 
+a, a:hover, a:active {
+    color: #35acdf;
+}
+
 .nav .open > a,
 .nav .open > a:hover,
 .nav .open > a:focus {
@@ -344,8 +348,8 @@ h1 {
 
 h2 {
     font-size: 24px;
-    border-left: 2px solid #6cfeae;
-    color: #6cfeae;
+    border-left: 2px solid #6cd4fe;
+    color: #a7a7a7;
     padding-left: 20px;
 }
 
