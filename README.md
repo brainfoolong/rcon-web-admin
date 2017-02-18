@@ -1,4 +1,4 @@
-# RCON Web Admin | Alpha
+# RCON Web Admin | Beta
 
 RCON Web Admin as a powerful web interface to control your RCON server. Every RCON server will work.
 
@@ -62,6 +62,9 @@ Just run all of this commands in the shell. **Note**: Never run this application
     
 ## Installation Raspberry pi
 See FAQ bellow.
+
+## Installation Docker
+[itzg](https://hub.docker.com/r/itzg/) have made a great docker container for rcon web admin. If you prefer docker, you can do it with https://hub.docker.com/r/itzg/rcon/
     
 ## Start/Stop on Linux
 
