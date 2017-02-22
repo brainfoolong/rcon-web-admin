@@ -33,6 +33,7 @@ So imagine you've set-up rcon web admin so that it check users for high ping, VA
 * Rust (Most tested at the moment)
 * Counter-Strike: Go (Basic tests with the console widget)
 * Minecraft (Basic tests with the console widget)
+* Note: Every other RCON supporting game server will work, it's just untested but console widget is generic for all games
 
 ## Widgets 
 The widgets are powerful, they deserve an extra header here. All dashboard things are written in widgets. From the simplest to the most powerful tool, widgets are the way to go. They are some sort of "High level" programs inside the rcon web admin. You don't have to dig much into the code to write widgets. It's basically HTML and JS.
@@ -61,7 +62,13 @@ Just run all of this commands in the shell. **Note**: Never run this application
     chmod 0755 -R startscripts *
     
 ## Installation Raspberry pi
-See FAQ bellow.
+Same as linux. You may not be able to run the server or `npm install`, or even the node modules do not download. This will be because of a very old npm/nodejs version (for old raspberry pi for example). So you have to update nodejs and npm to a new version. **Warning**: This will delete old nodejs and npm installation. Make some backups before you do this.
+
+    sudo apt-get purge nodejs npm
+    ## Pi2 | wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv7l.tar.xz -O node.tar.xz
+    ## Pi A/A+, B/B+ und Zero (ARMv6) | wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv6l.tar.xz -O node.tar.xz
+    tar -xvf node.tar.xz
+    cd node-v6.9.3-linux-armv*
 
 ## Installation Docker
 [itzg](https://hub.docker.com/r/itzg/) have made a great docker container for rcon web admin. If you prefer docker, you can do it with https://hub.docker.com/r/itzg/rcon/
@@ -90,18 +97,8 @@ On linux you can start the rcon web admin with your server start. For example on
 
 Goto https://github.com/brainfoolong/rcon-web-admin/tree/master/public/widgets for more information.
 
-## Installation FAQ
+## Troubleshooting
 
 Linux: If you've installed it and `node` as not available but `nodejs` is, than create a symlink with 
 
-    sudo ln -s `which nodejs` /usr/bin/node
-    
-RaspberryPi: You may not be able to run the server or `npm install`, or the node modules do not download. This will be because of a very old npm/nodejs version (for old raspberry pi for example). So you have to update nodejs and npm to a new version. **Warning**: This will delete old nodejs and npm installation. Make some backups before you do this.
-
-    sudo apt-get purge nodejs npm
-    ## Pi2 | wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv7l.tar.xz -O node.tar.xz
-    ## Pi A/A+, B/B+ und Zero (ARMv6) | wget https://nodejs.org/dist/v6.9.3/node-v6.9.3-linux-armv6l.tar.xz -O node.tar.xz
-    tar -xvf node.tar.xz
-    cd node-v6.9.3-linux-armv*
-    sudo cp -R * /usr/local/
-    
+    sudo ln -s `which nodejs` /usr/bin/node    
