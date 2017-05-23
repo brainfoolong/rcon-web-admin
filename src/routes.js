@@ -13,8 +13,8 @@ app.get("/", function (req, res) {
 });
 
 // output the required ws port number
-app.get("/wsport", function (req, res) {
-    res.send((config.port + 1).toString());
+app.get("/wsconfig", function (req, res) {
+    res.send(JSON.stringify({port : config.port + 1, sslUrl : config.websocketUrlSsl, url : config.websocketUrl}));
 });
 
 app.use(express.static(__dirname + "/../public"));

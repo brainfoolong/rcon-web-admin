@@ -8,6 +8,8 @@ var fs = require("fs");
  */
 var config = {
     "host": null,
+    "websocketUrlSsl": null,
+    "websocketUrl": null,
     "port": 4326
 };
 

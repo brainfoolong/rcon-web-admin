@@ -55,7 +55,9 @@ function View(user, messageData, callback) {
                     }
                 });
                 for (var j = 10; j < filesArr.length; j++) {
-                    fs.unlink(logdir + "/" + filesArr[j].file);
+                    fs.unlink(logdir + "/" + filesArr[j].file, function () {
+                      
+                    });
                     delete filesArr[i];
                 }
                 if (callback) callback({"files": filesArr});
@@ -73,7 +75,9 @@ function View(user, messageData, callback) {
             fs.readFile(file, "utf8", function (err, data) {
                 if (data.length > 1024 * 1024) {
                     data = data.substr(-(1024 * 1024 * 0.8));
-                    fs.writeFile(file, data);
+                    fs.writeFile(file, data, function () {
+
+                    });
                 }
                 callback({"content": data});
             });

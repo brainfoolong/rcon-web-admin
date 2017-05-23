@@ -17,8 +17,8 @@ Socket.queue = [];
 /** @type {{}} */
 Socket.onMessageEvents = {};
 
-/** @type {number|null} */
-Socket.port = null;
+/** @type {{}} */
+Socket.config = {};
 
 /**
  * Bind a callback to be triggered everytime a message is received
@@ -55,7 +55,13 @@ Socket.sendQueue = function () {
  */
 Socket.connect = function (callback) {
     var cb = function () {
-        var con = new WebSocket('ws://' + window.location.hostname + ':' + Socket.port);
+        var url = 'ws://' + window.location.hostname + ':' + Socket.config.port
+        if(location.protocol === 'https:' && Socket.config.sslUrl !== null){
+            url = Socket.config.sslUrl
+        } else if(Socket.config.url !== null){
+            url = Socket.config.url
+        }
+        var con = new WebSocket(url);
         /**
          * On open connection
          */
@@ -130,9 +136,9 @@ Socket.connect = function (callback) {
     if (Socket.port) {
         cb();
     } else {
-        // load the required port number
-        $.get("wsport", function (port) {
-            Socket.port = parseInt(port);
+        // load the required ws config
+        $.getJSON("wsconfig", function (config) {
+            Socket.config = config
             cb();
         });
     }
