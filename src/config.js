@@ -15,7 +15,10 @@ var config = {
 
 // load config.js if exist
 if (fs.existsSync(__dirname + "/../config.js")) {
-    config = require(__dirname + "/../config.js");
+    var configLocal = require(__dirname + "/../config.js");
+    for(var i in configLocal){
+        config[i] = configLocal[i];
+    }
 }
 
 module.exports = config;
