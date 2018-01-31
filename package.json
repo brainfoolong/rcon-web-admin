@@ -2,7 +2,7 @@
   "author": "BrainFooLong (https://github.com/brainfoolong/rcon-web-admin)",
   "name": "rcon-web-admin",
   "description": "Self hosted, online RCON administration tool for your server.",
-  "version": "0.13.1",
+  "version": "0.13.2",
   "license": "MIT",
   "main": "src/main.js",
   "repository": {
