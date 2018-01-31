@@ -1,12 +1,10 @@
-# RCON Web Admin | Beta
+# RCON Web Admin
 
 RCON Web Admin as a powerful web interface to control your RCON server. Every RCON server will work.
 
 The most powerful feature is that this web admin can run on a server, raspberry pi or another device that is online 24/7. It does all jobs for you, even if you are not connected to the interface. You can install it almost everywhere.
 
 So imagine you've set-up rcon web admin so that it check users for high ping, VAC status or chat filter. The RCON web admin does it 24/7 for you, no need to have a tool opened all the time.
-
-**Notice:** Currently this all is in alpha state and as with all software it need more tests to be stable. If you're interested, please help me with tests and your time. Also almost all things are currently tested for rust game servers. But the system is built to support every rcon server, like counterstrike, minecraft, etc...
 
 `if(youLikeThisRepository === true && spendMeSomeRedBullOrCoffee === true) echo I would really appriciate that` https://www.paypal.me/brainfoolong
 
