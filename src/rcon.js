@@ -57,13 +57,13 @@ function Rcon(host, port, server) {
      * Receive data buffer
      * @type {Buffer}
      */
-    this.dataBuffer = new Buffer(0);
+    this.dataBuffer = Buffer.alloc(0);
 
     /**
      * The received body buffer
      * @type string
      */
-    this.bodyBuffer = new Buffer(0);
+    this.bodyBuffer = Buffer.alloc(0);
 
     /**
      * Send queue
@@ -237,7 +237,7 @@ Rcon.prototype.send = function (cmd, user, log, callback, type) {
             type = Rcon.SERVERDATA_EXECCOMMAND;
         }
         if (!Buffer.isBuffer(cmd)) {
-            cmd = new Buffer(cmd);
+            cmd = Buffer.from(cmd);
         }
         // for auth request we handle a special callback
         if (type == Rcon.SERVERDATA_AUTH) {
@@ -256,7 +256,7 @@ Rcon.prototype.send = function (cmd, user, log, callback, type) {
             // write an extra empty request to be able to find multipart message boundings
             // minecraft dont have multipart packages so we need no end
             if (type != Rcon.SERVERDATA_AUTH && self.server.serverData.game != "minecraft") {
-                self.socket.write(self._pack(self.packetId, Rcon.SERVERDATA_RESPONSE_VALUE, new Buffer(0)));
+                self.socket.write(self._pack(self.packetId, Rcon.SERVERDATA_RESPONSE_VALUE, Buffer.alloc(0)));
                 self.packetId = self.nextPacketId();
             }
         });
@@ -328,7 +328,7 @@ Rcon.prototype._data = function () {
                 } catch (e) {
                     console.error(new Date(), "RconServer [" + serverName + "]: send callback error", e, e.stack);
                 }
-                this.bodyBuffer = new Buffer(0);
+                this.bodyBuffer = Buffer.alloc(0);
             }
             this.sendBlocked = false;
             this.processQueue();
@@ -353,7 +353,7 @@ Rcon.prototype._data = function () {
  * @private
  */
 Rcon.prototype._pack = function (id, type, body) {
-    var buf = new Buffer(body.length + 14);
+    var buf = Buffer.alloc(body.length + 14);
     buf.writeInt32LE(body.length + 10, 0);
     buf.writeInt32LE(id, 4);
     buf.writeInt32LE(type, 8);

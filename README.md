@@ -37,6 +37,9 @@ If you like to buy some coffee, i will appriciate it. You can do this on [Patreo
 ## Widgets 
 The widgets are powerful, they deserve an extra header here. All dashboard things are written in widgets. From the simplest to the most powerful tool, widgets are the way to go. They are some sort of "High level" programs inside the rcon web admin. You don't have to dig much into the code to write widgets. It's basically HTML and JS.
 
+## Requirements
+- NodeJS min. v5.10.0
+
 ## Installation Windows
 * Download and install node.js (https://nodejs.org)
 * Download zip repository and unpack wherever you want
