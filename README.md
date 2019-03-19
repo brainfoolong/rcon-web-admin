@@ -1,3 +1,6 @@
+### Project discontinued
+Because of lack of time, i must discontinue this project. It will stay online, it will probably work out of the box. Maybe someone can take over development for this project?! Feel free to fork it.
+
 # RCON Web Admin
 
 RCON Web Admin as a powerful web interface to control your RCON server. Every RCON server will work.
