@@ -1,5 +1,8 @@
+### Active development in this fork
+Lacaulac's fork is actively maintained -> https://github.com/lacaulac/rcon-web-admin
+
 ### Project discontinued
-Because of lack of time, i must discontinue this project. It will stay online, it will probably work out of the box. Maybe someone can take over development for this project?! Feel free to fork it.
+This repository is out of date. See above fork for a more recent version.
 
 # RCON Web Admin
 
@@ -8,9 +11,6 @@ RCON Web Admin as a powerful web interface to control your RCON server. Every RC
 The most powerful feature is that this web admin can run on a server, raspberry pi or another device that is online 24/7. It does all jobs for you, even if you are not connected to the interface. You can install it almost everywhere.
 
 So imagine you've set-up rcon web admin so that it check users for high ping, VAC status or chat filter. The RCON web admin does it 24/7 for you, no need to have a tool opened all the time.
-
-# Support me
-If you like to buy some coffee, i will appriciate it. You can do this on [Patreon](https://www.patreon.com/brainfoolong) or via [PayPal](https://www.paypal.me/brainfoolong)
 
 ## Features
 
