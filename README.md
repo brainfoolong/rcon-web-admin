@@ -1,8 +1,8 @@
 ### Active development in this fork
-Lacaulac's fork is actively maintained -> https://github.com/lacaulac/rcon-web-admin
+This fork is actively maintained -> https://github.com/rcon-web-admin/rcon-web-admin
 
 ### Project discontinued
-This repository is out of date. See above fork for a more recent version.
+I've initially created RCON Web Admin but now this repository is out of date. Other people have taken over development of this project. See above fork for a more recent version.
 
 # RCON Web Admin
 
