@@ -1,5 +1,3 @@
-### Active development in this fork
-
 ### Project discontinued
 I've initially created RCON Web Admin but now this repository is out of date. Other people have taken over development of this project. 
 This fork is actively maintained -> https://github.com/rcon-web-admin/rcon-web-admin
